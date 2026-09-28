@@ -1489,6 +1489,17 @@
 
   // 미리보기(preview.html)에서 아이폰 노치/홈바 영역 흉내
   if (/[?&]sim=1/.test(location.search)) { const r = document.documentElement.style; r.setProperty('--st', '0px'); r.setProperty('--sb', '21px'); r.setProperty('--sl', '59px'); r.setProperty('--sr', '59px'); }
+  // 가로 전용: 지원하는 기기(안드로이드 등)는 화면 방향을 가로로 고정.
+  // 아이폰은 웹에서 고정이 막혀 있어서, 세로로 인식되면 화면을 90도 돌려 가로로 표시 (onResize).
+  function lockLandscape() {
+    try {
+      const d = document.documentElement;
+      const p = d.requestFullscreen && !document.fullscreenElement ? d.requestFullscreen({ navigationUI: 'hide' }) : Promise.resolve();
+      Promise.resolve(p).then(() => screen.orientation && screen.orientation.lock && screen.orientation.lock('landscape')).catch(() => {});
+    } catch (e) {}
+  }
+  addEventListener('pointerdown', lockLandscape, { once: true });
+  addEventListener('orientationchange', () => setTimeout(onResize, 120));
   addEventListener('resize', onResize);
   onResize();
   setupInput();

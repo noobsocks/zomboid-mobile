@@ -282,12 +282,6 @@ svg{display:block}
 .ov-box h2{font-size:26px;margin-top:2px}
 .overlay{padding:16px calc(var(--sr) + 10px) 16px calc(var(--sl) + 10px)}
 
-/* 세로로 들면 안내 */
-#rotate{display:none;position:fixed;inset:0;z-index:99;background:var(--grain),#070707;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center}
-#rotate .rot-ic{width:84px;height:84px;color:var(--bone);animation:rot 2.4s ease-in-out infinite}
-#rotate b{font-family:var(--fh);font-weight:400;font-size:24px}
-#rotate small{font-size:13px;opacity:.6}
-@keyframes rot{0%,20%{transform:rotate(0)}50%,80%{transform:rotate(-90deg)}100%{transform:rotate(0)}}
 /* 세로로 인식될 때: 게임 전체를 90도 돌려 가로로 표시 */
 html.rot #app{inset:auto;top:0;transform-origin:0 0;transform:rotate(90deg)}
 html.rot{--sl:max(env(safe-area-inset-top),12px);--sr:max(env(safe-area-inset-bottom),12px);--st:6px;--sb:8px}
