@@ -32,14 +32,60 @@
     bat:     { name: '야구방망이', w: 1.5, type: 'melee', dmg: 1.3, range: 1.35, cd: .8, endu: 10, dur: 40, knock: .5, color: '#c8a06a', icon: 'bat' },
     pipe:    { name: '쇠파이프', w: 1.8, type: 'melee', dmg: 1.6, range: 1.4, cd: .95, endu: 12, dur: 70, knock: .6, color: '#8d99a3', icon: 'pipe' },
     pistol:  { name: '권총', w: 1, type: 'gun', dmg: 3.2, range: 9, cd: .55, noise: 24, color: '#111', icon: 'gun' },
-    ammo:    { name: '9mm 탄약', w: .02, type: 'ammo', icon: 'ammo' },
+    ammo:    { name: '9mm 탄약', w: .02, type: 'ammo', stack: true, icon: 'ammo' },
+    // --- 재료·도구 ---
+    plank:   { name: '판자', w: 1, type: 'mat', icon: 'plank' },
+    nails:   { name: '못', w: .01, type: 'mat', stack: true, icon: 'nails' },
+    cloth:   { name: '천 조각', w: .05, type: 'mat', stack: true, icon: 'cloth' },
+    scrap:   { name: '고철', w: .5, type: 'mat', icon: 'scrap' },
+    wire:    { name: '전선', w: .1, type: 'mat', icon: 'wire' },
+    tape:    { name: '덕트 테이프', w: .2, type: 'mat', uses: 4, icon: 'tape' },
+    glue:    { name: '접착제', w: .2, type: 'mat', uses: 3, icon: 'glue' },
+    shirt:   { name: '낡은 옷', w: .4, type: 'mat', icon: 'shirt' },
+    screwdriver: { name: '드라이버', w: .3, type: 'tool', icon: 'screwdriver' },
+    barricade: { name: '바리케이드 판자', w: 1.2, type: 'mat', icon: 'barricade' },
+    benchkit: { name: '작업대 (설치용)', w: 6, type: 'place', icon: 'bench' },
+    // --- 제작 무기 ---
+    nailbat: { name: '못 박힌 판자', w: 1.3, type: 'melee', dmg: 1.2, range: 1.25, cd: .8, endu: 10, dur: 30, knock: .45, color: '#a47a4c', icon: 'nailbat' },
+    spear:   { name: '창', w: 1.6, type: 'melee', dmg: 1.5, range: 1.8, cd: .85, endu: 10, dur: 45, knock: .3, color: '#8d99a3', icon: 'spear' },
   };
+  const STACK_ROLL = { ammo: [6, 15], nails: [3, 10], cloth: [2, 4] };
+  const TOOL_NAME = { hammer: '망치', screwdriver: '드라이버' };
+  // 제작 레시피: in = [아이템, 개수] (못·천은 개수, 테이프·접착제는 사용 횟수)
+  const RECIPES = [
+    { id: 'bandage',   in: [['cloth', 2]], out: 'bandage', time: 3 },
+    { id: 'barricade', in: [['plank', 1], ['nails', 2]], tools: ['hammer'], out: 'barricade', time: 4, noise: 5 },
+    { id: 'nailbat',   in: [['plank', 1], ['nails', 3]], tools: ['hammer'], out: 'nailbat', time: 5, noise: 5 },
+    { id: 'benchkit',  in: [['plank', 4], ['nails', 6]], tools: ['hammer'], out: 'benchkit', time: 10, noise: 6 },
+    { id: 'spear',     in: [['pipe', 1], ['knife', 1], ['tape', 1]], out: 'spear', time: 6, bench: true },
+  ];
+  // 가구 분해
+  const DISMANTLE = {
+    closet:  { tool: 'hammer', time: 7, noise: 7, out: [['plank', 3, 4], ['nails', 2, 5]] },
+    drawer:  { tool: 'hammer', time: 5, noise: 6, out: [['plank', 2, 3], ['nails', 1, 4]] },
+    cabinet: { tool: 'hammer', time: 5, noise: 6, out: [['plank', 2, 3], ['nails', 2, 4]] },
+    fridge:  { tool: 'screwdriver', time: 8, noise: 4, out: [['scrap', 2, 3], ['wire', 1, 2]] },
+    bench:   { tool: 'hammer', time: 6, noise: 6, out: [['plank', 2, 3], ['nails', 2, 4]] },
+  };
+  // 아이템 분해
+  const ITEM_DISMANTLE = {
+    shirt:   { time: 3, out: [['cloth', 2, 4]] },
+    bat:     { time: 3, out: [['plank', 1, 1]] },
+    nailbat: { tool: 'hammer', time: 3, noise: 4, out: [['plank', 1, 1], ['nails', 1, 2]] },
+    barricade: { tool: 'hammer', time: 3, noise: 4, out: [['plank', 1, 1], ['nails', 1, 2]] },
+    pipe:    { time: 2, out: [['scrap', 1, 2]] },
+    spear:   { time: 3, out: [['pipe', 1, 1]] },
+    knife:   { tool: 'screwdriver', time: 3, out: [['scrap', 1, 1]] },
+    hammer:  { tool: 'screwdriver', time: 3, out: [['scrap', 1, 1], ['plank', 0, 1]] },
+    pistol:  { tool: 'screwdriver', time: 6, out: [['scrap', 2, 2], ['wire', 0, 1]] },
+  };
+  const REPAIR = { tape: .35, glue: .55 }; // 최대 내구도 대비 회복량
   const FISTS = { name: '맨손', type: 'melee', dmg: .35, range: .85, cd: .5, endu: 4, knock: .25, icon: 'fist' };
   const LOOT = {
     fridge:  { name: '냉장고', color: '#f4f4f4', pool: [['apple', 3], ['bread', 2], ['water', 3], ['soda', 3], ['can', 1]], min: 1, max: 3 },
-    cabinet: { name: '찬장', color: '#a17a50', pool: [['can', 3], ['chips', 3], ['water', 1], ['bread', 1], ['pills', 1]], min: 0, max: 3 },
-    drawer:  { name: '서랍', color: '#7a5a3a', pool: [['bandage', 3], ['knife', 1.2], ['ammo', .8], ['pills', 2], ['hammer', .8]], min: 0, max: 2 },
-    closet:  { name: '옷장', color: '#5a432d', pool: [['bandage', 2], ['bat', 1.5], ['pipe', .8], ['pistol', .35], ['ammo', 1]], min: 0, max: 2 },
+    cabinet: { name: '찬장', color: '#a17a50', pool: [['can', 3], ['chips', 3], ['water', 1], ['bread', 1], ['pills', 1], ['tape', .8], ['glue', .6]], min: 0, max: 3 },
+    drawer:  { name: '서랍', color: '#7a5a3a', pool: [['bandage', 3], ['knife', 1.2], ['ammo', .8], ['pills', 2], ['hammer', .8], ['nails', 1.6], ['tape', 1], ['screwdriver', .9], ['glue', .5]], min: 0, max: 3 },
+    closet:  { name: '옷장', color: '#5a432d', pool: [['bandage', 2], ['bat', 1.5], ['pipe', .8], ['pistol', .35], ['ammo', 1], ['shirt', 2.5], ['cloth', 1]], min: 0, max: 3 },
   };
   const CAP = 15;          // 무게 한도
   const RING_C = 289;      // 버튼 링 둘레 (2π·46)
@@ -60,7 +106,9 @@
     const d = ITEMS[id];
     const it = { uid: G.uid++, id };
     if (d.dur) it.dur = Math.round(d.dur * (0.6 + r() * 0.4));
-    if (id === 'ammo') it.n = 6 + Math.floor(r() * 10);
+    if (STACK_ROLL[id]) { const [a, b] = STACK_ROLL[id]; it.n = a + Math.floor(r() * (b - a + 1)); }
+    else if (d.stack) it.n = 1;
+    if (d.uses) it.u = d.uses;
     return it;
   }
   function rollLoot(kind, r) {
@@ -81,7 +129,7 @@
         bleed: false, infected: false, infT: 0, inv: [], equip: null, cd: 0, cdMax: 1, noiseT: 0, atkT: 0, noiseR: 0 },
       zombies: [], corpses: [], fx: [], containers: [], searched: new Set(),
       running: false, paused: false, sleeping: false, openC: -1, sel: null,
-      actions: [], lastHour: 9, night: 0, saveT: 0, hudT: 0, dead: false, shake: 0, dmgInd: [], nearC: -1,
+      actions: [], placed: [], removed: new Set(), tab: 'bag', nearBench: -1, lastHour: 9, night: 0, saveT: 0, hudT: 0, dead: false, shake: 0, dmgInd: [], nearC: -1,
     };
   }
 
@@ -175,6 +223,7 @@
       const x = el('path', { d: 'M.22 .22L.78 .78M.78 .22L.22 .78', stroke: '#c8141f', 'stroke-width': .09, opacity: 0 }, g);
       return { g, x };
     });
+    L.placed = el('g', {}, L.world);
     L.hl = el('rect', { x: 0, y: 0, width: 1.1, height: 1.1, fill: 'none', stroke: '#e9e3d2', 'stroke-width': .07, 'stroke-dasharray': '.22 .12', opacity: 0 }, L.world);
     L.zombies = el('g', {}, L.world);
     L.noise = el('circle', { cx: 0, cy: 0, r: 1, fill: 'none', stroke: '#e9e3d2', 'stroke-width': .045, 'stroke-dasharray': '.3 .22', opacity: 0 }, L.world);
@@ -224,6 +273,11 @@
   }
   function refreshContainer(i) {
     if (!G || !L.cont) return;
+    if (G.removed.has(i)) {
+      L.cont[i].g.style.display = 'none';
+      for (const m of [L.mini, L.big]) if (m) m.dots[i].style.display = 'none';
+      return;
+    }
     const searched = G.searched.has(i), empty = searched && (!G.containers[i] || !G.containers[i].length);
     L.cont[i].g.setAttribute('opacity', empty ? .45 : 1);
     L.cont[i].x.setAttribute('opacity', empty ? .9 : 0);
@@ -716,7 +770,7 @@
     const sheetOn = !$('sheet').classList.contains('hidden');
     const panelW = sheetOn ? (L.panelW || (L.panelW = document.querySelector('.sheet-card').offsetWidth)) : 0;
     const psx = (VW - panelW) / 2, psy = VH * .5;
-    if (L._psx !== psx) { L._psx = psx; $('act').style.left = psx + 'px'; }
+    if (L._psx !== psx) { L._psx = psx; $('act').style.left = psx + 'px'; $('toast').style.left = psx + 'px'; }
     const camX = psx - p.x * ZOOM + ox, camY = psy - p.y * ZOOM + oy;
     L.world.setAttribute('transform', `translate(${camX.toFixed(1)} ${camY.toFixed(1)}) scale(${ZOOM.toFixed(3)})`);
     L.pg.setAttribute('transform', `translate(${p.x.toFixed(3)} ${p.y.toFixed(3)}) rotate(${(p.face * 180 / Math.PI).toFixed(1)})`);
@@ -792,11 +846,17 @@
     // 상호작용 대상 + 하이라이트
     let near = -1, nd = 1.5;
     for (let i = 0; i < M.containers.length; i++) {
+      if (G.removed.has(i)) continue;
       const c = M.containers[i];
       const d = Math.hypot(c.x + .5 - p.x, c.y + .5 - p.y);
       if (d < nd && losClear(p.x, p.y, c.x + .5, c.y + .5)) { nd = d; near = i; }
     }
     G.nearC = near;
+    G.nearBench = -1;
+    for (let i = 0; i < G.placed.length; i++) {
+      const b = G.placed[i];
+      if (Math.hypot(b.x + .5 - p.x, b.y + .5 - p.y) < 1.7) { G.nearBench = i; break; }
+    }
     if (near >= 0) {
       const c = M.containers[near];
       L.hl.setAttribute('x', c.x - .05); L.hl.setAttribute('y', c.y - .05);
@@ -848,9 +908,9 @@
     else if (w.item && w.item.dur != null) wn += ' · ' + w.item.dur;
     $('wname').textContent = wn;
     const ub = $('btnUse');
-    ub.disabled = G.nearC < 0;
+    ub.disabled = G.nearC < 0 && G.nearBench < 0;
     ub.classList.toggle('hot', G.nearC >= 0 && !G.searched.has(G.nearC));
-    $('useLbl').textContent = G.nearC >= 0 ? LOOT[M.containers[G.nearC].kind].name : '뒤지기';
+    $('useLbl').textContent = G.nearC >= 0 ? LOOT[M.containers[G.nearC].kind].name : (G.nearBench >= 0 ? '작업대' : '뒤지기');
     $('btnRun').classList.toggle('on', input.run);
     $('btnRun').classList.toggle('tired', p.endu < 20);
     $('bagLbl').textContent = invWeight().toFixed(1) + 'kg';
@@ -876,9 +936,13 @@
     if (d.hyd) sub.push('수분 ' + (d.hyd > 0 ? '+' : '') + d.hyd);
     if (d.hp) sub.push('체력 +' + d.hp);
     if (d.stopBleed) sub.push('지혈');
-    if (d.type === 'melee') sub.push('공격력 ' + d.dmg, '사거리 ' + d.range, '내구도 ' + it.dur + '/' + d.dur);
+    if (d.type === 'melee') sub.push('공격력 ' + d.dmg, '사거리 ' + d.range, '내구도 ' + it.dur + '/' + (it.max || d.dur));
+    if (d.uses) sub.push('남은 사용 ' + it.u + '회');
+    if (d.type === 'mat' && !d.uses) sub.push('재료');
+    if (d.type === 'tool') sub.push('도구 · 분해에 사용');
+    if (d.type === 'place') sub.push('설치하면 작업대 레시피 사용 가능');
     if (d.type === 'gun') sub.push('공격력 ' + d.dmg, '사거리 ' + d.range, '소음 매우 큼');
-    if (it.n) sub.push(it.n + '발');
+    if (it.n) sub.push(it.n + (it.id === 'ammo' ? '발' : '개'));
     sub.push((d.w * (it.n || 1)).toFixed(1) + 'kg');
     return sub.join(' · ');
   }
@@ -888,26 +952,54 @@
     const sel = G.sel && G.sel.uid === it.uid;
     let extra = '';
     if (it.n) extra += `<span class="qty">x${it.n}</span>`;
-    if (it.dur != null && d.dur) { const f = it.dur / d.dur; extra += `<span class="dur${f < .3 ? ' low' : ''}"><i style="width:${(f * 100).toFixed(0)}%"></i></span>`; }
+    if (it.u != null) extra += `<span class="qty">${it.u}회</span>`;
+    if (it.dur != null && d.dur) { const f = it.dur / (it.max || d.dur); extra += `<span class="dur${f < .3 ? ' low' : ''}"><i style="width:${(f * 100).toFixed(0)}%"></i></span>`; }
     if (eq) extra += `<span class="eqt">장착</span>`;
     const busy = busyUid(it.uid);
     return `<button class="card${eq ? ' eq' : ''}${sel ? ' sel' : ''}${src === 'cont' ? ' loot' : ''}${busy ? ' busy' : ''}" data-src="${src}" data-uid="${it.uid}">${ico(d.icon)}<span class="cn">${d.name}</span>${extra}</button>`;
   }
+  function chip(icon, label, ok) { return `<i class="chip${ok ? '' : ' miss'}">${ico(icon)}${label}</i>`; }
+  function craftHtml() {
+    const benchNear = G.nearBench >= 0;
+    let h = `<div class="bench-st${benchNear ? ' on' : ''}">${ico('bench')}${benchNear ? '작업대 근처 — 모든 레시피 사용 가능' : '작업대에서 멀리 있음 — 일부 레시피 잠김'}${benchNear ? '<button data-act="benchdismantle">작업대 분해</button>' : ''}</div>`;
+    const rows = RECIPES.map(r => ({ r, max: recipeMax(r) })).sort((a, b) => (b.max > 0) - (a.max > 0));
+    for (const { r, max } of rows) {
+      const o = ITEMS[r.out];
+      let chips = r.in.map(([id, need]) => { const c = countOf(id); return chip(ITEMS[id].icon, `${ITEMS[id].name} ${Math.min(c, 99)}/${need}${ITEMS[id].uses ? '회' : ''}`, c >= need); }).join('');
+      if (r.tools) chips += r.tools.map(t => chip(ITEMS[t].icon, TOOL_NAME[t] + ' (도구)', has(t))).join('');
+      if (r.bench) chips += chip('bench', '작업대 근처', benchNear);
+      const busy = G.actions.filter(a => a.kind === 'craft' && a.label.startsWith(o.name)).length;
+      h += `<div class="rc${max ? '' : ' off'}"><div class="rc-ic">${ico(o.icon)}</div><div class="rc-m"><b>${o.name}<small>${r.time}초</small>${busy ? `<em>제작 대기 ${busy}</em>` : ''}</b><div class="chips">${chips}</div></div>
+        <div class="rc-b"><button class="sbtn2 w" data-act="craft" data-rid="${r.id}" ${max ? '' : 'disabled'}>만들기</button>${max > 1 ? `<button class="sbtn2" data-act="craftmax" data-rid="${r.id}">x${max}</button>` : ''}</div></div>`;
+    }
+    return h;
+  }
   function renderSheet() {
     const p = G.p, ci = G.openC;
-    $('sheetTitle').textContent = ci >= 0 ? LOOT[M.containers[ci].kind].name + ' 수색' : '가방';
-    $('sheetIcon').setAttribute('href', ci >= 0 ? '#i-search' : '#i-bag');
+    const crafting = ci < 0 && G.tab === 'craft';
+    $('sheetTitle').textContent = ci >= 0 ? LOOT[M.containers[ci].kind].name + ' 수색' : (crafting ? '제작' : '가방');
+    $('sheetIcon').setAttribute('href', ci >= 0 ? '#i-search' : (crafting ? '#i-craft' : '#i-bag'));
     const wt = invWeight();
     $('wtext').textContent = `${wt.toFixed(1)} / ${CAP}kg`;
     $('wfill').style.width = Math.min(100, wt / CAP * 100).toFixed(0) + '%';
     $('wfill').parentElement.classList.toggle('over', wt > CAP);
     let h = '';
+    if (ci < 0) h += `<div class="tabs"><button data-act="tab-bag" class="${crafting ? '' : 'on'}">${ico('bag')}가방</button><button data-act="tab-craft" class="${crafting ? 'on' : ''}">${ico('craft')}제작</button></div>`;
+    if (crafting) {
+      const body = $('sheetBody'), st = body.scrollTop;
+      body.innerHTML = h + craftHtml(); body.scrollTop = st;
+      G.sel = null; renderDetail();
+      return;
+    }
     if (ci >= 0) {
       const items = G.containers[ci];
       h += `<div class="sec-t"><span>안에 있는 것 · 눌러서 가져가기</span>${items.length > 1 ? '<button data-act="takeall">모두 가져가기</button>' : ''}</div><div class="grid">`;
       if (!items.length) h += `<div class="empty">비어 있다</div>`;
       for (const it of items) h += card(it, 'cont');
       h += `</div>`;
+      const D = DISMANTLE[M.containers[ci].kind];
+      const ok = has(D.tool) && !items.length;
+      h += `<div class="acts"><button class="abtn${ok ? ' w' : ''}" data-act="dismantle">${ico('screwdriver')}가구 분해 · ${TOOL_NAME[D.tool]} 필요${items.length ? ' (먼저 비우기)' : ''}</button></div>`;
     }
     h += `<div class="sec-t"><span>내 가방 · ${p.inv.length}개</span></div><div class="grid">`;
     if (!p.inv.length) h += `<div class="empty">가방이 비었다</div>`;
@@ -930,6 +1022,12 @@
     else if (d.type === 'melee' || d.type === 'gun') acts += p.equip === it.uid
       ? `<button class="abtn r" data-act="equip">${ico(d.icon)}해제</button>`
       : `<button class="abtn w" data-act="equip">${ico(d.icon)}장착</button>`;
+    if (d.type === 'place') acts += `<button class="abtn w" data-act="place">${ico('bench')}설치</button>`;
+    if (d.type === 'melee' && it.dur < (it.max || d.dur)) {
+      for (const m of ['tape', 'glue']) if (countOf(m)) acts += `<button class="abtn" data-act="repair-${m}">${ico(m)}수리 · ${ITEMS[m].name}</button>`;
+      if (!countOf('tape') && !countOf('glue')) acts += `<button class="abtn" disabled>${ico('tape')}수리 (테이프/접착제 필요)</button>`;
+    }
+    if (ITEM_DISMANTLE[it.id]) { const D = ITEM_DISMANTLE[it.id]; acts += `<button class="abtn" data-act="itemdismantle"${D.tool && !has(D.tool) ? ' disabled' : ''}>${ico('screwdriver')}분해${D.tool ? ' · ' + TOOL_NAME[D.tool] : ''}</button>`; }
     acts += `<button class="abtn" data-act="drop">${G.openC >= 0 ? '넣기' : '버리기'}</button>`;
     if (busyUid(it.uid)) acts = `<div class="busytxt">진행 중…</div>`;
     box.innerHTML = `<div class="dt"><div class="dic">${ico(d.icon)}</div><div><b>${d.name}</b><small>${itemStats(it)}</small></div></div><div class="dacts">${acts}</div>`;
@@ -955,6 +1053,7 @@
     if (!a) return;
     if (a.valid && !a.valid()) { G.actions.shift(); renderAction(); return; }
     a.t += dt;
+    if (a.noise) { a.nt = (a.nt || 0) - dt; if (a.nt <= 0) { a.nt = 1.2; noise(G.p.x, G.p.y, a.noise, false); G.p.noiseR = Math.max(G.p.noiseR, a.noise); } }
     if (a.t >= a.dur) {
       G.actions.shift();
       a.done();
@@ -993,6 +1092,13 @@
       valid: () => G.openC === c && G.containers[c].some(x => x.uid === it.uid),
       done: () => { const arr = G.containers[c], i = arr.findIndex(x => x.uid === it.uid); if (i >= 0) { stackAdd(arr.splice(i, 1)[0]); wtWarn(); } } });
     if (act === 'cancel') return cancelActions('행동 취소');
+    if (act === 'tab-bag' || act === 'tab-craft') { G.tab = act.slice(4); G.sel = null; return renderSheet(); }
+    if (act === 'craft' || act === 'craftmax') { craft(uid, act === 'craft' ? 1 : 99); return renderSheet(); }
+    if (act === 'dismantle') { dismantleFurniture(ci); return renderSheet(); }
+    if (act === 'benchdismantle') { if (G.nearBench >= 0) dismantleBench(G.nearBench); return renderSheet(); }
+    if (act === 'itemdismantle') { const it = selIt(); if (it && !busyUid(it.uid)) dismantleItem(it); return renderSheet(); }
+    if (act === 'place') { const it = selIt(); if (it && !busyUid(it.uid)) placeBench(it); return renderSheet(); }
+    if (act === 'repair-tape' || act === 'repair-glue') { const it = selIt(); if (it && !busyUid(it.uid)) repairItem(it, act.slice(7)); return renderSheet(); }
     if (act === 'takecont') {
       const it = G.containers[ci].find(x => x.uid === uid);
       if (!it || busyUid(uid)) return;
@@ -1041,11 +1147,145 @@
     renderSheet(); renderHud();
   }
   function stackAdd(it) {
-    if (it.id === 'ammo') {
-      const a = G.p.inv.find(i => i.id === 'ammo');
-      if (a) { a.n += it.n; return; }
+    if (ITEMS[it.id].stack) {
+      const a = G.p.inv.find(i => i.id === it.id);
+      if (a) { a.n += it.n || 1; return; }
     }
     G.p.inv.push(it);
+  }
+  /* ================= 제작 · 분해 · 수리 ================= */
+  const has = id => G.p.inv.some(i => i.id === id);
+  function countOf(id) {
+    let n = 0;
+    for (const i of G.p.inv) if (i.id === id) n += ITEMS[id].stack ? (i.n || 0) : ITEMS[id].uses ? (i.u || 0) : 1;
+    return n;
+  }
+  function consume(id, need) {
+    const p = G.p, d = ITEMS[id];
+    // 장착 안 한 것, 상태 나쁜 것부터 사용
+    const list = p.inv.filter(i => i.id === id).sort((a, b) => (a.uid === p.equip) - (b.uid === p.equip) || (a.dur || 0) - (b.dur || 0) || (a.u || 0) - (b.u || 0));
+    for (const it of list) {
+      if (need <= 0) break;
+      if (d.stack) { const k = Math.min(need, it.n); it.n -= k; need -= k; if (it.n <= 0) p.inv.splice(p.inv.indexOf(it), 1); }
+      else if (d.uses) { const k = Math.min(need, it.u); it.u -= k; need -= k; if (it.u <= 0) p.inv.splice(p.inv.indexOf(it), 1); }
+      else { p.inv.splice(p.inv.indexOf(it), 1); need--; if (p.equip === it.uid) { p.equip = null; updateWeaponLook(); } }
+    }
+  }
+  function recipeMax(r) {
+    if (r.tools && r.tools.some(t => !has(t))) return 0;
+    if (r.bench && G.nearBench < 0) return 0;
+    let m = 99;
+    for (const [id, need] of r.in) m = Math.min(m, Math.floor(countOf(id) / need));
+    return m;
+  }
+  function giveOut(list, rr) {
+    const got = [];
+    for (const [id, a, b] of list) {
+      const n = a + Math.floor(rr() * (b - a + 1));
+      if (n <= 0) continue;
+      if (ITEMS[id].stack) { const it = mkItem(id); it.n = n; stackAdd(it); }
+      else for (let k = 0; k < n; k++) stackAdd(mkItem(id));
+      got.push(ITEMS[id].name + ' ' + n);
+    }
+    return got;
+  }
+  function craft(rid, times) {
+    const r = RECIPES.find(x => x.id === rid);
+    const n = Math.min(times, recipeMax(r));
+    if (n <= 0) return toast('재료나 도구가 부족하다');
+    for (let k = 0; k < n; k++) {
+      queueAction({ kind: 'craft', label: ITEMS[r.out].name + ' 만드는 중', icon: ITEMS[r.out].icon, dur: r.time, noise: r.noise,
+        valid: () => recipeMax(r) > 0,
+        done: () => { for (const [id, need] of r.in) consume(id, need); stackAdd(mkItem(r.out)); if (invWeight() > CAP) toast('너무 무겁다 — 느려진다'); } });
+    }
+  }
+  function dismantleFurniture(ci) {
+    const kind = M.containers[ci].kind, D = DISMANTLE[kind];
+    if (G.containers[ci].length) return toast('먼저 안을 비워야 한다');
+    if (!has(D.tool)) return toast(TOOL_NAME[D.tool] + '가 필요하다');
+    queueAction({ kind: 'dismantle', label: LOOT[kind].name + ' 분해 중', icon: 'screwdriver', dur: D.time, noise: D.noise,
+      valid: () => G.openC === ci && has(D.tool) && !G.containers[ci].length,
+      done: () => {
+        G.removed.add(ci); refreshContainer(ci);
+        const got = giveOut(D.out, rand);
+        closeSheet(); toast('분해 완료 — ' + got.join(', '), 2600);
+      } });
+  }
+  function dismantleBench(bi) {
+    const D = DISMANTLE.bench;
+    if (!has(D.tool)) return toast('망치가 필요하다');
+    const b = G.placed[bi];
+    queueAction({ kind: 'dismantle', label: '작업대 분해 중', icon: 'screwdriver', dur: D.time, noise: D.noise,
+      valid: () => G.placed.includes(b) && has(D.tool),
+      done: () => { removePlaced(b); const got = giveOut(D.out, rand); toast('분해 완료 — ' + got.join(', '), 2600); } });
+  }
+  function dismantleItem(it) {
+    const D = ITEM_DISMANTLE[it.id];
+    if (D.tool && !has(D.tool)) return toast(TOOL_NAME[D.tool] + '가 필요하다');
+    queueAction({ uid: it.uid, label: ITEMS[it.id].name + ' 분해 중', icon: 'screwdriver', dur: D.time, noise: D.noise,
+      valid: () => G.p.inv.includes(it) && (!D.tool || has(D.tool)),
+      done: () => {
+        G.p.inv.splice(G.p.inv.indexOf(it), 1);
+        if (G.p.equip === it.uid) { G.p.equip = null; updateWeaponLook(); }
+        if (G.sel && G.sel.uid === it.uid) G.sel = null;
+        toast('분해 — ' + giveOut(D.out, rand).join(', '));
+      } });
+  }
+  function repairItem(it, mat) {
+    const d = ITEMS[it.id], max = it.max || d.dur;
+    if (it.dur >= max) return toast('수리할 필요가 없다');
+    if (!countOf(mat)) return toast(ITEMS[mat].name + '이(가) 없다');
+    queueAction({ uid: it.uid, label: d.name + ' 수리 중', icon: mat, dur: 3,
+      valid: () => G.p.inv.includes(it) && countOf(mat) > 0,
+      done: () => {
+        consume(mat, 1);
+        const m = it.max || d.dur;
+        it.dur = Math.min(m, it.dur + Math.round(m * REPAIR[mat]));
+        it.max = Math.max(5, Math.round(m * .9)); // 고칠수록 최대 내구도 감소
+        it.dur = Math.min(it.dur, it.max);
+        toast(d.name + ' 수리 — 내구도 ' + it.dur + '/' + it.max);
+      } });
+  }
+  // 작업대 설치
+  function placeBench(it) {
+    const p = G.p;
+    const spot = () => {
+      const cands = [[Math.cos(p.face), Math.sin(p.face)], [1, 0], [-1, 0], [0, 1], [0, -1]];
+      const px = Math.floor(p.x), py = Math.floor(p.y);
+      for (const [dx, dy] of cands) {
+        const x = Math.floor(p.x + dx * .95), y = Math.floor(p.y + dy * .95);
+        if (x === px && y === py) continue;
+        if (M.moveBlock[y * M.W + x]) continue;
+        if (M.containers.some((c, i) => !G.removed.has(i) && c.x === x && c.y === y)) continue;
+        if (G.placed.some(b => b.x === x && b.y === y)) continue;
+        return [x, y];
+      }
+      return null;
+    };
+    if (!spot()) return toast('놓을 자리가 없다');
+    queueAction({ uid: it.uid, label: '작업대 설치 중', icon: 'bench', dur: 4, noise: 4,
+      valid: () => G.p.inv.includes(it) && !!spot(),
+      done: () => {
+        const [x, y] = spot();
+        G.p.inv.splice(G.p.inv.indexOf(it), 1);
+        if (G.sel && G.sel.uid === it.uid) G.sel = null;
+        addPlaced({ x, y, type: 'bench' });
+        toast('작업대를 설치했다');
+      } });
+  }
+  function addPlaced(b) {
+    G.placed.push(b);
+    M.moveBlock[b.y * M.W + b.x] = 1;
+    b.g = el('g', { transform: `translate(${b.x} ${b.y})` }, L.placed);
+    el('rect', { x: .04, y: .14, width: .92, height: .72, fill: '#8a6a45', stroke: '#000', 'stroke-width': .06 }, b.g);
+    el('path', { d: 'M.1 .38H.9M.1 .62H.9', stroke: '#5a432d', 'stroke-width': .05 }, b.g);
+    el('path', { d: 'M.62 .2L.82 .42M.3 .55l.18 .18', stroke: '#d9dde0', 'stroke-width': .07, 'stroke-linecap': 'round' }, b.g);
+  }
+  function removePlaced(b) {
+    const i = G.placed.indexOf(b); if (i < 0) return;
+    G.placed.splice(i, 1);
+    M.moveBlock[b.y * M.W + b.x] = 0;
+    b.g.remove();
   }
   function trySleep() {
     const p = G.p;
@@ -1071,7 +1311,7 @@
       v: 1, seed: G.seed, time: G.time, kills: G.kills, uid: G.uid, lastHour: G.lastHour,
       p: { x: p.x, y: p.y, face: p.face, hp: p.hp, full: p.full, hyd: p.hyd, energy: p.energy, endu: p.endu,
         bleed: p.bleed, infected: p.infected, infT: p.infT, inv: p.inv, equip: p.equip },
-      cont: G.containers, searched: [...G.searched],
+      cont: G.containers, searched: [...G.searched], removed: [...G.removed], placed: G.placed.map(b => ({ x: b.x, y: b.y, type: b.type })),
       z: G.zombies.filter(z => !z.dead).map(z => [+z.x.toFixed(2), +z.y.toFixed(2), +z.hp.toFixed(2), z.shirt]),
       c: G.corpses.map(c => [+c.x.toFixed(2), +c.y.toFixed(2), +c.a.toFixed(2), c.shirt]),
     };
@@ -1106,12 +1346,14 @@
   function continueGame(s) {
     G = baseState(s.seed);
     G.searched = new Set(s.searched || []);
+    G.removed = new Set(s.removed || []);
     setupWorld(s.seed);
     G.time = s.time; G.kills = s.kills; G.uid = s.uid; G.lastHour = s.lastHour;
     Object.assign(G.p, s.p);
     G.containers = s.cont;
     for (const [x, y, hp, shirt] of s.z) addZombie(x, y, hp, shirt);
     for (const [x, y, a, shirt] of (s.c || [])) addCorpse(x, y, a, shirt);
+    for (const b of (s.placed || [])) addPlaced({ x: b.x, y: b.y, type: b.type });
     for (let i = 0; i < M.containers.length; i++) refreshContainer(i);
     updateWeaponLook();
     start();
@@ -1138,19 +1380,21 @@
     const zone = $('joyzone'), joy = $('joy'), knob = $('knob');
     let jid = null, ox = 0, oy = 0;
     const R = 54;
+    // 화면 좌표 → 게임(회전 반영) 좌표
+    const local = e => document.documentElement.classList.contains('rot') ? [e.clientY, innerWidth - e.clientX] : [e.clientX, e.clientY];
     zone.addEventListener('pointerdown', e => {
       if (jid !== null) return;
-      jid = e.pointerId; ox = e.clientX; oy = e.clientY;
-      const zr = zone.getBoundingClientRect();
+      jid = e.pointerId; [ox, oy] = local(e);
       joy.classList.add('free', 'active');
-      joy.style.left = (ox - zr.left) + 'px';
-      joy.style.bottom = (zr.bottom - oy) + 'px';
+      joy.style.left = (ox - zone.offsetLeft) + 'px';
+      joy.style.bottom = (zone.offsetTop + zone.offsetHeight - oy) + 'px';
       try { zone.setPointerCapture(jid); } catch (err) {}
       e.preventDefault();
     });
     zone.addEventListener('pointermove', e => {
       if (e.pointerId !== jid) return;
-      let dx = e.clientX - ox, dy = e.clientY - oy;
+      const [lx, ly] = local(e);
+      let dx = lx - ox, dy = ly - oy;
       const d = Math.hypot(dx, dy);
       if (d > R) { dx = dx / d * R; dy = dy / d * R; }
       knob.style.transform = `translate(${dx}px,${dy}px)`;
@@ -1170,15 +1414,15 @@
     const atkUp = () => { input.attackHeld = false; };
     atk.addEventListener('pointerup', atkUp); atk.addEventListener('pointercancel', atkUp); atk.addEventListener('pointerleave', atkUp);
     $('btnRun').addEventListener('click', () => { input.run = !input.run; renderHud(); });
-    $('btnUse').addEventListener('click', () => { if (G.nearC >= 0) startSearch(G.nearC); });
-    $('btnBag').addEventListener('click', () => openSheet(-1));
+    $('btnUse').addEventListener('click', () => { if (G.nearC >= 0) startSearch(G.nearC); else if (G.nearBench >= 0) { G.tab = 'craft'; openSheet(-1); } });
+    $('btnBag').addEventListener('click', () => { G.tab = 'bag'; openSheet(-1); });
     $('sheetClose').addEventListener('click', closeSheet);
     $('sheet').addEventListener('click', e => { if (e.target.id === 'sheet') closeSheet(); });
     document.querySelector('.sheet-card').addEventListener('click', e => {
       const c = e.target.closest('.card');
       if (c) return sheetAction(c.dataset.src === 'cont' ? 'takecont' : 'selinv', +c.dataset.uid);
       const b = e.target.closest('button[data-act]');
-      if (b) sheetAction(b.dataset.act, null);
+      if (b && !b.disabled) sheetAction(b.dataset.act, b.dataset.rid || null);
     });
     $('minimap').addEventListener('click', () => {
       if (!G || !G.running) return;
@@ -1223,7 +1467,13 @@
   }
 
   function onResize() {
-    VW = innerWidth; VH = innerHeight; L.panelW = 0;
+    // 폰이 세로로 인식되면 게임 화면을 90도 돌려서 가로로 표시
+    const rot = innerHeight > innerWidth;
+    document.documentElement.classList.toggle('rot', rot);
+    const app = $('app');
+    if (rot) { app.style.width = innerHeight + 'px'; app.style.height = innerWidth + 'px'; app.style.left = innerWidth + 'px'; }
+    else { app.style.width = app.style.height = app.style.left = ''; }
+    VW = rot ? innerHeight : innerWidth; VH = rot ? innerWidth : innerHeight; L.panelW = 0;
     view.setAttribute('viewBox', `0 0 ${VW} ${VH}`);
     if (L.tint) for (const r of [L.tint, L.vign]) { r.setAttribute('width', VW); r.setAttribute('height', VH); }
   }
@@ -1232,8 +1482,7 @@
   function frame(ts) {
     const dt = Math.min(.05, Math.max(0, (ts - last) / 1000));
     last = ts;
-    const portrait = innerHeight > innerWidth;
-    if (G && G.running && !G.paused && !portrait) update(dt);
+    if (G && G.running && !G.paused) update(dt);
     if (G && M && !G.dead) render(dt);
     requestAnimationFrame(frame);
   }
@@ -1246,5 +1495,5 @@
   if (loadSave()) $('tContinue').classList.remove('hidden');
   requestAnimationFrame(frame);
 
-  window.DT.debug = { get G() { return G; }, get M() { return M; }, get AS() { return AS; }, newGame, save, loadSave, continueGame, playerAttack, noise };
+  window.DT.debug = { mkItem: id => mkItem(id), stackAdd: it => stackAdd(it), RECIPES, get G() { return G; }, get M() { return M; }, get AS() { return AS; }, newGame, save, loadSave, continueGame, playerAttack, noise };
 })();
