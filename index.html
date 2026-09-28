@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="DEAD TOWN">
+<meta name="theme-color" content="#000000">
+<meta name="format-detection" content="telephone=no">
+<title>DEAD TOWN</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Black+Ops+One&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<!-- 아이콘 세트 -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<defs>
+<symbol id="i-heart" viewBox="0 0 24 24"><path fill="currentColor" d="M12 21s-7.5-4.6-9.5-9.3C1.2 8.4 3.3 5 6.6 5c2 0 3.4 1.1 4.4 2.5C12 6.1 13.4 5 15.4 5c3.3 0 5.4 3.4 4.1 6.7C19.5 16.4 12 21 12 21z"/></symbol>
+<symbol id="i-food" viewBox="0 0 24 24"><path fill="currentColor" d="M5 7.5C5 6.1 8.1 5 12 5s7 1.1 7 2.5v10c0 1.4-3.1 2.5-7 2.5s-7-1.1-7-2.5z"/><path d="M5 11c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5M5 15c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5" fill="none" stroke="#000" stroke-width="1.3" opacity=".45"/></symbol>
+<symbol id="i-drop" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2.5c3.5 4.6 6.5 8.2 6.5 11.5a6.5 6.5 0 0 1-13 0C5.5 10.7 8.5 7.1 12 2.5z"/></symbol>
+<symbol id="i-moon" viewBox="0 0 24 24"><path fill="currentColor" d="M20 14.5A8.2 8.2 0 1 1 9.5 4a6.6 6.6 0 0 0 10.5 10.5z"/></symbol>
+<symbol id="i-bolt" viewBox="0 0 24 24"><path fill="currentColor" d="M13.5 2L4 14h6.5l-1.5 8 9.5-12.5h-6.5z"/></symbol>
+<symbol id="i-sun" viewBox="0 0 24 24"><circle fill="currentColor" cx="12" cy="12" r="4.5"/><path d="M12 1.5v3M12 19.5v3M1.5 12h3M19.5 12h3M4.6 4.6l2.1 2.1M17.3 17.3l2.1 2.1M4.6 19.4l2.1-2.1M17.3 6.7l2.1-2.1" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+<symbol id="i-dusk" viewBox="0 0 24 24"><path fill="currentColor" d="M5 16a7 7 0 0 1 14 0z"/><path d="M2 19.5h20M12 4v3M4.5 8.5l2 2M19.5 8.5l-2 2" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+<symbol id="i-fist" viewBox="0 0 24 24"><path fill="currentColor" d="M6 10.5V9a1.8 1.8 0 0 1 3.6 0v-.6a1.8 1.8 0 0 1 3.6 0v.1a1.8 1.8 0 0 1 3.6 0v.6a1.8 1.8 0 0 1 3.2 1.1V14a7 7 0 0 1-7 7h-1.5A6.5 6.5 0 0 1 5 14.5v-2.2a1.8 1.8 0 0 1 1-1.8z"/></symbol>
+<symbol id="i-knife" viewBox="0 0 24 24"><path fill="currentColor" d="M20.5 3.5c.8 3.5-1 7-4.5 9.8l-2.2 1.8-3.4-3.4z"/><path fill="currentColor" d="M9.6 12.5l2.9 2.9-6.6 6.6a2 2 0 0 1-2.9-2.9z"/></symbol>
+<symbol id="i-hammer" viewBox="0 0 24 24"><path fill="currentColor" d="M9.5 4.5l5-2 5 5-2 5-2.3-2.3-9.4 9.4a1.8 1.8 0 0 1-2.6-2.6l9.4-9.4z"/></symbol>
+<symbol id="i-bat" viewBox="0 0 24 24"><path fill="currentColor" d="M18.2 2.6a3 3 0 0 1 3.2 3.2c-.2 1-.9 1.9-1.7 2.6L8.3 18.2l-2.5-2.5 9.8-11.4c.7-.8 1.6-1.5 2.6-1.7z"/><path fill="currentColor" d="M5.2 16.3l2.5 2.5-2.9 2.9a1.8 1.8 0 0 1-2.5-2.5z"/></symbol>
+<symbol id="i-pipe" viewBox="0 0 24 24"><path fill="currentColor" d="M17.5 2.5l4 4-2 2-1-1-11 11 1 1-2 2-4-4 2-2 1 1 11-11-1-1z"/></symbol>
+<symbol id="i-gun" viewBox="0 0 24 24"><path fill="currentColor" d="M2 6.5h17l1-1h2v5h-8.5l-1.5 1.5v2h-3l-1.2 5.5H3.5L5 12.5 2 10.5z"/></symbol>
+<symbol id="i-ammo" viewBox="0 0 24 24"><path fill="currentColor" d="M4.5 9c0-3 1.5-5 2-6 .5 1 2 3 2 6v11h-4zM10 9c0-3 1.5-5 2-6 .5 1 2 3 2 6v11h-4zM15.5 9c0-3 1.5-5 2-6 .5 1 2 3 2 6v11h-4z"/></symbol>
+<symbol id="i-apple" viewBox="0 0 24 24"><path fill="currentColor" d="M12 7.5c-1.2-.8-2.4-1-3.5-1C5.6 6.5 4 9 4 12c0 4.5 3 9 5.5 9 1.2 0 1.6-.6 2.5-.6s1.3.6 2.5.6C17 21 20 16.5 20 12c0-3-1.6-5.5-4.5-5.5-1.1 0-2.3.2-3.5 1z"/><path d="M12 7.5c0-2 1-3.8 3-4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+<symbol id="i-bread" viewBox="0 0 24 24"><path fill="currentColor" d="M4 11a8 5 0 0 1 16 0 2 2 0 0 1-1 1.7V19a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-6.3A2 2 0 0 1 4 11z"/></symbol>
+<symbol id="i-chips" viewBox="0 0 24 24"><path fill="currentColor" d="M6 3h12l-1.5 3 1.5 3-1 12H7L6 9l1.5-3z"/></symbol>
+<symbol id="i-bottle" viewBox="0 0 24 24"><path fill="currentColor" d="M10 2h4v3l1.5 2.5V21a1 1 0 0 1-1 1h-5a1 1 0 0 1-1-1V7.5L10 5z"/></symbol>
+<symbol id="i-soda" viewBox="0 0 24 24"><path fill="currentColor" d="M7 4h10l-.5 1.5V19l.5 1.5H7l.5-1.5V5.5z"/></symbol>
+<symbol id="i-bandage" viewBox="0 0 24 24"><rect fill="currentColor" x="2" y="8" width="20" height="8" rx="4" transform="rotate(-40 12 12)"/><g fill="#000" opacity=".5"><circle cx="11" cy="11" r="1"/><circle cx="13" cy="13" r="1"/><circle cx="13" cy="10.5" r="1"/><circle cx="11" cy="13.5" r="1"/></g></symbol>
+<symbol id="i-pills" viewBox="0 0 24 24"><rect fill="currentColor" x="3" y="8.5" width="18" height="7" rx="3.5" transform="rotate(-35 12 12)"/><path d="M9.8 8.8l4.4 6.4" stroke="#000" stroke-width="1.4" opacity=".5"/></symbol>
+<symbol id="i-run" viewBox="0 0 24 24"><circle fill="currentColor" cx="14.5" cy="4" r="2.3"/><path d="M6.5 21.5l3.5-6 3.2 2.6V22M4.5 11.5L8 8h5.3l2.7 4 3.2.8M12.8 8.2L10 15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-search" viewBox="0 0 24 24"><circle cx="10" cy="10" r="6" fill="none" stroke="currentColor" stroke-width="2.8"/><path d="M14.5 14.5L21 21" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/></symbol>
+<symbol id="i-bag" viewBox="0 0 24 24"><path fill="currentColor" d="M8.5 6V5a3.5 3.5 0 0 1 7 0v1h1A3.5 3.5 0 0 1 20 9.5V20a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V9.5A3.5 3.5 0 0 1 7.5 6zm2 0h3V5a1.5 1.5 0 0 0-3 0z"/><path d="M8 13.5h8v4.5H8z" fill="#000" opacity=".4"/></symbol>
+<symbol id="i-skull" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C7 2 3.5 5.5 3.5 10c0 2.6 1.2 4.6 3 5.9V19a1 1 0 0 0 1 1h1v2h2v-2h3v2h2v-2h1a1 1 0 0 0 1-1v-3.1c1.8-1.3 3-3.3 3-5.9C20.5 5.5 17 2 12 2z"/><circle cx="8.7" cy="11" r="2.3" fill="#000"/><circle cx="15.3" cy="11" r="2.3" fill="#000"/></symbol>
+<symbol id="i-bio" viewBox="0 0 24 24"><circle fill="currentColor" cx="12" cy="12.5" r="2.4"/><path d="M12 3a4.5 4.5 0 0 1 3.7 7M12 3a4.5 4.5 0 0 0-3.7 7M3.8 17.2a4.5 4.5 0 0 1 4-6.3M3.8 17.2a4.5 4.5 0 0 0 7.9.3M20.2 17.2a4.5 4.5 0 0 0-4-6.3M20.2 17.2a4.5 4.5 0 0 1-7.9.3" fill="none" stroke="currentColor" stroke-width="2.2"/></symbol>
+<symbol id="i-weight" viewBox="0 0 24 24"><path fill="currentColor" d="M8 8.5a4 4 0 0 1 8 0h-2.2a1.8 1.8 0 0 0-3.6 0z"/><path fill="currentColor" d="M5.5 11h13l1.5 10H4z"/></symbol>
+<symbol id="i-map" viewBox="0 0 24 24"><path d="M3 5.5l6-2.2 6 2.2 6-2.2v15.2l-6 2.2-6-2.2-6 2.2z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 3.5v15M15 5.5v15" stroke="currentColor" stroke-width="2"/></symbol>
+<symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 6.5h16M4 12h16M4 17.5h16" stroke="currentColor" stroke-width="2.8" stroke-linecap="square"/></symbol>
+<symbol id="i-close" viewBox="0 0 24 24"><path d="M5 5l14 14M19 5L5 19" stroke="currentColor" stroke-width="3" stroke-linecap="square"/></symbol>
+<symbol id="i-save" viewBox="0 0 24 24"><path fill="currentColor" d="M4 3h13l3 3v15H4zm3 2v5h9V5zm5 9a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5z"/></symbol>
+<symbol id="i-hand" viewBox="0 0 24 24"><path fill="currentColor" d="M8 11V4.5a1.5 1.5 0 0 1 3 0V10h.5V3a1.5 1.5 0 0 1 3 0v7h.5V4.5a1.5 1.5 0 0 1 3 0v9.5c0 4.4-3 7.5-7 7.5-2.4 0-4-1-5.3-2.8L3.5 14a1.6 1.6 0 0 1 2.5-2z"/></symbol>
+</defs>
+</svg>
+
+<div id="app">
+  <svg id="view" xmlns="http://www.w3.org/2000/svg"></svg>
+  <div id="lowhp"></div>
+  <div id="hurt"></div>
+  <div id="grain"></div>
+
+  <div id="hud">
+    <div class="hud-grid">
+      <div class="hud-left">
+        <div id="clock">
+          <div class="daybox"><small>DAY</small><b id="day">1</b></div>
+          <div class="timebox">
+            <b id="time">09:00</b>
+            <span id="phase"><svg><use id="phaseIcon" href="#i-sun"/></svg><em id="phaseTxt">낮</em></span>
+          </div>
+        </div>
+        <div id="stats">
+          <div class="stat" data-k="hp"><svg><use href="#i-heart"/></svg><b>100</b><span><em></em></span></div>
+          <div class="stat" data-k="full"><svg><use href="#i-food"/></svg><b>80</b><span><em></em></span></div>
+          <div class="stat" data-k="hyd"><svg><use href="#i-drop"/></svg><b>80</b><span><em></em></span></div>
+          <div class="stat" data-k="energy"><svg><use href="#i-moon"/></svg><b>85</b><span><em></em></span></div>
+          <div class="stat" data-k="endu"><svg><use href="#i-bolt"/></svg><b>100</b><span><em></em></span></div>
+        </div>
+      </div>
+      <div class="hud-right">
+        <button id="minimap" aria-label="지도"><svg id="mini" viewBox="0 0 28 28"></svg><i class="mm-tag"><svg><use href="#i-map"/></svg></i></button>
+        <button id="menuBtn" class="icon-btn" aria-label="메뉴"><svg><use href="#i-menu"/></svg></button>
+      </div>
+    </div>
+    <div id="moodles"></div>
+  </div>
+
+  <div id="toast"></div>
+  <div id="act" class="hidden"></div>
+
+  <div id="joyzone"><div id="joy"><div id="knob"></div></div></div>
+
+  <div id="btns">
+    <button id="btnAttack" class="btn big">
+      <svg class="ring" viewBox="0 0 100 100"><circle class="rbg" cx="50" cy="50" r="46"/><circle id="atkRing" class="rfg" cx="50" cy="50" r="46"/></svg>
+      <svg class="ic"><use id="atkIcon" href="#i-fist"/></svg>
+      <small id="wname">맨손</small>
+    </button>
+    <button id="btnUse" class="btn" disabled>
+      <svg class="ic"><use href="#i-search"/></svg><small id="useLbl">뒤지기</small>
+    </button>
+    <button id="btnRun" class="btn">
+      <svg class="ring" viewBox="0 0 100 100"><circle class="rbg" cx="50" cy="50" r="46"/><circle id="runRing" class="rfg" cx="50" cy="50" r="46"/></svg>
+      <svg class="ic"><use href="#i-run"/></svg><small>달리기</small>
+    </button>
+    <button id="btnBag" class="btn">
+      <svg class="ic"><use href="#i-bag"/></svg><small id="bagLbl">0kg</small>
+    </button>
+  </div>
+
+  <div id="sheet" class="hidden">
+    <div class="sheet-card">
+      <div class="tape"></div>
+      <div class="sheet-head">
+        <svg class="hic"><use id="sheetIcon" href="#i-bag"/></svg>
+        <b id="sheetTitle">가방</b>
+        <button id="sheetClose" class="xbtn" aria-label="닫기"><svg><use href="#i-close"/></svg></button>
+      </div>
+      <div class="wgauge">
+        <svg><use href="#i-weight"/></svg>
+        <div class="wbar"><em id="wfill"></em><i class="cap"></i></div>
+        <span id="wtext">0 / 15kg</span>
+      </div>
+      <div id="sheetAct" class="hidden"></div>
+      <div id="sheetBody" class="scroll"></div>
+      <div id="detail" class="hidden"></div>
+    </div>
+  </div>
+
+  <div id="bigmap" class="overlay hidden">
+    <div class="map-box">
+      <div class="map-head"><svg><use href="#i-map"/></svg><b>마을 지도</b><button id="mapClose" class="xbtn" aria-label="닫기"><svg><use href="#i-close"/></svg></button></div>
+      <svg id="bigmapSvg" viewBox="0 0 72 72"></svg>
+      <div class="legend"><span><i class="lg-p"></i>나</span><span><i class="lg-c"></i>안 뒤진 가구</span><span><i class="lg-e"></i>뒤진 가구</span></div>
+    </div>
+  </div>
+
+  <div id="sleep" class="hidden">
+    <svg class="sleep-ic"><use href="#i-moon"/></svg>
+    <div class="zzz">Z z z</div>
+    <div id="sleepTime">잠자는 중</div>
+    <button id="wakeBtn" class="wbtn">일어나기</button>
+  </div>
+
+  <div id="menu" class="overlay hidden">
+    <div class="ov-box">
+      <div class="tape"></div>
+      <h2>일시정지</h2>
+      <p id="menuStat"></p>
+      <button id="mResume" class="wbtn">계속하기</button>
+      <button id="mSave" class="obtn">저장하기</button>
+      <button id="mNew" class="obtn danger">새 게임 (현재 기록 삭제)</button>
+    </div>
+  </div>
+
+  <div id="title" class="overlay">
+    <div class="ov-box two">
+      <div class="col">
+        <div class="logo">DEAD<span>TOWN</span></div>
+        <div class="tape"></div>
+        <p class="tag">마을은 무너졌다. 살아남은 날을 세라.</p>
+      </div>
+      <div class="col">
+        <button id="tContinue" class="wbtn hidden">이어하기</button>
+        <button id="tNew" class="obtn">새 게임</button>
+        <div class="help">
+          <span><svg><use href="#i-hand"/></svg>왼쪽 드래그 이동 · 오른쪽 버튼 행동</span>
+          <span><svg><use href="#i-run"/></svg>달리기·총소리는 좀비를 부른다</span>
+          <span><svg><use href="#i-moon"/></svg>밤에는 시야가 좁고 좀비가 빠르다</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="dead" class="overlay hidden">
+    <div class="ov-box">
+      <svg class="skull"><use href="#i-skull"/></svg>
+      <div class="logo red">사망</div>
+      <div class="tape"></div>
+      <p id="deadStat"></p>
+      <button id="dRestart" class="wbtn">다시 시작</button>
+    </div>
+  </div>
+</div>
+<div id="rotate">
+  <svg class="rot-ic" viewBox="0 0 64 64"><rect x="20" y="6" width="24" height="44" rx="4" fill="none" stroke="currentColor" stroke-width="4"/><path d="M8 40a24 24 0 0 0 24 18" fill="none" stroke="#c8141f" stroke-width="4" stroke-linecap="round"/><path d="M26 54l6 4-4 6" fill="none" stroke="#c8141f" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  <b>가로로 돌려주세요</b>
+  <small>DEAD TOWN은 가로 화면 전용입니다</small>
+</div>
+<script src="js/rng.js"></script>
+<script src="js/map.js"></script>
+<script src="js/astar.js"></script>
+<script src="js/game.js"></script>
+</body>
+</html>
