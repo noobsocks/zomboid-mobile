@@ -314,3 +314,206 @@ html.rot{--sl:max(env(safe-area-inset-top),12px);--sr:max(env(safe-area-inset-bo
 .dacts{flex-wrap:wrap}
 .dacts .abtn{flex:1 1 30%;font-size:13px}
 .abtn:disabled{opacity:.35}
+
+/* =====================================================
+   UI/UX 개선 (가로)
+   ===================================================== */
+/* 가방 패널: 뒤 화면 조작 가능(조이스틱), 헤더에 탭 통합 */
+#sheet{pointer-events:none;background:none}
+.sheet-card{pointer-events:auto;position:relative}
+.sheet-head{padding:8px 12px 6px;gap:8px}
+.sheet-head b{font-size:18px;flex:none}
+.hic{width:20px;height:20px}
+#sheetTabs{flex:1;display:flex;gap:6px}
+#sheetTabs:empty{display:none}
+#sheetTitle.hidden{display:none}
+.sheet-head b:not(.hidden)+#sheetTabs:empty+.xbtn{margin-left:auto}
+.sheet-head .xbtn{margin-left:auto}
+#sheetTabs button{flex:1;display:flex;align-items:center;justify-content:center;gap:5px;padding:7px 6px;font-family:var(--fh);font-size:14px;border:2px solid #3a3b35;clip-path:var(--cut-s)}
+#sheetTabs button svg{width:15px;height:15px}
+#sheetTabs button.on{background:var(--bone);color:var(--ink);border-color:var(--bone)}
+.xbtn{width:36px;height:36px}
+.wgauge{padding:0 12px 8px}
+.wbar{height:6px}
+#sheetAct{margin:0 12px 4px;padding:6px 9px}
+.scroll{padding:0 12px 10px}
+.sec-t{margin:8px 0 6px;font-size:12.5px}
+.sec-b{display:flex;gap:6px}
+.sec-t .ghost{display:flex;align-items:center;gap:4px;background:none;color:var(--bone);border:1.5px solid #4a4b44;opacity:.75}
+.sec-t .ghost svg{width:12px;height:12px}
+.sec-t .ghost.ok{border-color:var(--bone);opacity:1}
+.grid{grid-template-columns:repeat(5,1fr);gap:6px}
+.card{aspect-ratio:1/1;padding:4px 2px 8px;gap:3px}
+.card svg{width:24px;height:24px}
+.card .cn{font-size:11px}
+/* 상세창: 목록을 가리지 않게 아래 고정 바로 */
+#sheetBody.withdetail{padding-bottom:112px}
+#detail{position:absolute;left:0;right:var(--sr);bottom:var(--sb);padding:8px 12px 8px;box-shadow:0 -10px 24px rgba(0,0,0,.6)}
+.dt{gap:10px;margin-bottom:7px}
+.dt .dic{width:36px;height:36px}
+.dt .dic svg{width:24px;height:24px}
+.dtx{flex:1;min-width:0}
+.dt b{font-size:15px}
+.dt small{font-size:11px;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dx{width:30px;height:30px;display:flex;align-items:center;justify-content:center;opacity:.7}
+.dx svg{width:15px;height:15px}
+.dacts{flex-wrap:nowrap;gap:6px}
+.dacts .abtn{flex:1 1 0;min-width:0;padding:9px 4px;font-size:12.5px;gap:4px;white-space:nowrap}
+.dacts .abtn svg{width:14px;height:14px;flex:none}
+.acts .abtn{padding:10px}
+/* 제작 목록 압축 */
+.bench-st{margin:6px 0 6px;padding:6px 9px}
+.rc{padding:7px 0;gap:9px}
+.rc-ic{width:38px;height:38px}
+.rc-ic svg{width:24px;height:24px}
+.rc-b{flex-direction:row}
+.sbtn2{padding:7px 10px}
+
+/* 버튼 글자 키움 */
+.btn small{font-size:11.5px}
+.btn.big small{font-size:12px}
+
+/* 추천 행동 버튼 (조이스틱과 공격 버튼 사이, 아래) */
+#quick{position:absolute;left:50%;bottom:calc(var(--sb) + 12px);transform:translateX(-50%);display:flex;gap:8px;z-index:3;will-change:transform}
+#quick:empty{display:none}
+.qb{display:flex;align-items:center;gap:6px;padding:9px 12px 9px 10px;font-family:var(--fh);font-size:13px;white-space:nowrap;
+  background:var(--grain),rgba(14,14,12,.9);border:2px solid var(--bone);clip-path:var(--cut-s);touch-action:manipulation}
+.qb svg{width:17px;height:17px}
+.qb:active{background:var(--bone);color:var(--ink)}
+.qb.urgent{border-color:var(--blood);background:var(--grain),var(--blood);color:#fff;animation:mdp 1.2s infinite}
+
+/* 메뉴 */
+.obtn.danger.confirm{background:var(--blood);color:#fff}
+.mhelp{font-size:12px!important;opacity:.55!important;line-height:1.5}
+
+/* 아이템 칸 진행 표시: 배경이 왼쪽→오른쪽으로 차오름 (설명 칸 없이) */
+.card.busy{opacity:.6;border-color:#5a5b52;border-style:solid}
+.card.busy::before{content:none}
+.card.prog{opacity:1;border-color:var(--bone);
+  background:linear-gradient(90deg,rgba(233,227,210,.32) var(--p,0%),transparent var(--p,0%)),var(--grain),#1a1b17}
+.card.loot.prog::after{content:none}
+.rc.prog{background:linear-gradient(90deg,rgba(233,227,210,.14) var(--p,0%),transparent var(--p,0%))}
+
+/* 2차 다듬기 */
+.card.prog{background:linear-gradient(90deg,rgba(233,227,210,.5) var(--p,0%),transparent var(--p,0%)),var(--grain),#1a1b17}
+.card.prog .cn,.card.prog svg{color:#fff}
+#quick{z-index:auto;gap:6px}
+.qb{padding:8px 10px 8px 8px;font-size:12.5px}
+.sec-t button{white-space:nowrap}
+.dacts{flex-wrap:wrap}
+.dacts .abtn{flex:1 1 22%}
+#sheetBody.withdetail{padding-bottom:0}
+
+.dacts .abtn{font-size:12px;padding:9px 3px}
+
+/* 세로로 인식돼 90도 돌린 화면에서 지도 크기 */
+html.rot #bigmapSvg{height:calc(100vw - 64px)}
+#tNew.confirm{background:var(--blood);border-color:var(--blood);color:#fff}
+
+/* 밤 색·가장자리 어둡게: SVG 밖 고정 레이어 (매 프레임 다시 그리지 않음) */
+#tint{position:absolute;inset:0;pointer-events:none;background:#071033;opacity:0;will-change:opacity}
+#vign{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 75% 75% at 50% 50%,transparent 55%,rgba(0,0,0,.85) 100%)}
+
+/* 메뉴 버튼 4개 + 도움말이 가로 화면에 들어가도록 */
+#menu .ov-box{gap:8px}
+#menu .wbtn,#menu .obtn{padding:11px}
+#menu h2{font-size:22px}
+
+/* 바닥 레이어: 한 번 그리고 이동만 (GPU 합성) */
+#app{background:#0b0b0b}
+#ground{position:absolute;left:0;top:0;transform-origin:0 0;will-change:transform;pointer-events:none;display:block}
+#view{background:transparent!important}
+
+/* 조이스틱: 민 거리로 걷기/달리기/질주, 바깥 링 = 지구력 */
+#btnRun{display:none}
+#joy::before{display:none}
+#joy .jring{position:absolute;inset:-9px;width:calc(100% + 18px);height:calc(100% + 18px);transform:rotate(-90deg);pointer-events:none}
+#joy .jring circle{fill:none;stroke-width:4}
+#joy .jring .rbg{stroke:rgba(0,0,0,.55)}
+#joy .jring .rfg{stroke:var(--bone);stroke-dasharray:289;opacity:.8}
+#joy.tired .jring .rfg{stroke:var(--blood)}
+#joy .zone{position:absolute;border-radius:50%;border:1.5px dashed rgba(233,227,210,.28);pointer-events:none}
+#joy .z1{inset:28%}      /* 걷기 경계 */
+#joy .z2{inset:11%}      /* 달리기/질주 경계 */
+#gaitLbl{position:absolute;left:50%;top:-30px;transform:translateX(-50%);font-family:var(--fh);font-weight:400;font-size:12px;white-space:nowrap;padding:2px 8px;background:rgba(8,8,7,.8);clip-path:var(--cut-s)}
+#gaitLbl:empty{display:none}
+#joy[data-g=walk] #knob{background:#bdb7a8}
+#joy[data-g=jog] #knob{background:var(--bone)}
+#joy[data-g=sprint] #knob{background:var(--blood);box-shadow:0 0 0 3px var(--ink),0 0 0 6px rgba(200,20,31,.5),0 4px 10px rgba(0,0,0,.6)}
+#joy[data-g=sprint] #gaitLbl{background:var(--blood);color:#fff}
+
+/* 타이틀: 안개 + 걸어가는 좀비 실루엣 */
+#title{overflow:hidden}
+#title .ov-box{position:relative;z-index:2}
+.tfog{position:absolute;inset:-20% -20% 0 -20%;pointer-events:none;
+  background:radial-gradient(ellipse 50% 30% at 30% 88%,rgba(90,90,82,.35),transparent 70%),radial-gradient(ellipse 45% 25% at 75% 92%,rgba(80,80,74,.3),transparent 70%),radial-gradient(ellipse 80% 40% at 50% 100%,rgba(60,58,54,.45),transparent 75%);
+  animation:fog 18s ease-in-out infinite alternate}
+@keyframes fog{to{transform:translateX(6%)}}
+.tzs{position:absolute;left:0;right:0;bottom:0;width:100%;height:36%;pointer-events:none;opacity:.9}
+.tzs g{fill:#050505;stroke:#050505}
+.zw{animation:walkx linear infinite}
+.z1{animation-duration:46s;animation-delay:-5s}
+.z2{animation-duration:58s;animation-delay:-30s}
+.z3{animation-duration:40s;animation-delay:-18s}
+.z4{animation-duration:66s;animation-delay:-48s}
+@keyframes walkx{from{transform:translateX(900px)}to{transform:translateX(-60px)}}
+.zw use{animation:sway 1.6s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:50% 100%}
+@keyframes sway{from{rotate:-4deg}to{rotate:5deg}}
+
+#rain{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:0}
+
+/* 문·창문·가구 행동 버튼 + 메뉴 */
+#btnAlt{right:100px;bottom:92px}
+#btnAlt small{font-size:10px;max-width:58px}
+#altMenu{position:absolute;right:calc(var(--sr) + 180px);bottom:calc(var(--sb) + 96px);display:flex;flex-direction:column;gap:6px;z-index:5}
+#altMenu button{display:flex;align-items:center;gap:7px;padding:9px 12px;font-family:var(--fh);font-size:13px;white-space:nowrap;background:var(--grain),rgba(12,12,10,.94);border:2px solid var(--bone);clip-path:var(--cut-s)}
+#altMenu button svg{width:16px;height:16px}
+#altMenu button.off{opacity:.45}
+#altMenu button:active{background:var(--bone);color:var(--ink)}
+
+/* 신선도 표시 */
+.card .fresh{position:absolute;left:4px;bottom:9px;font-family:var(--fh);font-size:9px;padding:1px 4px}
+.card .fresh.f1{background:#8a7a2a;color:#fff}
+.card .fresh.f2{background:#5a8a2a;color:#fff}
+/* 탭 3개 */
+#sheetTabs button{font-size:13px;padding:7px 4px}
+/* 능력 탭 */
+.skills{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.sk{display:flex;align-items:center;gap:10px;padding:8px 10px;background:#17180f10;border:1.5px solid #2c2d27;clip-path:var(--cut-s)}
+.sk-ic{width:34px;height:34px;display:flex;align-items:center;justify-content:center;background:#23241f;clip-path:var(--cut-s)}
+.sk-ic svg{width:20px;height:20px}
+.sk-m{flex:1;min-width:0}
+.sk-m b{display:flex;justify-content:space-between;font-family:var(--fh);font-weight:400;font-size:14px}
+.sk-m b em{font-style:normal;font-family:var(--fn);font-size:13px;color:#ff5a63}
+.sk-bar{height:5px;background:#2c2c28;margin:5px 0 4px;position:relative}
+.sk-bar i{position:absolute;left:0;top:0;bottom:0;background:var(--bone)}
+.sk-m small{font-size:11px;opacity:.6}
+.sk-foot{margin-top:12px;font-size:12px;opacity:.6;text-align:center}
+/* 모닥불 흔들림 */
+.flame{animation:flk .35s ease-in-out infinite alternate;transform-origin:50% 70%;transform-box:fill-box}
+.flame2{animation:flk .25s ease-in-out infinite alternate-reverse;transform-origin:50% 70%;transform-box:fill-box}
+@keyframes flk{from{transform:scale(1,1)}to{transform:scale(.88,1.12)}}
+
+.card .fresh{left:3px;top:3px;bottom:auto}
+
+.mrow{display:flex;gap:8px}.mrow .obtn{flex:1;font-size:14px}
+
+/* look picker */
+.lookpick{display:flex;gap:10px;align-items:center;margin-top:4px;background:rgba(0,0,0,.35);border:1px solid rgba(232,220,196,.15);border-radius:8px;padding:6px 8px}
+#lookSvg{width:86px;height:86px;flex:none;background:radial-gradient(circle,#3a3a30 0,#1b1b17 70%);border-radius:6px}
+.lk-rows{flex:1;display:flex;flex-direction:column;gap:3px}
+.lk-row{display:flex;align-items:center;gap:4px}
+.lk-row span{flex:1;text-align:center;font-size:12px;opacity:.9;white-space:nowrap}
+.lk-row button,.lk-rand{background:rgba(232,220,196,.1);border:1px solid rgba(232,220,196,.2);color:var(--bone);border-radius:4px;font-size:11px;height:19px;min-width:26px;padding:0 6px;font-family:inherit}
+.lk-rand{height:20px;margin-top:2px}
+.lk-row button:active,.lk-rand:active{background:var(--blood)}
+
+/* 시야 기억 안개 */
+#fog{position:absolute;left:0;top:0;transform-origin:0 0;will-change:transform;pointer-events:none}
+
+/* 로딩 */
+#loading{position:absolute;inset:0;z-index:60;background:rgba(8,8,7,.92);display:flex;align-items:center;justify-content:center}
+#loading.hidden{display:none}
+#loading .ld-box{display:flex;align-items:center;gap:14px;font-family:var(--fh);font-size:20px;color:var(--bone)}
+#loading i{width:22px;height:22px;border:3px solid rgba(232,220,196,.25);border-top-color:var(--blood);border-radius:50%;animation:ldspin .8s linear infinite}
+@keyframes ldspin{to{transform:rotate(360deg)}}

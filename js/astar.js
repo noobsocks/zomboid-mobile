@@ -16,6 +16,7 @@
     this.hf = new Float32Array(N * 8);
     this.hs = 0;
     this.lastExpanded = 0;
+    this.cost = null; // 칸별 추가 비용 (닫힌 문·창문 등: 부수고 지나가야 함)
   }
   AStar.prototype.push = function (n, f) {
     const hn = this.hn, hf = this.hf;
@@ -94,7 +95,7 @@
         const m = ny * W + nx;
         if (B[m] || closed[m] === gen) continue;
         if (dx && dy && (B[y * W + nx] || B[ny * W + x])) continue;
-        const ng = g[n] + (dx && dy ? SQ2 : 1);
+        const ng = g[n] + (dx && dy ? SQ2 : 1) + (this.cost ? this.cost[m] : 0);
         if (open[m] !== gen || ng < g[m]) {
           open[m] = gen; g[m] = ng; par[m] = n;
           this.push(m, ng + h(nx, ny, tx, ty));
