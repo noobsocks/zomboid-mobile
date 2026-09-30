@@ -1,6 +1,6 @@
 // DEAD TOWN 오프라인 실행용 서비스워커
 // 게임 파일을 폰에 저장해두고, 인터넷 없이도 실행. 새 버전을 올리면 VERSION만 올리면 됨.
-const VERSION = 'deadtown-v27';
+const VERSION = 'deadtown-v38';
 const FILES = [
   './', 'index.html', 'style.css', 'manifest.webmanifest',
   'js/audio.js', 'js/rng.js', 'js/map.js', 'js/world.js', 'js/county.js', 'js/story.js', 'js/levels.js', 'js/astar.js', 'js/game.js',

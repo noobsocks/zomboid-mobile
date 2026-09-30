@@ -30,6 +30,8 @@
     chips:   { name: '과자', w: .2, type: 'food', full: 15, hyd: -4, time: 2.5, icon: 'chips' },
     can:     { name: '통조림', w: .6, type: 'food', full: 35, time: 4, icon: 'food' },
     water:   { name: '생수', w: .5, type: 'drink', hyd: 40, time: 2, icon: 'bottle' },
+    bottle:  { name: '빈 물병', w: .1, type: 'mat', icon: 'bottle' },
+    dirtywater: { name: '끓이지 않은 물', w: .5, type: 'drink', hyd: 30, time: 2, icon: 'bottle', sickP: .5 }, // 끓이면 생수
     soda:    { name: '탄산음료', w: .4, type: 'drink', hyd: 25, full: 4, time: 2, icon: 'soda' },
     note: { name: '쪽지', w: .05, type: 'note', icon: 'note' },
     carkey: { name: '자동차 열쇠', w: .02, type: 'key', icon: 'key' },
@@ -40,7 +42,7 @@
     hammer:  { name: '망치', w: 1, type: 'melee', hits: 1, dmg: 1.25, range: 1.1, cd: .75, endu: 9, dur: 45, knock: .35, color: '#a0a0a0', icon: 'hammer' },
     bat:     { name: '야구방망이', w: 1.5, type: 'melee', hits: 2, dmg: 1.3, range: 1.35, cd: .8, endu: 10, dur: 40, knock: .5, color: '#c8a06a', icon: 'bat' },
     pipe:    { name: '쇠파이프', w: 1.8, type: 'melee', hits: 2, dmg: 1.6, range: 1.4, cd: .95, endu: 12, dur: 70, knock: .6, color: '#8d99a3', icon: 'pipe' },
-    pistol:  { name: '권총', w: 1, type: 'gun', ammo: 'ammo', dmg: 3.2, range: 9, cd: .55, noise: 30, color: '#111', icon: 'gun' },
+    pistol:  { name: '권총', w: 1, type: 'gun', ammo: 'ammo', mag: 12, dmg: 3.2, range: 9, cd: .55, noise: 30, color: '#111', icon: 'gun' },
     ammo:    { name: '9mm 탄약', w: .02, type: 'ammo', stack: true, icon: 'ammo' },
     // --- 재료·도구 ---
     plank:   { name: '판자', w: 1, type: 'mat', icon: 'plank' },
@@ -67,10 +69,10 @@
     fireaxe: { name: '소방 도끼', w: 2.6, type: 'melee', hits: 3, dmg: 2.3, range: 1.45, cd: 1.1, endu: 15, dur: 80, knock: .65, color: '#c8141f', icon: 'fireaxe' },
     sledge:  { name: '오함마', w: 4, type: 'melee', hits: 3, dmg: 2.8, range: 1.45, cd: 1.5, endu: 22, dur: 100, knock: 1, color: '#5a5a58', icon: 'sledge' },
     katana:  { name: '일본도', w: 1.3, type: 'melee', hits: 3, dmg: 2.4, range: 1.55, cd: .7, endu: 9, dur: 55, knock: .3, color: '#e8eef2', icon: 'katana' },
-    revolver: { name: '리볼버', w: 1.1, type: 'gun', ammo: 'ammo', dmg: 4, range: 9, cd: .85, noise: 32, color: '#2a2a2a', icon: 'revolver' },
-    shotgun: { name: '산탄총', w: 3.2, type: 'gun', ammo: 'shells', hits: 3, spread: .38, dmg: 3.4, range: 5.5, cd: 1.2, noise: 42, color: '#4a3a2a', icon: 'shotgun' },
-    rifle:   { name: '사냥 소총', w: 3.8, type: 'gun', ammo: 'rammo', pierce: 2, dmg: 6, range: 14, cd: 1.4, noise: 45, color: '#5a4028', icon: 'rifle' },
-    crossbow: { name: '석궁', w: 2.4, type: 'gun', ammo: 'bolt', dmg: 3.2, range: 10, cd: 1.7, noise: 4, color: '#4a3a2a', icon: 'crossbow' },
+    revolver: { name: '리볼버', w: 1.1, type: 'gun', ammo: 'ammo', mag: 6, dmg: 4, range: 9, cd: .85, noise: 32, color: '#2a2a2a', icon: 'revolver' },
+    shotgun: { name: '산탄총', w: 3.2, type: 'gun', ammo: 'shells', mag: 5, hits: 3, spread: .38, dmg: 3.4, range: 5.5, cd: 1.2, noise: 42, color: '#4a3a2a', icon: 'shotgun' },
+    rifle:   { name: '사냥 소총', w: 3.8, type: 'gun', ammo: 'rammo', mag: 5, pierce: 2, dmg: 6, range: 14, cd: 1.4, noise: 45, color: '#5a4028', icon: 'rifle' },
+    crossbow: { name: '석궁', w: 2.4, type: 'gun', ammo: 'bolt', mag: 1, dmg: 3.2, range: 10, cd: 1.7, noise: 4, color: '#4a3a2a', icon: 'crossbow' },
     shells:  { name: '산탄', w: .04, type: 'ammo', stack: true, icon: 'shells' },
     rammo:   { name: '소총탄', w: .03, type: 'ammo', stack: true, icon: 'rammo' },
     bolt:    { name: '석궁 볼트', w: .05, type: 'ammo', stack: true, icon: 'bolt' },
@@ -102,6 +104,16 @@
     milboots:  { name: '군화', w: 1.4, type: 'wear', slot: 'feet', warm: 2, def: 4, spd: 1, dur: 80, icon: 'boots' },
     gloves:    { name: '작업 장갑', w: .2, type: 'wear', slot: 'hands', warm: 1, def: 2, dur: 35, soft: 1, icon: 'gloves' },
     tgloves:   { name: '전술 장갑', w: .2, type: 'wear', slot: 'hands', warm: 1, def: 3, dur: 50, soft: 1, icon: 'gloves' },
+    mapitem:   { name: '지역 지도', w: .05, type: 'map', icon: 'map' }, // it.town = 도시 번호 → 읽으면 그 도시가 지도에 나옴
+    countymap: { name: '카운티 도로 지도', w: .05, type: 'map', icon: 'map' }, // 읽으면 도로·강이 지도에 나옴
+    pencil:    { name: '연필', w: .02, type: 'tool', icon: 'note', pen: '#77746c' },
+    pen:       { name: '볼펜', w: .02, type: 'tool', icon: 'note', pen: '#1c1c1c' },
+    redpen:    { name: '빨간 펜', w: .02, type: 'tool', icon: 'note', pen: '#b3121c' },
+    bluepen:   { name: '파란 펜', w: .02, type: 'tool', icon: 'note', pen: '#2350b8' },
+    eraser:    { name: '지우개', w: .02, type: 'tool', icon: 'bandage' },
+    raincol:   { name: '빗물 받이', w: 3, type: 'place', icon: 'drop' },
+    splint:    { name: '부목', w: .4, type: 'med', icon: 'plank', splint: 1, time: 4 },
+    disinfect: { name: '소독약', w: .3, type: 'med', icon: 'pills', uses: 3, disinfect: 1, time: 2 },
     gascan:    { name: '기름통', w: .8, type: 'tool', icon: 'fuel' }, // it.fuel: 0~10L (무게 1L=0.75kg)
     oldpack:   { name: '낡은 배낭', w: .6, type: 'wear', slot: 'back', cap: 5, icon: 'pack', lookP: 1 },
     schoolbag: { name: '책가방', w: .5, type: 'wear', slot: 'back', cap: 7, icon: 'pack', pack: 'school' },
@@ -123,11 +135,16 @@
     { id: 'benchkit',  in: [['plank', 4], ['nails', 6]], tools: ['hammer'], out: 'benchkit', time: 10, noise: 6 },
     { id: 'spear',     in: [['pipe', 1], ['knife', 1], ['tape', 1]], out: 'spear', time: 6, bench: true },
     { id: 'campkit',   in: [['plank', 2], ['cloth', 1]], out: 'campkit', time: 5 },
+    { id: 'raincol',   in: [['plank', 2], ['nails', 2], ['cloth', 2]], tools: ['hammer'], out: 'raincol', time: 8, noise: 4 },
+    { id: 'splint',    in: [['plank', 1], ['cloth', 2]], out: 'splint', time: 4 },
+    { id: 'boil',      in: [['dirtywater', 1]], tools: ['pot'], out: 'water', time: 5, heat: true, cook: true },
     // 요리 (불 필요: 전기 있을 땐 조리대, 끊기면 모닥불)
     { id: 'hotcan',    in: [['can', 1]], out: 'hotcan', time: 4, heat: true, cook: true },
     { id: 'toast',     in: [['bread', 1]], out: 'toast', time: 3, heat: true, cook: true },
     { id: 'stew',      in: [['can', 1], ['water', 1], ['apple', 1]], tools: ['pot'], out: 'stew', time: 8, heat: true, cook: true },
   ];
+  // 제작할 때 소리 (망치 쓰는 건 망치질이 따로 반복됨)
+  const CRAFT_SFX = { bandage: 'craft_cloth', plank3: 'saw', spear: 'craft_tape', splint: 'craft_tape', campkit: 'craft_wood' };
   // 가구 분해
   const DISMANTLE = {
     closet:  { tool: 'hammer', time: 7, noise: 7, out: [['plank', 3, 4], ['nails', 2, 5]] },
@@ -185,14 +202,14 @@
   const SPEC = { corpse: .82, treeR: [.5, .56] };
   const FISTS = { name: '맨손', type: 'melee', hits: 1, dmg: .35, range: .85, cd: .5, endu: 4, knock: .25, icon: 'fist' };
   const LOOT = {
-    fridge:  { name: '냉장고', color: '#f4f4f4', pool: [['gascan', .4], ['hikebag', .6], ['boots', .6], ['fieldjkt', .4], ['milpants', .4], ['gloves', .5], ['sneakers', 1.2], ['cap', 1], ['schoolbag', .6], ['duffel', .6], ['firehelm', .8], ['firecoat', .55], ['boots', .6], ['gloves', .8], ['workpants', .7], ['boots', .6], ['gloves', .7], ['cap', .4], ['hikebag', .25], ['vest', .12], ['hoodie', 1.4], ['jeans', 1.4], ['sneakers', .9], ['cap', .9], ['schoolbag', .5], ['leather', .3], ['duffel', .3], ['gloves', .3], ['brick', .05], ['apple', 3], ['bread', 2], ['water', 3], ['soda', 3], ['can', 1]], min: 1, max: 3 },
+    fridge:  { name: '냉장고', color: '#f4f4f4', pool: [['pen', .2], ['countymap', .08], ['mapitem', .25], ['pencil', .6], ['pen', .5], ['redpen', .15], ['bluepen', .15], ['eraser', .3], ['bottle', .6], ['bottle', 1], ['disinfect', .5], ['splint', .4], ['disinfect', .4], ['disinfect', 1.5], ['gascan', .4], ['hikebag', .6], ['boots', .6], ['fieldjkt', .4], ['milpants', .4], ['gloves', .5], ['sneakers', 1.2], ['cap', 1], ['schoolbag', .6], ['duffel', .6], ['firehelm', .8], ['firecoat', .55], ['boots', .6], ['gloves', .8], ['workpants', .7], ['boots', .6], ['gloves', .7], ['cap', .4], ['hikebag', .25], ['vest', .12], ['hoodie', 1.4], ['jeans', 1.4], ['sneakers', .9], ['cap', .9], ['schoolbag', .5], ['leather', .3], ['duffel', .3], ['gloves', .3], ['brick', .05], ['apple', 3], ['bread', 2], ['water', 3], ['soda', 3], ['can', 1]], min: 1, max: 3 },
     cabinet: { name: '조리대', color: '#a17a50', pool: [['pan', .9], ['can', 3], ['chips', 3], ['water', 1], ['bread', 1], ['pills', 1], ['tape', .8], ['glue', .6], ['pot', .7]], min: 0, max: 3 },
     drawer:  { name: '서랍', color: '#7a5a3a', pool: [['hknife', .35], ['wrench', .3], ['bolt', .2], ['bandage', 3], ['knife', 1.2], ['ammo', .8], ['pills', 2], ['hammer', .8], ['nails', 1.6], ['tape', 1], ['screwdriver', .9], ['glue', .5]], min: 0, max: 3 },
     closet:  { name: '옷장', color: '#5a432d', pool: [['bandage', 2], ['bat', 1.5], ['pipe', .8], ['pistol', .35], ['ammo', 1], ['shirt', 2.5], ['cloth', 1], ['axe', .15], ['golf', .6], ['hockey', .5], ['katana', .05], ['crossbow', .08], ['shotgun', .06], ['shells', .15]], min: 0, max: 3 },
     // 특수 건물
     shelf_food: { name: '식품 진열대', color: '#c8a050', pool: [['can', 3], ['chips', 3], ['bread', 2], ['soda', 2.5], ['water', 2.5], ['apple', 1.5]], min: 1, max: 4 },
     shelf_med:  { name: '약 진열대', color: '#6aa8a0', pool: [['bandage', 3], ['pills', 3], ['water', .8], ['glue', .3]], min: 1, max: 3 },
-    counter:    { name: '계산대', color: '#8a7a6a', pool: [['gascan', .25], ['soda', 1], ['chips', 1], ['pills', .7], ['tape', .6], ['knife', .4], ['ammo', .3], ['baton', .2], ['shells', .15]], min: 0, max: 2 },
+    counter:    { name: '계산대', color: '#8a7a6a', pool: [['mapitem', .5], ['countymap', .12], ['pen', .4], ['pencil', .3], ['gascan', .25], ['soda', 1], ['chips', 1], ['pills', .7], ['tape', .6], ['knife', .4], ['ammo', .3], ['baton', .2], ['shells', .15]], min: 0, max: 2 },
     locker:     { name: '사물함', color: '#4a5a6a', pool: [['bandage', 1.5], ['baton', 1.6], ['ammo', 1.5], ['pistol', .35], ['revolver', .3], ['shells', .8], ['shirt', 1], ['hknife', .6]], min: 0, max: 3 },
     gunlocker:  { name: '총기 보관함', color: '#2a3440', pool: [['ammo', 3], ['pistol', 1.2], ['revolver', .8], ['shotgun', .9], ['shells', 2.5], ['rifle', .5], ['rammo', 1.5]], min: 1, max: 3 },
     toolrack:   { name: '공구 선반', color: '#9a6a3a', pool: [['gascan', .6], ['gloves', 1], ['workpants', .4], ['boots', .3], ['hammer', 1], ['nails', 3], ['plank', 2.5], ['screwdriver', 1], ['tape', 1.5], ['glue', 1], ['wire', 1.5], ['pipe', .8], ['scrap', 1.5], ['axe', .6], ['saw', 1], ['wrench', 1], ['crowbar', .8], ['shovel', .8], ['sledge', .35], ['pickaxe', .45], ['fireaxe', .25], ['machete', .4]], min: 1, max: 4 },
@@ -202,16 +219,18 @@
     sportrack:  { name: '스포츠 진열대', color: '#3a6a9a', pool: [['bat', 1.5], ['golf', 1.5], ['hockey', 1.2], ['water', 1.5], ['soda', 1], ['bandage', .6], ['tape', .6]], min: 1, max: 3 },
     safe:       { name: '금고', color: '#4a4a48', pool: [['revolver', .5], ['pistol', .6], ['ammo', 2], ['baton', .8], ['bandage', .6], ['pills', .5]], min: 0, max: 2 },
     crate:      { name: '나무 상자', color: '#9a7446', pool: [['plank', 2], ['nails', 2], ['scrap', 1.5], ['wire', 1], ['can', 1.5], ['water', 1], ['tape', 1], ['glue', .6], ['crowbar', .25], ['wrench', .3], ['sledge', .1]], min: 0, max: 3 },
-    luggage:    { name: '여행 가방', color: '#2a4a6a', pool: [['hoodie', 1], ['jeans', 1], ['cap', .6], ['sneakers', .6], ['duffel', .4], ['shirt', 3], ['cloth', 2], ['pills', 1.2], ['bandage', 1], ['water', 1], ['chips', 1], ['soda', .8], ['note', .9], ['radio', .12]], min: 0, max: 3 },
-    supply:     { name: '보급 상자', color: '#4e5436', pool: [['milhelm', .35], ['milpants', .4], ['milboots', .4], ['tgloves', .3], ['fieldjkt', .3], ['can', 3], ['water', 3], ['bandage', 2], ['pills', 1], ['ammo', 1.2], ['rammo', .8], ['shells', .5], ['note', .4]], min: 1, max: 3 },
+    luggage:    { name: '여행 가방', color: '#2a4a6a', pool: [['mapitem', .3], ['pen', .3], ['pencil', .2], ['hoodie', 1], ['jeans', 1], ['cap', .6], ['sneakers', .6], ['duffel', .4], ['shirt', 3], ['cloth', 2], ['pills', 1.2], ['bandage', 1], ['water', 1], ['chips', 1], ['soda', .8], ['note', .9], ['radio', .12]], min: 0, max: 3 },
+    supply:     { name: '보급 상자', color: '#4e5436', pool: [['countymap', .2], ['pencil', .2], ['disinfect', .5], ['milhelm', .35], ['milpants', .4], ['milboots', .4], ['tgloves', .3], ['fieldjkt', .3], ['can', 3], ['water', 3], ['bandage', 2], ['pills', 1], ['ammo', 1.2], ['rammo', .8], ['shells', .5], ['note', .4]], min: 1, max: 3 },
     miltruck:   { name: '군용 트럭', color: '#4b5134', pool: [['milhelm', .5], ['vest', .25], ['milpants', .5], ['milboots', .5], ['tgloves', .4], ['milbag', .3], ['fieldjkt', .4], ['ammo', 2], ['rammo', 1.5], ['can', 2], ['water', 2], ['bandage', 1.5], ['rifle', .12], ['machete', .3], ['radio', .3], ['note', .5]], min: 1, max: 3 },
-    car:        { name: '차량', color: '#6b6b66', pool: [['gascan', .35], ['motohelm', .15], ['gloves', .3], ['cap', .3], ['water', 2], ['soda', 1.5], ['chips', 1.5], ['tape', 1], ['screwdriver', .8], ['hammer', .4], ['bandage', 1], ['pills', .8], ['cloth', 1], ['wire', .8], ['scrap', .8], ['ammo', .25], ['saw', .25], ['axe', .12], ['wrench', .6], ['crowbar', .5], ['golf', .3], ['brick', .3], ['shovel', .15], ['rifle', .03], ['rammo', .08]], min: 0, max: 3 },
+    car:        { name: '차량', color: '#6b6b66', pool: [['mapitem', .45], ['countymap', .12], ['pen', .25], ['bottle', .5], ['gascan', .35], ['motohelm', .15], ['gloves', .3], ['cap', .3], ['water', 2], ['soda', 1.5], ['chips', 1.5], ['tape', 1], ['screwdriver', .8], ['hammer', .4], ['bandage', 1], ['pills', .8], ['cloth', 1], ['wire', .8], ['scrap', .8], ['ammo', .25], ['saw', .25], ['axe', .12], ['wrench', .6], ['crowbar', .5], ['golf', .3], ['brick', .3], ['shovel', .15], ['rifle', .03], ['rammo', .08]], min: 0, max: 3 },
   };
   const BASE_CAP = 10;     // 무게 한도 (배낭 없이) — 배낭을 메면 늘어남
   // 들어서 옮길 수 있는 가구 (이름·무게)
   const FURN = { fridge: ['냉장고', 22], cabinet: ['조리대', 14], drawer: ['서랍장', 10], closet: ['옷장', 16], bed: ['침대', 18], sofa: ['소파', 16], table: ['식탁', 7], tv: ['TV', 6], toilet: ['변기', 9], shelf: ['책장', 14], bath: ['욕조', 30], sink: ['세면대', 8], washer: ['세탁기', 25], plant: ['화분', 4], desk: ['책상', 10], shelf_food: ['진열대', 20], shelf_med: ['약 진열대', 18], counter: ['계산대', 24], locker: ['사물함', 20], gunlocker: ['총기 보관함', 34], toolrack: ['공구 선반', 22], firegear: ['소방 장비함', 20], kitchen: ['주방 선반', 16], huntrack: ['사냥 진열대', 20], sportrack: ['스포츠 진열대', 18], safe: ['금고', 60], crate: ['나무 상자', 12], luggage: ['여행 가방', 5], supply: ['보급 상자', 14] };
   const FURN_CONT = { fridge: 1, cabinet: 1, drawer: 1, closet: 1, shelf_food: 1, shelf_med: 1, counter: 1, locker: 1, gunlocker: 1, toolrack: 1, firegear: 1, kitchen: 1, huntrack: 1, sportrack: 1, safe: 1, crate: 1, luggage: 1, supply: 1 };
-  const nameOf = it => it.id === 'furn' ? (FURN[it.kind] || ['가구'])[0] : it.id === 'note' && it.nid && DT.STORY && DT.STORY.notes[it.nid] ? DT.STORY.notes[it.nid].t : ITEMS[it.id].name;
+  const namedTowns = () => (M.towns || []).filter(t => t.name && t.key !== 'hamlet');
+  function pickMapTown(c, r) { const T0 = namedTowns(); if (!T0.length) return null; if (c && c.town != null && M.towns[c.town] && M.towns[c.town].name && r() < .6) return c.town; return T0[(r() * T0.length) | 0].id; }
+  const nameOf = it => it.id === 'mapitem' && it.town != null && M.towns && (G.worldM || M).towns[it.town] ? (G.worldM || M).towns[it.town].name + ' 지도' : it.id === 'furn' ? (FURN[it.kind] || ['가구'])[0] : it.id === 'note' && it.nid && DT.STORY && DT.STORY.notes[it.nid] ? DT.STORY.notes[it.nid].t : ITEMS[it.id].name;
   // 쪽지 고르기: 그 도시 이야기 3배 가중 + 어디서나 나오는 쪽지
   function pickNote(key, r) {
     r = r || rand; const N = (DT.STORY || {}).notes || {}, ids = Object.keys(N), pool = [];
@@ -242,6 +261,7 @@
     if (STACK_ROLL[id]) { const [a, b] = STACK_ROLL[id]; it.n = a + Math.floor(r() * (b - a + 1)); }
     else if (d.stack) it.n = 1;
     if (d.uses) it.u = d.uses;
+    if (d.mag) it.mag = r() < .4 ? 1 + Math.floor(r() * d.mag) : 0; // 총은 가끔 탄이 조금 든 채로 발견
     if (id === 'gascan') { it.fuel = r() < .55 ? 0 : 1 + Math.floor(r() * 6); canW(it); }
     if (id === 'note') it.nid = pickNote('any', r);
     return it;
@@ -253,6 +273,7 @@
       const c = M.containers[i], r = DT.rng((G.seed ^ (i * 2654435761) ^ (M.salt || 0)) >>> 0);
       l = G.containers[i] = c ? rollLoot(c.kind, r) : [];
       for (const it of l) if (it.id === 'note') it.nid = pickNote(townKeyOf(c), r); // 그 도시의 이야기
+      for (const it of l) if (it.id === 'mapitem') it.town = pickMapTown(c, r); // 대부분 그 도시 지도, 가끔 다른 도시
       if (c && c.fixedNote) { const n = mkItem('note'); n.nid = c.fixedNote; l.unshift(n); } // 정해진 자리의 핵심 문서
       if (!M.level && G.keyAt && G.keyAt[i] != null) { const k = mkItem('carkey'); k.vid = G.keyAt[i]; l.unshift(k); } // 근처 차 열쇠
     }
@@ -273,11 +294,11 @@
     return {
       seed, time: 9 * 60, kills: 0, uid: 1,
       p: { x: 0, y: 0, r: .3, face: 0, hp: 100, full: 80, hyd: 80, energy: 85, endu: 100,
-        bleed: false, infected: false, infT: 0, inv: [], equip: null, equip2: null, wear: {}, cd: 0, cdMax: 1, noiseT: 0, atkT: 0, noiseR: 0 },
+        bleed: false, infected: false, infT: 0, inv: [], equip: null, equip2: null, wear: {}, wounds: [], cd: 0, cdMax: 1, noiseT: 0, atkT: 0, noiseR: 0 },
       zombies: [], zdorm: new Map(), zdormN: 0, zoneT: 0, corpses: [], fx: [], containers: [], searched: new Set(),
       running: false, paused: false, sleeping: false, openC: -1, sel: null,
       sk: { melee: { lv: 0, xp: 0 }, gun: { lv: 0, xp: 0 }, carp: { lv: 0, xp: 0 }, cook: { lv: 0, xp: 0 }, aid: { lv: 0, xp: 0 }, mech: { lv: 0, xp: 0 } },
-      power: 1, powerOffAt: (6 + Math.floor(Math.random() * 4)) * 1440 + 9 * 60, sick: 0,
+      power: 1, powerOffAt: (6 + Math.floor(Math.random() * 4)) * 1440 + 9 * 60, sick: 0, waterOn: 1, snowCov: 0, marks: [], toiletUsed: [],
       rain: 0, rainTarget: 0, weatherNext: 9 * 60 + 120 + Math.random() * 300, thunderT: 30, flashT: 0, hitStop: 0,
       actions: [], placed: [], removed: new Set(), tab: 'bag', chopped: new Set(), nearTree: -1, nearBench: -1, lastHour: 9, night: 0, saveT: 0, hudT: 0, dead: false, shake: 0, dmgInd: [], nearC: -1,
     };
@@ -451,6 +472,7 @@
     // 바닥 층: 0 바탕(잔디·도로·바닥) 1 바닥 장식 2 벽 3 문·창문 4 물건(차·가구·간판·가로등) 5 나무
     const gr = el('g', { 'shape-rendering': 'crispEdges' }, gsv);
     L.GL = [0, 1, 2, 3, 4, 5].map(() => el('g', {}, gr));
+    L.snowG = el('g', { opacity: 0, 'pointer-events': 'none' }); gr.insertBefore(L.snowG, L.GL[1]); L._snowO = null; // 쌓인 눈 (바깥 칸만)
     L.chunks = new Map(); L.ckQ = []; L._ckR = null;
     L.cont = []; L.opEl = {}; L.lampEls = [];
 
@@ -482,12 +504,14 @@
   }
 
   const SHOPC = { market: '#2a8a3a', pharmacy: '#1f9a8a', police: '#2a4a9a', hardware: '#c86a1a', gas: '#c8141f', firestation: '#e0301a', restaurant: '#d8a020', hunting: '#5a7a2a', sports: '#2a8ac8', bank: '#b89a4a', army: '#5a6a3a', hospital: '#e8e4dc', warehouse: '#8a7a5a', factory: '#7a6a5a', terminal: '#3a7ac8', prison: '#c86a1a' };
+  const SHOW_SHOP_SIGN = false; // 건물 간판·이름 표시 (철물점 등) — 요청으로 끔
   function buildChunk(cx, cy) {
     const key = cy * M.CW + cx;
     if (L.chunks.has(key)) return;
     const T = DT.T, W = M.W, H = M.H;
     const x0 = cx * CK, y0 = cy * CK, x1 = Math.min(W, x0 + CK), y1 = Math.min(H, y0 + CK);
     const gl = L.GL.map(p => el('g', {}, p));
+    if (L.snowG && !M.level) { const sd = runsPathR(v => v === T.GRASS || v === T.ROAD || v === T.CAR || v === T.WALK || v === T.DIRT || v === T.FENCE || v === T.TREE, x0, y0, x1, y1); if (sd) gl.push(el('path', { d: sd, fill: '#e4eaee' }, L.snowG)); }
     const ch = { key, cx, cy, gl, cont: [], lamps: [] };
     L.chunks.set(key, ch);
     const [g0, g1, g2, g3, g4, g5] = gl;
@@ -669,7 +693,7 @@
     // ---- 4) 물건: 폐차·실내가구·간판·가로등 ----
     for (const i of M.ixCar[key]) drawCar(g4, M.cars[i]);
     for (const i of M.ixDecor[key]) if (!(G.rmDecor && G.rmDecor.has(i))) drawDecor(g4, M.decor[i]);
-    for (const sh of M.ixShop[key]) {
+    for (const sh of (SHOW_SHOP_SIGN ? M.ixShop[key] : [])) { // 건물 간판 (지금은 끔)
       const sw = Math.max(2.8, sh.name.length * .5 + .4), [dx, dy] = sh.door, sx = dx + .5 - sw / 2, sy = dy + 1.15, c = SHOPC[sh.kind] || '#888';
       el('rect', { x: sx + .06, y: sy + .08, width: sw, height: .8, fill: '#000', 'fill-opacity': .4 }, g4);
       el('rect', { x: sx, y: sy, width: sw, height: .8, rx: .06, fill: '#141414', stroke: c, 'stroke-width': .09 }, g4);
@@ -792,7 +816,7 @@
       if (onScreen || !built || performance.now() < tEnd) { built++; L.ckQ.splice(i, 1); buildChunk(cx, cy); }
     }
     // 바닥 SVG는 화면 주변 128x96칸 창으로만 (아주 큰 그림 한 장이 되지 않게)
-    const zs = (OPTS.zoom || 1) * (L.dz || 1), RW = L.dz < 1 ? 176 : 128, RH = L.dz < 1 ? 128 : 96, Z0 = Math.round(ZOOM / zs * 100) / 100; // 확대·축소는 CSS 배율로만 (바닥을 다시 그리지 않음)
+    const zs = (OPTS.zoom || 1) * (L.dz || 1) * (L.cz || 1), RW = L.dz < 1 ? 176 : 128, RH = L.dz < 1 ? 128 : 96, Z0 = Math.round(ZOOM / zs * 100) / 100; // 확대·축소는 CSS 배율로만 (바닥을 다시 그리지 않음)
     let R = L.reg;
     if (!R || R.rw !== RW || vx0 < R.x + 2 || vy0 < R.y + 2 || vx1 > R.x + RW - 2 || vy1 > R.y + RH - 2) {
       R = L.reg = { rw: RW, x: Math.floor(((vx0 + vx1) / 2 - RW / 2) / CK) * CK, y: Math.floor(((vy0 + vy1) / 2 - RH / 2) / CK) * CK };
@@ -997,18 +1021,20 @@
       el('rect', { x: 0, y: 0, width: M.W, height: M.H, fill: '#171a13' }, svg);
       const base = el('image', { x: 0, y: 0, width: M.W, height: M.H, preserveAspectRatio: 'none', style: 'image-rendering:pixelated' }, svg);
       if (big) {
-        for (const sh of (M.shops || [])) { const t = el('text', { x: sh.x + sh.w / 2, y: sh.y + sh.h / 2 + .8, 'text-anchor': 'middle', 'font-size': 2.4, 'font-weight': 700, fill: '#f2eee4', stroke: '#000', 'stroke-width': .35, 'paint-order': 'stroke', 'font-family': 'sans-serif' }, svg); t.textContent = sh.name; }
+        if (SHOW_SHOP_SIGN) for (const sh of (M.shops || [])) { const t = el('text', { x: sh.x + sh.w / 2, y: sh.y + sh.h / 2 + .8, 'text-anchor': 'middle', 'font-size': 2.4, 'font-weight': 700, fill: '#f2eee4', stroke: '#000', 'stroke-width': .35, 'paint-order': 'stroke', 'font-family': 'sans-serif' }, svg); t.textContent = sh.name; }
       }
       const mask = el('image', { x: 0, y: 0, width: M.W, height: M.H, preserveAspectRatio: 'none' }, svg); // 안 가본 곳 가림
       const tl = el('g', {}, svg); // 도시 이름 (가본 도시만)
+      const mk = el('g', {}, svg); // 내가 찍은 표시
       const pm = el('g', {}, svg);
       if (big) el('circle', { r: 2.2, fill: 'none', stroke: '#c8141f', 'stroke-width': .35 }, pm);
       el('path', { d: 'M1.6 0L-1 -1.1L-.4 0L-1 1.1Z', fill: '#c8141f', stroke: '#000', 'stroke-width': .2, transform: big ? 'scale(1.1)' : 'scale(.9)' }, pm);
-      return { base, pm, mask, tl, big };
+      return { base, pm, mask, tl, big, mk };
     };
     L.mini = make($('mini'), false);
     L.big = make($('bigmapSvg'), true);
     L.mapDirty = false;
+    if (G) drawMarks();
     const Mx = M, setBase = url => { for (const m of [L.mini, L.big]) m.base.setAttribute('href', url); };
     if (Mx._baseURL) setBase(Mx._baseURL); // 한 번 그린 지도 바탕은 다시 씀 (층 이동 때 빠르게)
     else mapBaseURL(url => { Mx._baseURL = url; if (M === Mx) setBase(url); });
@@ -1029,6 +1055,51 @@
       e.textContent = (L._bigSize || 0) > 600 ? t.name : t.name + ' · ' + t.label;
     }
   }
+  // 지도 아이템: 도시 지도 = 그 도시 전체, 카운티 도로 지도 = 도로·강 (프로젝트 좀보이드처럼 읽으면 지도에 채워짐)
+  function mapFocus(it) { const W0 = G.worldM || M, t = it.id === 'mapitem' && it.town != null && W0.towns ? W0.towns[it.town] : null; return t ? [t.x + t.w / 2, t.y + t.h / 2, Math.max(60, t.w * 1.15)] : [W0.W / 2, W0.H / 2, W0.W]; }
+  function revealMap(it) {
+    const W0 = M, E = G.exp, W = W0.W, T = DT.T, f = mapFocus(it);
+    const t = it.id === 'mapitem' && it.town != null && W0.towns ? W0.towns[it.town] : null;
+    if (t) { for (let y = Math.max(0, t.y); y < Math.min(W0.H, t.y + t.h); y++) for (let x = Math.max(0, t.x); x < Math.min(W, t.x + t.w); x++) { const v = W0.t[y * W + x]; if (v !== T.VOID) E[y * W + x] = 1; } }
+    else for (let k = 0; k < E.length; k++) { const v = W0.t[k]; if (v === T.ROAD || v === T.CAR || v === T.WATER) E[k] = 1; }
+    G.expDirty = false; updateMapMask(); updateTownLabels();
+    return f;
+  }
+  function openBigmap(focus) {
+    if (!G || !G.running) return;
+    G.paused = true; if (G.expDirty) { G.expDirty = false; updateMapMask(); } fitBigmap();
+    if (focus) setBigView(focus[0], focus[1], focus[2]);
+    renderMkBar(); $('bigmap').classList.remove('hidden');
+  }
+  // 큰 지도 보기 영역 (확대·이동)
+  function setBigView(cx, cy, size) {
+    const W0 = M; size = clamp(size, 24, Math.max(W0.W, W0.H)); cx = clamp(cx, size / 2, W0.W - size / 2); cy = clamp(cy, size / 2, W0.H - size / 2);
+    L.bv = { cx, cy, size }; L._bigSize = size;
+    $('bigmapSvg').setAttribute('viewBox', `${(cx - size / 2).toFixed(1)} ${(cy - size / 2).toFixed(1)} ${size.toFixed(1)} ${size.toFixed(1)}`);
+    clearTimeout(L._bvTO); L._bvTO = setTimeout(() => { updateTownLabels(); drawMarks(); updateMaps(); }, 60);
+  }
+  // 필기구: 표시·글자는 펜/연필이 있어야, 지우기는 지우개 (연필로 쓴 것만 지워짐)
+  const PEN_IDS = ['pencil', 'pen', 'redpen', 'bluepen'];
+  const pensHave = () => PEN_IDS.filter(id => G.p.inv.some(i => i.id === id));
+  function renderMkBar() {
+    const have = pensHave(); if (!have.includes(L.pen)) L.pen = have[0] || null;
+    $('mkPens').innerHTML = have.map(id => `<button data-pen="${id}" class="${L.pen === id ? 'on' : ''}"><i style="background:${ITEMS[id].pen}"></i>${ITEMS[id].name}</button>`).join('') || '<span class="nopen">필기구가 없다 — 연필·펜을 찾아보자</span>';
+    const er = has('eraser');
+    for (const b of $('mkBar').querySelectorAll('button[data-mk]')) { const k = b.dataset.mk; b.disabled = k === 'del' ? !er : !L.pen; b.classList.toggle('on', k === L.mkMode); }
+    if ((L.mkMode === 'del' && !er) || (L.mkMode && L.mkMode !== 'del' && !L.pen)) L.mkMode = null;
+    $('mkText').classList.toggle('hidden', L.mkMode !== 'text');
+    $('mkHint').textContent = !L.mkMode ? (L.pen ? '기호를 고르고 지도를 누르세요 · 끌어서 이동' : '끌어서 이동 · +/− 확대') : L.mkMode === 'del' ? '지울 표시를 누르세요 (연필로 쓴 것만)' : L.mkMode === 'text' ? '글자를 적고 지도를 누르세요' : '표시할 곳을 누르세요';
+  }
+  // 지도 표시 (기지·차·위험·물건) — 바깥 지도에만
+  const MARK = { base: ['기지', '#6ab04c', '집'], car: ['차', '#3a86c8', '차'], danger: ['위험', '#c8141f', '!'], loot: ['물건', '#d8a020', '★'], food: ['음식', '#d8a020', '식'], water: ['물', '#3a86c8', '물'], med: ['약', '#6ab04c', '✚'], zomb: ['좀비 떼', '#c8141f', '좀'], text: ['글자', '#1c1c1c', ''] };
+  function drawMarks() {
+    for (const m of [L.mini, L.big]) { if (!m || !m.mk) continue; m.mk.innerHTML = ''; if (M.level) continue;
+      const r = m.big ? Math.max(1.4, (L._bigSize || 72) / 55) : 1.1;
+      for (const k of G.marks || []) { const t = MARK[k.t]; if (!t) continue; const g = el('g', { transform: `translate(${k.x.toFixed(1)} ${k.y.toFixed(1)})` }, m.mk), c = k.c || t[1];
+        if (k.t === 'text') { if (!m.big) { el('circle', { r: r * .35, fill: c }, g); continue; } const tx = el('text', { y: r * .4, 'text-anchor': 'middle', 'font-size': r * 1.25, 'font-weight': 800, fill: c, stroke: '#e8dfc6', 'stroke-width': r * .25, 'paint-order': 'stroke', 'font-family': 'sans-serif' }, g); tx.textContent = k.txt || ''; continue; }
+        el('circle', { r, fill: 'none', stroke: c, 'stroke-width': r * .22 }, g);
+        const tx = el('text', { y: r * .4, 'text-anchor': 'middle', 'font-size': r * (t[2].length > 1 ? .85 : 1.2), 'font-weight': 900, fill: c, stroke: m.big ? '#e8dfc6' : '#000', 'stroke-width': r * .12, 'paint-order': 'stroke', 'font-family': 'sans-serif' }, g); tx.textContent = t[2]; } }
+  }
   function updateMaps() {
     const p = G.p;
     const t = `translate(${p.x.toFixed(2)} ${p.y.toFixed(2)}) rotate(${(p.face * 180 / Math.PI).toFixed(0)})`;
@@ -1047,9 +1118,10 @@
       const size = Math.min(M.W, Math.max(40, x1 - x0 + 8, y1 - y0 + 8));
       const cx = clamp((x0 + x1) / 2, size / 2, M.W - size / 2), cy = clamp((y0 + y1) / 2, size / 2, M.H - size / 2);
       $('bigmapSvg').setAttribute('viewBox', `${(cx - size / 2).toFixed(1)} ${(cy - size / 2).toFixed(1)} ${size.toFixed(1)} ${size.toFixed(1)}`);
-      L._bigSize = size;
+      L._bigSize = size; L.bv = { cx, cy, size };
     }
     updateTownLabels();
+    drawMarks();
     updateMaps();
   }
   function refreshContainer(i) {
@@ -2219,13 +2291,85 @@
     return { def: ITEMS[item.id], item };
   }
   function ammoItem(def) { const id = (def && def.ammo) || (curWeapon().def.ammo) || 'ammo'; return G.p.inv.find(i => i.id === id && i.n > 0); }
+  function ammoLeft(def) { const id = def.ammo || 'ammo'; let n = 0; for (const i of G.p.inv) if (i.id === id) n += i.n || 0; return n; }
+  /* ===== 재장전 =====
+     각 총마다 단계가 나뉘고, 단계가 끝날 때 해당 소리가 난다 (소리 이름 = 효과음 목록의 저장 이름)
+     mag  : 한꺼번에 채우기 (권총·소총 탄창, 리볼버 실린더)
+     each : 한 발씩 넣기 (산탄총·석궁) — 넣는 중 공격하면 넣은 만큼 쏠 수 있다 */
+  const RELOAD = {
+    pistol:   { kind: 'mag',  open: ['mag_out', .55, '탄창 빼는 중'], per: ['mag_in', 1.5, '탄창 끼우는 중'], close: ['slide', .4, '슬라이드 당기는 중', 1] },
+    rifle:    { kind: 'mag',  open: ['mag_out', .6, '탄창 빼는 중'], per: ['mag_in', 1.6, '탄창 끼우는 중'], close: ['bolt_cycle', .55, '노리쇠 당기는 중', 1] },
+    revolver: { kind: 'mag',  per: ['cyl_load', 3.0, '실린더에 탄 넣는 중'] }, // 열기·넣기·닫기를 한 번에
+    shotgun:  { kind: 'each', per: ['shell_in', .6, '산탄 넣는 중'], close: ['pump', .45, '펌프 당기는 중', 1] },
+    crossbow: { kind: 'each', per: ['xbow_load', 1.3, '시위 당기고 볼트 거는 중'] }, // 한 번에
+  };
+  const CYCLE_SFX = { shotgun: ['pump', .38], rifle: ['bolt_cycle', .5] }; // 쏜 뒤 다음 발 준비 소리
+  function rlSpeed() { return Math.max(.5, 1 - .05 * skillLv('gun')); }
+  function reloadState() { return G.p.rl || null; }
+  function canReload(it) { const d = it && ITEMS[it.id]; return !!(d && d.mag && (it.mag || 0) < d.mag && ammoLeft(d) > 0); }
+  function startReload(quiet) {
+    const p = G.p, w = curWeapon(), it = w.item, d = w.def;
+    if (!it || !d.mag || p.inCar != null || G.dead || G.sleeping) return false;
+    if (p.rl) return false;
+    if ((it.mag || 0) >= d.mag) { if (!quiet) toast('이미 가득 찼다'); return false; }
+    if (!ammoLeft(d)) { if (!quiet) toast((ITEMS[d.ammo] || ITEMS.ammo).name + '이(가) 없다'); SFX.play('dryfire', { kind: it.id }); return false; }
+    if (G.actions.length) cancelActions();
+    const R = RELOAD[it.id] || RELOAD.pistol, empty = !(it.mag > 0);
+    const q = [];
+    if (R.open) q.push({ k: 'open', s: R.open });
+    q.push({ k: 'per', s: R.per });
+    p.rl = { uid: it.uid, id: it.id, q, i: 0, t: 0, R, empty, loaded: 0 };
+    p.rl.dur = R.open ? R.open[1] * rlSpeed() : R.per[1] * rlSpeed();
+    return true;
+  }
+  function cancelReload(msg) { if (!G.p.rl) return; G.p.rl = null; if (msg) toast(msg); }
+  function tickReload(dt) {
+    const p = G.p, r = p.rl; if (!r) return;
+    const it = p.inv.find(i => i.uid === r.uid);
+    if (!it || p.equip !== r.uid || p.inCar != null || G.dead || G.sleeping) { p.rl = null; return; }
+    r.t += dt; if (r.t < r.dur) return;
+    const st = r.q[r.i], d = ITEMS[it.id], R = r.R;
+    SFX.play(st.s[0], { kind: it.id }); noise(p.x, p.y, 2, false);
+    r.i++; r.t = 0;
+    if (st.k === 'per') {
+      const need = d.mag - (it.mag || 0);
+      const take = Math.min(R.kind === 'mag' ? need : 1, ammoLeft(d));
+      if (take > 0) { consume(d.ammo, take); it.mag = (it.mag || 0) + take; r.loaded += take; }
+      if (R.kind === 'each' && it.mag < d.mag && ammoLeft(d) > 0) r.q.push({ k: 'per', s: R.per });
+      else if (R.close && (!R.close[3] || r.empty)) r.q.push({ k: 'close', s: R.close });
+    }
+    if (r.i >= r.q.length) { p.rl = null; gainXP('gun', .5); return; }
+    r.dur = r.q[r.i].s[1] * rlSpeed();
+  }
+  function reloadLabel() { const r = G.p.rl; if (!r) return ''; const st = r.q[r.i]; return st ? st.s[2] : ''; }
+  function unloadGun(it) {
+    const d = ITEMS[it.id]; if (!d.mag || !(it.mag > 0)) return;
+    if (G.p.rl && G.p.rl.uid === it.uid) cancelReload();
+    const n = it.mag;
+    queueAction({ uid: it.uid, sfx: 'ammo_out', label: d.name + ' 탄 빼는 중', icon: d.icon, dur: Math.min(2.5, .4 + n * .15) * rlSpeed(),
+      valid: () => G.p.inv.includes(it) && it.mag > 0,
+      done: () => { const k = it.mag; it.mag = 0; stackAdd({ uid: G.uid++, id: d.ammo, n: k }); toast(`${(ITEMS[d.ammo] || ITEMS.ammo).name} ${k}발을 뺐다`); } });
+  }
 
+  // 무기별 타격음 종류 (효과음 목록 기준)
+  const HIT_KIND = { bat: 'blunt', nailbat: 'blunt', golf: 'blunt', hockey: 'blunt', baton: 'blunt', plank: 'blunt',
+    pipe: 'metal', crowbar: 'metal', wrench: 'metal', pan: 'metal', hammer: 'metal',
+    knife: 'blade', hknife: 'blade', machete: 'blade', katana: 'blade', spear: 'stab', screwdriver: 'stab',
+    axe: 'axe', fireaxe: 'axe', sledge: 'heavy', pickaxe: 'heavy', shovel: 'heavy', brick: 'heavy' };
+  const HEAVY_SWING = { sledge: 1, pickaxe: 1, axe: 1, fireaxe: 1, shovel: 1 };
   function playerAttack() {
     const p = G.p;
     if (p.inCar != null) return honk();
     if (p.cd > 0 || G.sleeping || G.dead) return;
-    if (G.actions.length) cancelActions('행동을 멈췄다');
     const w = curWeapon(), def = w.def;
+    if (p.rl) { // 재장전 중: 한 발씩 넣는 총은 넣은 만큼 바로 쏠 수 있다
+      if (p.rl.R.kind === 'each' && w.item && w.item.mag > 0 && p.rl.loaded > 0) cancelReload(); else return;
+    }
+    if (def.type === 'gun' && w.item && !(w.item.mag > 0)) { // 빈 총: 여분 탄이 있으면 자동 재장전
+      if (!startReload(true)) { p.cd = p.cdMax = .35; if (!ammoLeft(def)) toast('빈 총이다 — ' + (ITEMS[def.ammo] || ITEMS.ammo).name + '이(가) 없다'); }
+      return;
+    }
+    if (G.actions.length) cancelActions('행동을 멈췄다');
     let target = null, best = 1e9;
     const reach = def.type === 'gun' ? def.range : def.range + 1.8;
     for (const z of G.zombies) {
@@ -2242,12 +2386,11 @@
     p.atkT = .18;
 
     if (def.type === 'gun') {
-      const am = ammoItem(def);
       p.cd = p.cdMax = def.cd * (1 - .03 * skillLv('gun'));
-      if (!am) { toast((ITEMS[def.ammo] || ITEMS.ammo).name + '이(가) 없다'); SFX.play('click'); return; }
       const quiet = def.noise < 10; // 석궁: 조용함
-      SFX.play(quiet ? 'swing' : 'gun', quiet ? { vol: .6 } : { rev: .9 });
-      am.n--; if (am.n <= 0) p.inv.splice(p.inv.indexOf(am), 1);
+      SFX.play(quiet ? 'crossbow' : 'gun', quiet ? { vol: .8, kind: w.item.id } : { rev: .9, kind: w.item.id });
+      w.item.mag--;
+      { const cy = CYCLE_SFX[w.item.id]; if (cy && w.item.mag > 0) setTimeout(() => SFX.play(cy[0], { kind: w.item.id }), cy[1] * 1000); }
       noise(p.x, p.y, def.noise, !quiet);
       if (!quiet) shake(def.hits || def.pierce ? .55 : .38, p.face + Math.PI, def.hits || def.pierce ? 11 : 7);
       // 산탄총: 부채꼴로 여러 명 / 소총: 일직선으로 관통
@@ -2284,7 +2427,7 @@
     p.cd = p.cdMax = def.cd * (p.endu < 10 ? 1.4 : 1);
     p.endu = Math.max(0, p.endu - def.endu * (1 - .04 * skillLv('melee')));
     addFx('swing', { x: p.x, y: p.y, a: p.face, r: def.range + .3 });
-    SFX.play('swing', { heavy: def.knock >= .35, vol: .9 });
+    SFX.play('swing', { heavy: !!(w.item && HEAVY_SWING[w.item.id]), vol: .9 });
     noise(p.x, p.y, 3.5, false);
     p.noiseR = Math.max(p.noiseR, 3.5);
     let hits = 0;
@@ -2301,7 +2444,7 @@
     }
     cands.sort((a, b) => a[0] - b[0]); // 앞쪽·가까운 좀비부터
     for (const [, z] of cands) {
-      let dmg = def.dmg * (.85 + rand() * .3) * tired * (1 + .06 * skillLv('melee'));
+      let dmg = def.dmg * (.85 + rand() * .3) * tired * (1 + .06 * skillLv('melee')) * woundMul('arm');
       if (z.down > 0) dmg *= 2;
       if (rand() < .12 + .015 * skillLv('melee')) dmg *= 1.8;
       gainXP('melee', 1.5);
@@ -2309,7 +2452,7 @@
       hits++;
       if (hits >= maxHits) break;
     }
-    if (hits) { shake(.2 + .06 * hits, p.face, 3.5); G.hitStop = .055; SFX.play(!w.item ? 'hitFist' : (w.item.id === 'knife' || w.item.id === 'spear' ? 'hitBlade' : 'hitBlunt')); }
+    if (hits) { shake(.2 + .06 * hits, p.face, 3.5); G.hitStop = .055; SFX.play('hit', { w: w.item ? (HIT_KIND[w.item.id] || 'blunt') : 'fist' }); SFX.play('flesh', { vol: .8 }); }
     if (hits && w.item && w.item.dur != null) {
       w.item.dur--;
       if (w.item.dur <= 0) {
@@ -2326,6 +2469,8 @@
     z.x += Math.cos(a) * knock; z.y += Math.sin(a) * knock; resolve(z);
     if (knockDown && rand() >= (tr.knock || 0)) z.down = 1.4;
     addFx('blood', { x: z.x, y: z.y, a });
+    if (z.hv == null) z.hv = (rand() * 3) | 0; // 좀비마다 맞는 목소리 1개 고정 (3종 중)
+    if (z.hp > 0) SFX.at('zombie_hurt', z.x, z.y, { range: 14, v: z.hv });
     if (z.hp <= 0) {
       z.dead = true; z.g.remove(); G.kills++;
       gainXP(curWeapon().def.type === 'gun' ? 'gun' : 'melee', 3);
@@ -2367,8 +2512,7 @@
             z.state = 'chase'; z.path = null; z.search = 0; z.herd = false;
             if (!z.alerted || G.time - z.alerted > 20) {
               z.alerted = G.time;
-              if (trait(z).scream) { SFX.at('alert', z.x, z.y, { range: 30, vol: 1.4 }); noise(z.x, z.y, 18, true, z); if (!G._scrT || G.time - G._scrT > 30) { G._scrT = G.time; toast('비명 좀비가 소리를 질렀다 — 주변 좀비가 몰려온다!', 2600); } }
-              else SFX.at('alert', z.x, z.y, { range: 16 });
+              if (trait(z).scream) { SFX.at('scream', z.x, z.y, { range: 30, vol: 1.4 }); noise(z.x, z.y, 18, true, z); if (!G._scrT || G.time - G._scrT > 30) { G._scrT = G.time; toast('비명 좀비가 소리를 질렀다 — 주변 좀비가 몰려온다!', 2600); } }
             }
           }
           z.lostT = 0; z.tx = p.x; z.ty = p.y; z.seenVx = p.vx || 0; z.seenVy = p.vy || 0;
@@ -2444,7 +2588,7 @@
   function zombieAttack(z) {
     const p = G.p;
     if (p.inCar != null && G.vehicles) { // 차 안: 차를 두드림
-      const v = G.vehicles[p.inCar]; v.hp = Math.max(0, Math.round(v.hp - 1 - rand())); shake(.06); SFX.at('hitBlunt', z.x, z.y, { range: 8, vol: .6 });
+      const v = G.vehicles[p.inCar]; v.hp = Math.max(0, Math.round(v.hp - 1 - rand())); shake(.06); SFX.at('car_hit', z.x, z.y, { range: 8, vol: .6 });
       if (!G._chT || G.time - G._chT > 20) { G._chT = G.time; toast('좀비가 차를 두드린다!', 1600); }
       if (v.hp <= 0 && !v._dead) { v._dead = 1; toast('차가 망가졌다 — 내려야 한다', 2400); }
       return;
@@ -2467,9 +2611,10 @@
     const r = rand(), pb = biteChance(gdef), ps = scratchChance(gdef);
     SFX.play(r < pb ? 'bite' : 'hurt');
     wearHit();
-    if (r < pb) { if (!p.infected) { p.infected = true; p.infT = 0; } p.bleed = true; toast('물렸다…', 2600); }
-    else if (r < pb + ps) { if (!p.bleed) toast('긁혔다 — 출혈'); p.bleed = true; }
-    else toast('공격당했다');
+    if (r < pb) { if (!p.infected) { p.infected = true; p.infT = 0; } const w = addWound('bite'); toast(PART_NAME[w.p] + ' 물렸다…', 2600); }
+    else if (r < pb + ps) { const w = addWound('scratch'); toast(PART_NAME[w.p] + ' 긁혔다 — 출혈'); }
+    else if (rand() < .03) { const w = addWound('fracture'); toast(PART_NAME[w.p] + '이(가) 부러졌다! 부목이 필요하다', 3000); }
+    else { const w = addWound('bruise'); toast('공격당했다 — ' + PART_NAME[w.p] + ' 타박상'); }
   }
 
   /* ================= 이펙트 ================= */
@@ -2567,6 +2712,7 @@
   }
   let toastTO = 0;
   function toast(msg, ms) {
+    if (msg) SFX.play('toast');
     const t = $('toast'); t.textContent = msg; t.classList.add('on');
     clearTimeout(toastTO); toastTO = setTimeout(() => t.classList.remove('on'), ms || 1800);
   }
@@ -2630,6 +2776,71 @@
     if (it.dur <= 0) { p.inv.splice(p.inv.indexOf(it), 1); gearFix(); toast(ITEMS[it.id].name + ' — 다 해져서 버렸다', 2200); }
   }
 
+  /* ---------- 겨울: 눈 · 쌓인 눈 · 발자국 (좀비가 따라옴) ---------- */
+  function updateWinter(dm) {
+    const p = G.p, air = airTemp(), r = G.rain || 0;
+    L.snowing = r > .05 && air < 1 && !G.lv;
+    if (L.snowing) G.snowCov = Math.min(1, (G.snowCov || 0) + r * dm * .004);
+    else if (G.snowCov > 0 && air > 2) G.snowCov = Math.max(0, G.snowCov - dm * .0004 * (air - 1));
+    if (L.snowG) { const o = M.level ? 0 : Math.round((G.snowCov || 0) * .72 * 20) / 20; if (o !== L._snowO) { L._snowO = o; L.snowG.setAttribute('opacity', o); } }
+    // 빗물 받이: 바깥에 두면 비(눈)가 올 때 참
+    if (r > .05 && !G.lv) for (const b of G.placed) if (b.type === 'raincol' && M.t[b.y * M.W + b.x] !== DT.T.FLOOR) { const o = b.w || 0; b.w = Math.min(20, o + r * dm * .04 * (L.snowing ? .5 : 1)); if (Math.floor(b.w) !== Math.floor(o)) drawRainCol(b); }
+    // 발자국: 눈이 쌓인 바깥을 걸으면 남고, 좀비가 따라온다
+    G.tracks = G.tracks || [];
+    if ((G.snowCov || 0) > .3 && !G.lv && p.inCar == null && G.gait !== 'idle' && M.t[Math.floor(p.y) * M.W + Math.floor(p.x)] !== DT.T.FLOOR) {
+      L.fpT = (L.fpT || 0) - dm;
+      if (L.fpT <= 0) {
+        L.fpT = G.gait === 'sprint' ? .35 : .55; L.fpS = -(L.fpS || 1);
+        const a = p.face, ox = Math.cos(a + Math.PI / 2) * .1 * L.fpS, oy = Math.sin(a + Math.PI / 2) * .1 * L.fpS;
+        const e = el('ellipse', { cx: (p.x + ox).toFixed(2), cy: (p.y + oy).toFixed(2), rx: .13, ry: .075, fill: '#6a7680', opacity: .75, transform: `rotate(${(a * 180 / Math.PI).toFixed(0)} ${(p.x + ox).toFixed(2)} ${(p.y + oy).toFixed(2)})` }, L.decals);
+        G.tracks.push({ x: p.x, y: p.y, t: G.time, e });
+        if (G.tracks.length > 240) G.tracks.shift().e.remove();
+      }
+    }
+    if (G.tracks.length && (G.tracks[0].t < G.time - 360 || (G.snowCov || 0) < .15)) { const t = G.tracks.shift(); t.e.remove(); } // 6시간 지나거나 눈이 녹으면 사라짐
+    // 좀비가 발자국을 발견하면 더 새로운 발자국 쪽으로
+    L.trkT = (L.trkT || 0) - dm;
+    if (L.trkT <= 0 && G.tracks.length > 4) {
+      L.trkT = 2;
+      const T0 = G.tracks;
+      for (const z of G.zombies) {
+        if (z.dead || z.state === 'chase' || z.down > 0 || (z.state === 'investigate' && z.path)) continue;
+        let bi = -1, bd = 3.5;
+        for (let i = 0; i < T0.length; i += 2) { const d = Math.abs(T0[i].x - z.x) + Math.abs(T0[i].y - z.y); if (d < bd) { bd = d; bi = i; } }
+        if (bi < 0) continue;
+        const nx = T0[Math.min(T0.length - 1, bi + 10)];
+        z.state = 'investigate'; z.tx = nx.x; z.ty = nx.y; z.path = null; requestPath(z);
+      }
+    }
+  }
+  /* ---------- 부상 부위 ----------
+     팔(공격력↓) · 다리(느려짐) · 몸통(지구력 회복↓) · 머리. 골절은 부목을 대야 제대로 낫는다 */
+  const PART_NAME = { arml: '왼팔', armr: '오른팔', legl: '왼다리', legr: '오른다리', torso: '몸통', head: '머리' };
+  const WOUND = { scratch: ['긁힘', 720, 1], cut: ['베임', 1440, 1], bite: ['물림', 2160, 1], bruise: ['타박상', 480, 0], fracture: ['골절', 4320, 0] };
+  function randPart(pool) { pool = pool || [['arml', .2], ['armr', .2], ['legl', .15], ['legr', .15], ['torso', .22], ['head', .08]]; let r = rand() * pool.reduce((t, x) => t + x[1], 0); for (const [k, w] of pool) { r -= w; if (r <= 0) return k; } return pool[0][0]; }
+  function addWound(k, part) {
+    const p = G.p; p.wounds = p.wounds || [];
+    const w = { p: part || randPart(k === 'fracture' ? [['arml', 1], ['armr', 1], ['legl', 1.2], ['legr', 1.2]] : null), k, h: WOUND[k][1] };
+    const same = p.wounds.find(x => x.p === w.p && x.k === k); // 같은 곳 같은 상처는 합침
+    if (same) { same.h = Math.max(same.h, w.h); same.band = false; } else p.wounds.push(w);
+    if (p.wounds.length > 8) p.wounds.shift();
+    if (WOUND[k][2]) p.bleed = true;
+    if (k === 'fracture') SFX.play('bone');
+    return same || w;
+  }
+  function woundMul(kind) { // kind: 'leg' 이동 · 'arm' 공격
+    let m = 1;
+    for (const w of G.p.wounds || []) { if (!w.p.startsWith(kind)) continue; m *= w.k === 'fracture' ? (w.spl ? .8 : .6) : w.k === 'bite' || w.k === 'cut' ? .88 : .94; }
+    return Math.max(.45, m);
+  }
+  function updateWounds(dm) {
+    const p = G.p; if (!p.wounds || !p.wounds.length) return;
+    const aid = 1 + .05 * skillLv('aid');
+    for (const w of p.wounds) w.h -= dm * aid * (w.dis ? 1.5 : 1) * (w.k === 'fracture' && !w.spl ? .33 : 1) * (G.sleeping ? 1.5 : 1) * (w.band || !WOUND[w.k][2] ? 1 : .5);
+    const before = p.wounds.length;
+    p.wounds = p.wounds.filter(w => w.h > 0);
+    if (p.wounds.length < before) toast('상처 하나가 아물었다');
+  }
   /* ---------- 기온 · 체온 ----------
      기온: 날이 갈수록 추워짐(가을→겨울) + 하루 중 오후 3시가 가장 따뜻 + 비 오면 -3도
      체감: 건물 안 +7 · 차 안 +5 · 모닥불 옆 +12 · 옷 보온 · 움직임 · 젖으면 추움 */
@@ -2649,7 +2860,7 @@
   function updateTemp(dm) {
     const p = G.p; if (p.bt == null) p.bt = 36.6; if (p.wet == null) p.wet = 0;
     const e = feelTemp();
-    if ((G.rain || 0) > .05 && !e.indoor && !e.car) p.wet = Math.min(1, p.wet + G.rain * dm * .012);
+    if ((G.rain || 0) > .05 && !e.indoor && !e.car) p.wet = Math.min(1, p.wet + G.rain * dm * (L.snowing ? .005 : .012));
     else p.wet = Math.max(0, p.wet - dm * (e.fire ? .04 : e.indoor ? .006 : .003));
     const eff = e.f + warmth() * 1.6 + (G.gait === 'sprint' ? 5 : G.gait === 'jog' ? 2.5 : 0) - p.wet * 4;
     let tgt = 36.6;
@@ -2733,8 +2944,8 @@
     const p = G.p;
     // 배고픔·목마름은 소리로 (가끔)
     if (!G.sleeping && !G.dead) {
-      if (p.full < 25) { L.stT = (L.stT == null ? 8 : L.stT) - dt; if (L.stT <= 0) { L.stT = (p.full < 8 ? 14 : 30) + Math.random() * 15; SFX.play('stomach', { vol: .8 }); } }
-      if (p.hyd < 25) { L.cgT = (L.cgT == null ? 12 : L.cgT) - dt; if (L.cgT <= 0) { L.cgT = (p.hyd < 8 ? 16 : 34) + Math.random() * 15; SFX.play('cough', { vol: .7 }); } }
+      if (p.full < 25) { L.stT = (L.stT == null ? 8 : L.stT) - dt; if (L.stT <= 0) { L.stT = (p.full < 8 ? 14 : 30) + Math.random() * 15;  } }
+      if (p.hyd < 25) { L.cgT = (L.cgT == null ? 12 : L.cgT) - dt; if (L.cgT <= 0) { L.cgT = (p.hyd < 8 ? 16 : 34) + Math.random() * 15;  } }
     }
     // 추우면 입김
     if (L.coldK > 0 && p.inCar == null) { L.brT = (L.brT || 0) - dt; if (L.brT <= 0) { L.brT = 1.8 - .6 * L.coldK; addFx('breath', { x: p.x + Math.cos(p.face) * .3, y: p.y + Math.sin(p.face) * .3, a: p.face }); } }
@@ -2770,14 +2981,14 @@
     G.gait = moving ? gait : 'idle';
     const running = gait === 'sprint';
     const wt = invWeight();
-    const spd = ({ walk: 1.35, jog: 2.35, sprint: 3.5 })[gait] * (p.energy < 20 ? .8 : 1) * (p.hp < 25 ? .85 : 1) * (wt > capKg() ? .7 : 1) * (p.crouch ? .62 : 1) * gearStats().spd;
+    const spd = ({ walk: 1.35, jog: 2.35, sprint: 3.5 })[gait] * (p.energy < 20 ? .8 : 1) * (p.hp < 25 ? .85 : 1) * (wt > capKg() ? .7 : 1) * (p.crouch ? .62 : 1) * gearStats().spd * woundMul('leg');
     if (moving) {
       mx /= (mag || 1); my /= (mag || 1); // 속도는 걸음 단계로만 정함
       p.stepT = (p.stepT || 0) - spd * dt;
       if (p.stepT <= 0) {
         p.stepT = running ? .78 : gait === 'jog' ? .7 : .6;
         const tt = M.t[Math.floor(p.y) * M.W + Math.floor(p.x)];
-        SFX.play('step', { surface: tt === DT.T.GRASS ? 'grass' : (tt === DT.T.FLOOR || tt === DT.T.DOOR ? 'wood' : 'hard'), run: gait !== 'walk', vol: gait === 'walk' ? .45 : .8 });
+        SFX.play('step', { surface: tt === DT.T.FLOOR || tt === DT.T.DOOR ? 'wood' : (!G.lv && (G.snowCov || 0) > .3) ? 'snow' : tt === DT.T.GRASS ? 'grass' : 'hard', run: gait !== 'walk', vol: gait === 'walk' ? .45 : .8 });
       }
       const ak = Math.floor(p.y + my * .6) * M.W + Math.floor(p.x + mx * .6), ao = M.opAt[ak];
       if (ao && ao.type === 'door') { const sd = G.ds[ak]; if (!sd.o && !sd.br && !sd.b.length && !G.actions.some(a => a.kind === 'door')) { G.nearOp = { t: 'op', o: ao }; doAlt('doorOpen'); } }
@@ -2799,11 +3010,12 @@
       } else { p.vx = p.vy = 0; }
     }
     p.atkT -= dt; p.cd -= dt;
+    tickReload(dt);
     p.noiseT -= dt;
     const nr = moving ? ({ walk: 1, jog: 3, sprint: 6.5 })[gait] * (p.crouch ? .3 : 1) : 0;
     p.noiseR = Math.max(nr, p.noiseR - dt * 6);
     if (moving && p.noiseT <= 0) { p.noiseT = running ? .4 : .6; noise(p.x, p.y, nr, false); }
-    if (running) p.endu -= 11 * dt; else p.endu += (gait === 'jog' ? 3 : moving ? 6 : 9) * dt;
+    if (running) p.endu -= 6 * dt; else p.endu += (gait === 'jog' ? 4 : moving ? 8 : 12) * dt * ((p.wounds || []).some(w => w.p === 'torso') ? .75 : 1); // 질주 약 17초 · 서 있으면 약 8초에 회복
     p.endu = clamp(p.endu, 0, 100);
     G.isRunning = running;
     if (mag > .3 && G.actions.length && !(G.actions.length === 1 && G.actions[0].kind === 'door')) cancelActions('이동해서 행동을 멈췄다');
@@ -2813,9 +3025,11 @@
     const act = running ? 1.35 : gait === 'jog' ? 1.1 : 1;
     p.full -= .045 * dm * act;
     p.hyd -= .065 * dm * act;
-    if (G.sleeping) p.energy += .22 * dm * (G.inBed ? 1.5 : 1); else p.energy -= .075 * dm * act;
+    if (G.sleeping) p.energy += .22 * dm * (G.inBed ? 1.5 : 1); else p.energy -= .05 * dm * (running ? 1.2 : 1); // 깨어 있으면 약 하루 반에 바닥
     p.full = clamp(p.full, 0, 100); p.hyd = clamp(p.hyd, 0, 100); p.energy = clamp(p.energy, 0, 100);
     updateTemp(dm);
+    updateWounds(dm);
+    updateWinter(dm);
     if (p.full <= 0) p.hp -= .03 * dm;
     if (p.hyd <= 0) p.hp -= .05 * dm;
     if (p.bleed) p.hp -= .12 * dm;
@@ -2834,7 +3048,8 @@
     if (!G.lv) { updateHerd(dt); updateHeli(dt); } // 건물 위·아래층에 있을 땐 바깥 사건은 멈춤
 
     // 정전
-    if (G.power && G.time >= G.powerOffAt) { G.power = 0; toast('전기가 끊겼다 — 냉장고가 멈추고 가로등이 꺼졌다', 3200); SFX.play('powerdown'); }
+    if (G.waterOn && G.time >= (G.waterOffAt || 1e12)) { G.waterOn = 0; toast('수도가 끊겼다 — 이제 물은 직접 구해야 한다 (빗물·변기 물통)', 3600); }
+    if (G.power && G.time >= G.powerOffAt) { G.power = 0; toast('전기가 끊겼다 — 냉장고가 멈추고 가로등이 꺼졌다', 3200); }
     const hour = Math.floor(G.time / 60);
     if (hour !== G.lastHour) ageFood(60 * Math.max(1, hour - G.lastHour));
     if (hour !== G.lastHour) {
@@ -2868,7 +3083,11 @@
     if (G.time > G.weatherNext) { G.weatherNext = G.time + 240 + rand() * 480; G.rainTarget = rand() < .38 ? .35 + rand() * .65 : 0; if (G.rainTarget > .2 && G.rain < .1) toast('비가 오기 시작한다 — 소리가 묻힌다', 2400); }
     G.rain += clamp(G.rainTarget - G.rain, -1, 1) * Math.min(1, dm * .02);
     if (G.rain > .65 && !G.sleeping) { G.thunderT -= dt; if (G.thunderT <= 0) { G.thunderT = 25 + rand() * 60; G.flashT = .45; const dl = .6 + rand() * 2.2; setTimeout(() => { SFX.play('thunder', { vol: 1 - dl / 4 }); shake(.35 * (1 - dl / 4)); }, dl * 1000); } }
-    SFX.update(dt, { rain: G.rain, x: p.x, y: p.y, night: G.night, hp: p.hp, dead: G.dead, sleeping: G.sleeping, indoor: ptile === DT.T.FLOOR });
+    { let fd = 99; if (!G.lv) for (const b of G.placed) if (b.type === 'campfire') fd = Math.min(fd, Math.hypot(b.x + .5 - p.x, b.y + .5 - p.y));
+      const run = G.gait === 'sprint' || (G.gait === 'jog' && p.endu < 30);
+      L.breath = clamp((L.breath || 0) + (run ? dt * .5 : -dt * .25), 0, 1) * (p.inCar != null ? 0 : 1);
+      SFX.update(dt, { rain: G.rain, x: p.x, y: p.y, night: G.night, hp: p.hp, dead: G.dead, sleeping: G.sleeping, indoor: ptile === DT.T.FLOOR,
+        snowing: !!L.snowing, fire: clamp(1 - fd / 7, 0, 1), breath: L.breath * clamp(1.2 - p.endu / 100, .3, 1) }); }
     G.saveT += dt;
     if (G.saveT > 30) { G.saveT = 0; save(false); }
   }
@@ -2879,8 +3098,9 @@
     clockT += dt;
     if (!G.paused) updateFx(dt);
     updateCond(dt);
-    { const tz = (p.inCar != null && !G.lv) ? .72 : 1; L.dz = (L.dz || 1) + (tz - (L.dz || 1)) * Math.min(1, dt * 2.5); if (Math.abs(L.dz - tz) < .004) L.dz = tz; } // 운전하면 멀리 보이게 (목표에 닿으면 멈춤 → 다시 그리지 않음)
-    ZOOM = (VW > VH ? VH / 9 : Math.min(VW, VH) / 12.5) * (OPTS.zoom || 1) * L.dz;
+    { const tz = (p.inCar != null && !G.lv) ? .72 : 1; L.dz = (L.dz || 1) + (tz - (L.dz || 1)) * Math.min(1, dt * 2.5); if (Math.abs(L.dz - tz) < .004) L.dz = tz; }
+    { const tc = p.crouch && p.inCar == null ? 1.25 : 1; L.cz = (L.cz || 1) + (tc - (L.cz || 1)) * Math.min(1, dt * 4); if (Math.abs(L.cz - tc) < .003) L.cz = tc; } // 웅크리면 카메라만 25% 확대 (캐릭터 크기는 그대로) // 운전하면 멀리 보이게 (목표에 닿으면 멈춤 → 다시 그리지 않음)
+    ZOOM = (VW > VH ? VH / 9 : Math.min(VW, VH) / 12.5) * (OPTS.zoom || 1) * L.dz * (L.cz || 1);
     const tr = G.trauma || 0, s2 = tr * tr * 16;
     const ox = (s2 ? s2 * (Math.sin(clockT * 47) * .6 + Math.sin(clockT * 83 + 1.3) * .4) : 0) + (G.kx || 0);
     const oy = (s2 ? s2 * (Math.sin(clockT * 53 + 2.1) * .6 + Math.sin(clockT * 71 + .4) * .4) : 0) + (G.ky || 0) + (L.shiver ? Math.sin(clockT * 57) * L.shiver * 1.4 : 0) + (L.sway ? Math.sin(clockT * .7 + 1) * L.sway * 7 : 0);
@@ -2910,7 +3130,7 @@
     updateChunks(camX, camY, !L.chunks.size);
     { const hide = p.inCar != null && !G.lv; if (L._pgh !== hide) { L._pgh = hide; L.pg.style.display = hide ? 'none' : ''; } }
     renderVehicles(dt);
-    L.pg.setAttribute('transform', `translate(${p.x.toFixed(3)} ${p.y.toFixed(3)}) rotate(${(p.face * 180 / Math.PI).toFixed(1)})${p.crouch ? ' scale(.84)' : ''}`);
+    L.pg.setAttribute('transform', `translate(${p.x.toFixed(3)} ${p.y.toFixed(3)}) rotate(${(p.face * 180 / Math.PI).toFixed(1)})`);
     animatePlayer(dt);
     renderRain(dt);
 
@@ -2961,7 +3181,8 @@
       const vis = Math.abs(z.x - p.x) < VW / 2 / ZOOM + 2 && Math.abs(z.y - p.y) < VH / 2 / ZOOM + 3 && inVision(z.x, z.y);
       if (vis !== z.vis) { z.vis = vis; if (vis) L.zombies.appendChild(z.g); else z.g.remove(); }
       if (vis) {
-        z.g.setAttribute('transform', `translate(${z.x.toFixed(3)} ${z.y.toFixed(3)}) rotate(${(z.face * 180 / Math.PI).toFixed(1)})${z.down > 0 ? ' scale(1 .7)' : ''}`);
+        z.g.setAttribute('transform', `translate(${z.x.toFixed(3)} ${z.y.toFixed(3)}) rotate(${(z.face * 180 / Math.PI + (z.down > 0 ? 75 : 0)).toFixed(1)})`);
+        if ((z.down > 0) !== !!z._dn) { z._dn = z.down > 0; if (!z.kd) z.kd = el('circle', { r: .44, fill: 'none', stroke: '#e9e3d2', 'stroke-width': .04, 'stroke-dasharray': '.12 .1', opacity: .55 }, z.g); z.kd.style.display = z._dn ? '' : 'none'; } // 쓰러짐 표시 (크기는 그대로)
         // 비틀거리며 걷기 (2프레임에 한 번 갱신 — 성능)
         const mv = (z.state === 'chase' ? 1.6 : (z.path ? 1 : .35)) * (trait(z).spd || 1); // 러너는 다리도 빨리 움직임
         z.wph += dt * 5 * mv;
@@ -3051,9 +3272,12 @@
     } else L.hl.setAttribute('opacity', 0);
 
     // 버튼 링 (매 프레임)
-    const cdFrac = clamp(p.cd / (p.cdMax || 1), 0, 1);
+    const cdFrac = p.rl ? 1 - clamp(p.rl.t / (p.rl.dur || 1), 0, 1) : clamp(p.cd / (p.cdMax || 1), 0, 1);
     $('atkRing').style.strokeDashoffset = (RING_C * cdFrac).toFixed(1);
-    $('btnAttack').classList.toggle('cool', cdFrac > 0);
+    $('btnAttack').classList.toggle('cool', cdFrac > 0 && !p.rl);
+    $('btnAttack').classList.toggle('rl', !!p.rl);
+    { const w = curWeapon(), show = w.def.type === 'gun' && !!w.item && p.inCar == null, full = show && (w.item.mag || 0) >= w.def.mag, k = show ? (p.rl ? 'r' : full ? 'f' : canReload(w.item) ? 'y' : 'n') + (w.item.mag || 0) : '';
+      if (L._rk !== k) { L._rk = k; const b = $('btnReload'); b.classList.toggle('hidden', !show); b.classList.toggle('on', !!p.rl); b.classList.toggle('dim', show && !p.rl && k[0] !== 'y'); b.classList.toggle('mt', show && !(w.item.mag > 0)); } }
     $('joyRing').style.strokeDashoffset = (RING_C * (1 - p.endu / 100)).toFixed(1);
     const gk = G.gait || 'idle';
     const gk2 = gk + (p.crouch ? 'c' : '');
@@ -3127,6 +3351,15 @@
     drops.length = n;
     rctx.clearRect(0, 0, VW, VH);
     rctx.fillStyle = `rgba(30,40,55,${(.12 * r).toFixed(3)})`; rctx.fillRect(0, 0, VW, VH);
+    if (L.snowing) { // 눈: 천천히 흩날리는 흰 점
+      rctx.fillStyle = 'rgba(245,248,252,.85)';
+      for (const d of drops) {
+        d.y += d.v * dt * .12; d.x += Math.sin((d.y + d.l * 40) * .02) * dt * 30 + dt * 12;
+        if (d.y > VH) { d.y = -4; d.x = rand() * (VW + 80) - 80; }
+        rctx.fillRect(d.x, d.y, d.l * .22, d.l * .22);
+      }
+      return;
+    }
     rctx.strokeStyle = `rgba(190,205,220,${(.25 + .3 * r).toFixed(2)})`; rctx.lineWidth = 1;
     rctx.beginPath();
     for (const d of drops) {
@@ -3150,7 +3383,7 @@
     $('phaseTxt').textContent = M.dark ? '지하 · 어둠' : isN ? '밤 · 위험' : (G.night > 0 ? '황혼' : '낮');
     $('phaseIcon').setAttribute('href', isN ? '#i-moon' : (G.night > 0 ? '#i-dusk' : '#i-sun'));
     $('phase').classList.toggle('night', isN);
-    if ((G.rain || 0) > .15 && !G.lv) $('phaseTxt').textContent += ' · 비';
+    if ((G.rain || 0) > .15 && !G.lv) $('phaseTxt').textContent += L.snowing ? ' · 눈' : ' · 비';
     { const sub = G.p.equip2 != null && G.p.inCar == null ? G.p.inv.find(i => i.uid === G.p.equip2) : null, k = sub ? sub.id : '';
       if (L._swk !== k) { L._swk = k; $('btnSwap').classList.toggle('hidden', !sub); if (sub) $('swapIcon').setAttribute('href', '#i-' + ITEMS[sub.id].icon); } }
     { const t = Math.round(airTemp()), k = t + '|' + (L.feel && L.feel.indoor ? 1 : 0);
@@ -3168,6 +3401,8 @@
     if (p.bt < 35.5) md.push(['temp', p.bt < 34.8 ? '저체온' : '추움', p.bt < 34.8]);
     else if (p.bt > 37.6) md.push(['temp', p.bt > 38.6 ? '열사병' : '더움', p.bt > 38.6]);
     if (p.wet > .3) md.push(['drop', '젖음', 0]);
+    { const W0 = p.wounds || []; const fr = W0.find(w => w.k === 'fracture'); if (fr) md.push(['plank', fr.spl ? '골절 · 부목' : '골절', !fr.spl]);
+      else { if (W0.some(w => w.p.startsWith('leg'))) md.push(['run', '다리 부상', 0]); if (W0.some(w => w.p.startsWith('arm'))) md.push(['fist', '팔 부상', 0]); } }
     if (p.infected && p.infT > 300) md.push(['bio', '메스꺼움', 1]);
     if (p.sick > 0) md.push(['bio', '식중독', 1]);
     if (!G.power) md.push(['bolt', '정전', 0]);
@@ -3181,7 +3416,7 @@
     const mo = $('moodles'); if (mo._h !== html) { mo._h = html; mo.innerHTML = html; }
     const w = curWeapon();
     let wn = w.def.name;
-    if (w.def.type === 'gun') { const a = ammoItem(w.def); wn += ' · ' + (a ? a.n : 0) + '발'; }
+    if (w.def.type === 'gun' && w.item) wn = G.p.rl ? reloadLabel() : wn + ' ' + (w.item.mag || 0) + '/' + w.def.mag + (ammoLeft(w.def) ? ' +' + ammoLeft(w.def) : '');
     else if (w.item && w.item.dur != null) wn += ' · ' + w.item.dur;
     $('wname').textContent = G.p.inCar != null && !G.lv ? '경적' : wn;
     const ub = $('btnUse');
@@ -3200,11 +3435,13 @@
     G.openC = ci; G.sel = null; G.eqSlot = null;
     if (ci >= 0) G.tab = 'bag';
     if (ci >= 0) { if (isVeh(ci) || isPlacedC(ci)) {} else if (isCorpse(ci)) { const c = corpseOf(ci); if (c) c.searched = true; } else G.searched.add(ci); refreshContainer(ci); }
+    if (ci < 0 && $('sheet').classList.contains('hidden')) SFX.play('bag_zip'); // 가방·장비 창 열기 = 지퍼 여는 소리
     $('sheet').classList.remove('hidden'); document.body.classList.add('menuOn');
     renderSheet();
   }
   function closeSheet() {
     G.eqSlot = null;
+    if (!$('sheet').classList.contains('hidden')) SFX.play('ui_back'); // 창 닫기 = 지퍼 닫는 소리
     if (G.openC >= 0) refreshContainer(G.openC);
     G.openC = -1; G.sel = null;
     $('sheet').classList.add('hidden'); document.body.classList.remove('menuOn'); $('danger').classList.add('hidden');
@@ -3214,6 +3451,9 @@
     const fs = freshState(it); if (fs) sub.push(fs.t + (fs.lv ? ` (효과 ${Math.round(fs.mul * 100)}%)` : ''));
     if (it.id === 'note') sub.push(G.journal && G.journal.includes(it.nid) ? '읽음' : '아직 안 읽음');
     if (it.id === 'radio') sub.push('비상방송을 들을 수 있다');
+    if (ITEMS[it.id].type === 'map') sub.push(it.read ? '읽음 — 지도에 표시됨' : '펼쳐 보면 지도에 그 지역이 나온다');
+    if (ITEMS[it.id].pen) sub.push('지도에 표시·글자를 적을 수 있다' + (it.id === 'pencil' ? ' (지우개로 지울 수 있음)' : ' (지울 수 없음)'));
+    if (it.id === 'eraser') sub.push('연필로 적은 표시를 지운다');
     if (it.id === 'gascan') sub.push(`기름 ${(it.fuel || 0).toFixed(1)} / ${CAN_MAX}L`, '주유기(전기 있을 때)나 세워진 차에서 채움');
     if (it.id === 'carkey') { const v = (G.vehicles || [])[it.vid]; if (v) { const dx = v.x - G.p.x, dy = v.y - G.p.y, d = Math.hypot(dx, dy), dir = ['동', '남동', '남', '남서', '서', '북서', '북', '북동'][((Math.round(Math.atan2(dy, dx) / (Math.PI / 4)) % 8) + 8) % 8]; sub.push(G.lv ? '건물 밖 차량용' : d < 3 ? '바로 옆 차 열쇠' : `차가 ${dir}쪽 약 ${Math.round(d)}칸`); } }
     if (it.q && it.q > 1) sub.push(`요리 품질 +${Math.round((it.q - 1) * 100)}%`);
@@ -3227,7 +3467,7 @@
     if (d.type === 'tool' || d.tool) sub.push('도구 · 분해에 사용');
     if (it.id === 'benchkit') sub.push('설치하면 작업대 레시피 사용 가능');
     if (it.id === 'furn') sub.push('원하는 곳에 놓아 길을 막을 수 있음' + (FURN_CONT[it.kind] ? ' · 물건 보관 가능' : ''));
-    if (d.type === 'gun') sub.push((d.hits ? '부채꼴 ' + d.hits + '명' : d.pierce ? '관통 ' + d.pierce + '명' : '1명'), '공격력 ' + d.dmg, '사거리 ' + d.range, '탄: ' + (ITEMS[d.ammo] || ITEMS.ammo).name, d.noise < 10 ? '조용함' : '소음 매우 큼');
+    if (d.type === 'gun') sub.push(`장전 ${it.mag || 0}/${d.mag}`, (d.hits ? '부채꼴 ' + d.hits + '명' : d.pierce ? '관통 ' + d.pierce + '명' : '1명'), '공격력 ' + d.dmg, '사거리 ' + d.range, '탄: ' + (ITEMS[d.ammo] || ITEMS.ammo).name, d.noise < 10 ? '조용함' : '소음 매우 큼');
     if (it.n) sub.push(it.n + (it.id === 'ammo' ? '발' : '개'));
     else { const same = G.p.inv.filter(i => gkey(i) === gkey(it)).length; if (same > 1) sub.push(same + '개 보유'); }
     sub.push(((it.w != null ? it.w : d.w) * (it.n || 1)).toFixed(1) + 'kg');
@@ -3235,7 +3475,7 @@
   }
   // 같은 물건 묶기 (가방·수색 창): 같은 종류 + 같은 신선도 + 같은 남은 횟수면 한 칸으로. 내구도 있는 무기·가구는 따로
   function gkey(it) {
-    if (it.dur != null || it.id === 'furn' || it.items || it.id === 'gascan') return 'u' + it.uid;
+    if (it.dur != null || it.id === 'furn' || it.items || it.id === 'gascan' || ITEMS[it.id].mag) return 'u' + it.uid;
     const fs = freshState(it);
     return it.id + '|' + (fs ? fs.lv : '') + '|' + (it.u != null ? it.u : '') + '|' + (it.q != null ? it.q : '') + (it.nid ? '|' + it.nid : '') + (it.vid != null ? '|v' + it.vid : '');
   }
@@ -3281,6 +3521,7 @@
     else if (grp && grp.length > 1) extra += `<span class="qty">x${grp.length}</span>`;
     if (it.u != null) extra += `<span class="qty">${it.u}회</span>`;
     if (it.id === 'gascan') extra += `<span class="qty">${Math.round(it.fuel || 0)}L</span>`;
+    if (d.mag) extra += `<span class="qty">${it.mag || 0}/${d.mag}</span>`;
     const fs = freshState(it); if (fs && fs.lv) extra += `<span class="fresh f${fs.lv}">${fs.t}</span>`;
     if (it.dur != null && d.dur) { const f = it.dur / (it.max || d.dur); extra += `<span class="dur${f < .3 ? ' low' : ''}"><i style="width:${(f * 100).toFixed(0)}%"></i></span>`; }
     if (eq) extra += `<span class="eqt">장착</span>`;
@@ -3378,7 +3619,7 @@
       hc += `<div class="ccap${cw >= cc * .9 ? ' over' : ''}"><span>보관 ${fmtW(cw)} / ${cc}kg</span><i><b style="width:${Math.min(100, cw / cc * 100).toFixed(0)}%"></b></i></div><div class="grid">`;
       if (!items.length) hc += `<div class="empty">비어 있다</div>`;
       for (const g of sortGroups(groupItems(items))) hc += card(g[0], 'cont', g);
-      hc += `</div><div class="hint">누르면 가방으로 · 묶음은 한 번에</div>`;
+      hc += `</div><div class="hint">누르면 가져오기 · 길게 누르면 정보</div>`;
     }
     const inv = p.inv.filter(i => !isWorn(i));
     const groups = groupItems(inv);
@@ -3398,7 +3639,7 @@
     if (filt !== 'all' && !byCat[filt] && inv.length) h += `<div class="empty">이 종류는 없다</div>`;
     h += `</div>`;
     if (!loot) h += `<div class="acts"><button class="abtn w" data-act="sleep">${ico('moon')}잠자기</button><button class="abtn" data-act="save">${ico('save')}저장</button></div>`;
-    return loot ? `<div class="lcol">${hc}</div><div class="lcol">${h}</div>` : h;
+    return loot ? `<div class="lcol">${h}</div><div class="lcol">${hc}</div>` : h; // 왼쪽: 내 가방 · 오른쪽: 보관함
   }
   // 장비: 캐릭터 양옆에 8칸 + 합계 + 입을 수 있는 것
   function equipPage() {
@@ -3442,6 +3683,9 @@
     h += `</div>`;
     const p = G.p;
     h += `<div class="sec-t"><span>상태</span></div><div class="stg">${[['heart', '체력', p.hp], ['food', '배고픔', p.full], ['drop', '목마름', p.hyd], ['moon', '기력', p.energy]].map(([ic, n, v]) => `<div>${ico(ic)}<span>${n}</span><b>${Math.round(v)}</b></div>`).join('')}</div>`;
+    const W0 = p.wounds || [];
+    h += `<div class="sec-t"><span>몸 상태</span><em>${W0.length ? '붕대(출혈)·부목(골절)·소독약(빨리 낫기)' : ''}</em></div>`;
+    h += W0.length ? `<div class="wnd">${W0.map(w => `<div class="${w.k === 'fracture' && !w.spl ? 'bad' : ''}"><b>${PART_NAME[w.p]}</b><span>${WOUND[w.k][0]}${WOUND[w.k][2] ? (w.band ? ' · 붕대' : ' · <i>출혈</i>') : ''}${w.spl ? ' · 부목' : ''}${w.dis ? ' · 소독' : ''}</span><em>${Math.max(1, Math.round(w.h / 60))}시간</em></div>`).join('')}</div>` : `<div class="empty" style="padding:10px">다친 곳 없음</div>`;
     h += `<div class="sk-foot">생존 ${Math.floor((G.time - 540) / 1440)}일 · 처치 ${G.kills} · ${G.power ? '전기 들어옴' : '정전'}</div>`;
     return h;
   }
@@ -3453,10 +3697,12 @@
     h += `<div class="notes">` + list.map(id => { const n = N[id], tn = M.towns && M.towns.find(t => t.key === n.town); return `<button data-act="note-${id}">${ico('note')}<b>${n.key ? '★ ' : ''}${n.t}</b><small>${n.d ? n.d.replace(/^0?(\d+)-0?(\d+)$/, '$1월 $2일') + ' · ' : ''}${tn ? tn.name : '어딘가'}</small></button>`; }).join('') + `</div>`;
     return h;
   }
-  const TYPE_NAME = { melee: '근접 무기', gun: '총', ammo: '탄약', food: '음식', drink: '마실 것', med: '의료', mat: '재료', tool: '도구', place: '설치', wear: '옷', note: '문서', radio: '라디오' };
+  const TYPE_NAME = { map: '지도', melee: '근접 무기', gun: '총', ammo: '탄약', food: '음식', drink: '마실 것', med: '의료', mat: '재료', tool: '도구', place: '설치', wear: '옷', note: '문서', radio: '라디오' };
   function renderDetail() {
-    const box = $('detail'), p = G.p, tab = tabOf();
-    if (tab === 'craft' || tab === 'note') { box.classList.add('hidden'); return; }
+    const box = $('detail'), p = G.p, tab = tabOf(), main = box.parentElement;
+    const hasSel = tab === 'skill' || (G.sel && (p.inv.some(i => i.uid === G.sel.uid) || (G.sel.cont && G.openC >= 0 && cItems(G.openC).some(i => i.uid === G.sel.uid)))) || (tab === 'equip' && G.eqSlot);
+    main.classList.toggle('nodet', !hasSel && tab !== 'craft' && tab !== 'note');
+    if (tab === 'craft' || tab === 'note' || !hasSel) { box.classList.add('hidden'); return; }
     box.classList.remove('hidden');
     if (tab === 'skill') {
       const k = G.skSel, sk = G.sk[k], need = xpNeed(sk.lv);
@@ -3469,6 +3715,11 @@ ${nx ? `<div class="nx"><b>LV.${sk.lv + 1} 되면</b>${nx.map(([a, b]) => `${a} 
     }
     let it = G.sel ? p.inv.find(i => i.uid === G.sel.uid) : null;
     if (tab === 'equip' && !it && G.eqSlot) it = wornIt(G.eqSlot);
+    if (!it && G.sel && G.sel.cont && G.openC >= 0) { const ci0 = cItems(G.openC).find(i => i.uid === G.sel.uid); if (ci0) { // 보관함 안 물건 (길게 눌러 보기)
+      const d = ITEMS[ci0.id]; let st = itemStats(ci0).split(' · ');
+      if (d.type === 'wear') { st = [d.def ? `방어 ${d.def}` : '', d.warm ? `보온 ${d.warm}` : '', d.cap ? `가방 용량 +${d.cap}kg` : '', d.spd ? `이동 ${d.spd > 0 ? '+' : ''}${d.spd}%` : '', d.dur ? `내구도 ${ci0.dur}/${ci0.max || d.dur}` : '', `${d.w}kg`].filter(Boolean); const cur = wornIt(d.slot); if (cur) { const cd = ITEMS[cur.id]; st.push(`지금 ${cd.name}: ` + (d.slot === 'back' ? `용량 ${cd.cap || 0} → ${d.cap || 0}kg` : `방어 ${cd.def || 0} → ${d.def || 0}`)); } }
+      box.innerHTML = `<div class="dt"><div class="dic">${ico(d.icon)}</div><div class="dtx"><b>${nameOf(ci0)}</b><span class="dtag">${cName(G.openC)} 안 · ${TYPE_NAME[d.type] || '물건'}</span></div><button class="dx" data-act="desel" aria-label="선택 해제">${ico('close')}</button></div><div class="dl">${st.map(t => `<div>${t}</div>`).join('')}</div><div class="dacts"><button class="abtn w" data-act="takesel">${ico('bag')}가방으로 가져오기</button></div>`;
+      return; } }
     if (!it) {
       if (tab === 'equip' && G.eqSlot) { box.innerHTML = `<div class="dt"><div class="dic">${ico(({ main: 'fist', sub: 'gun' })[G.eqSlot] || SLOTS.find(s => s[0] === G.eqSlot)[2])}</div><div class="dtx"><b>${SLOT_NAME[G.eqSlot]}</b><span class="dtag">빈 칸</span></div></div><div class="ds">가운데 목록에서 ${G.eqSlot === 'main' || G.eqSlot === 'sub' ? '무기' : '옷'}를 골라 넣자.</div>`; return; }
       box.innerHTML = `<div class="dempty">${ico(tab === 'equip' ? 'jacket' : 'hand')}<span>${tab === 'equip' ? '칸이나 옷을 누르면<br>여기에 정보가 나온다' : '물건을 누르면<br>여기에 정보가 나온다'}</span></div>`;
@@ -3481,12 +3732,15 @@ ${nx ? `<div class="nx"><b>LV.${sk.lv + 1} 되면</b>${nx.map(([a, b]) => `${a} 
     else if (d.type === 'med') acts += `<button class="abtn w" data-act="use">${ico(d.icon)}사용</button>`;
     else if (d.type === 'note') acts += `<button class="abtn w" data-act="read">${ico(d.icon)}읽기</button>`;
     else if (d.type === 'radio') acts += `<button class="abtn w" data-act="listen">${ico(d.icon)}듣기</button>`;
+    else if (d.type === 'map') acts += `<button class="abtn w" data-act="readmap">${ico('map')}${it.read ? '지도에서 보기' : '지도 펼쳐 보기'}</button>`;
     else if (d.type === 'wear') acts += ws ? `<button class="abtn r" data-act="unwear">${ico(d.icon)}벗기</button>` : `<button class="abtn w" data-act="wear">${ico(d.icon)}입기</button>`;
     else if (d.type === 'melee' || d.type === 'gun') {
       acts += isMain ? `<button class="abtn r" data-act="equip">${ico(d.icon)}해제</button>` : `<button class="abtn w" data-act="equip">${ico(d.icon)}${isSub ? '주무기로' : '장착'}</button>`;
       if (isMain && p.equip2 != null) acts += `<button class="abtn" data-act="swapw">${ico('swap')}바꾸기</button>`;
       else if (isSub) acts += `<button class="abtn" data-act="unsub">보조 빼기</button>`;
       else if (!isMain) acts += `<button class="abtn" data-act="setsub">보조로</button>`;
+      if (d.mag && isMain) acts += `<button class="abtn" data-act="reload"${canReload(it) && !p.rl ? '' : ' disabled'}>${ico((ITEMS[d.ammo] || ITEMS.ammo).icon)}${p.rl ? '장전 중' : '장전'}</button>`;
+      if (d.mag && it.mag > 0) acts += `<button class="abtn" data-act="unload">${ico((ITEMS[d.ammo] || ITEMS.ammo).icon)}탄 빼기</button>`;
     }
     if (quickable(d)) { const on = (p.quick || []).includes(it.id); acts += `<button class="abtn" data-act="pin">${ico('star')}${on ? '빠른 칸 빼기' : '빠른 칸'}</button>`; }
     if (d.type === 'place') acts += `<button class="abtn w" data-act="place">${ico(d.icon)}${it.id === 'furn' ? '내려놓기' : it.id === 'campkit' ? '불 피우기' : '설치'}</button>`;
@@ -3522,6 +3776,7 @@ ${nx ? `<div class="nx"><b>LV.${sk.lv + 1} 되면</b>${nx.map(([a, b]) => `${a} 
   /* ---------- 행동(소요시간) 대기열 ---------- */
   function queueAction(a) {
     if (G.dead || G.sleeping) return;
+    if (G.p.rl) cancelReload(); // 다른 행동을 하면 재장전은 멈춘다 (넣은 탄은 그대로)
     a.t = 0;
     if (L.urgentNext) a.urgent = true;
     if (a.urgent && G.actions.length) G.actions.splice(1, 0, a); else G.actions.push(a);
@@ -3537,10 +3792,11 @@ ${nx ? `<div class="nx"><b>LV.${sk.lv + 1} 되면</b>${nx.map(([a, b]) => `${a} 
   }
   function updateActions(dt) {
     const a = G.actions[0];
-    if (!a) return;
+    if (!a) { if (SFX.act) SFX.act(null); return; }
     if (a.valid && !a.valid()) { G.actions.shift(); renderAction(); return; }
     a.t += dt;
-    if (!a.started) { a.started = true; if (a.sfx) SFX.play(a.sfx); }
+    if (!a.started) a.started = true;
+    if (SFX.act) SFX.act(a.sfx || null, a); // 행동 중엔 소리 반복, 끝나거나 취소하면 멈춤
     if (a.noise) { a.nt = (a.nt || 0) - dt; if (a.nt <= 0) { a.nt = 1.2; noise(G.p.x, G.p.y, a.noise, false); G.p.noiseR = Math.max(G.p.noiseR, a.noise); } }
     if (a.hammer) { a.ht = (a.ht || 0) - dt; if (a.ht <= 0) { a.ht = .55 + rand() * .2; SFX.play('hammer', { rev: .3 }); } }
     if (a.t >= a.dur) {
@@ -3610,13 +3866,14 @@ ${nx ? `<div class="nx"><b>LV.${sk.lv + 1} 되면</b>${nx.map(([a, b]) => `${a} 
     if (act.startsWith('tab-')) { G.tab = act.slice(4); G.sel = null; G.eqSlot = null; $('sheetBody').scrollTop = 0; return renderSheet(); }
     if (act.startsWith('eqslot-')) { const k = act.slice(7); if (G.eqSlot === k) { G.eqSlot = null; G.sel = null; } else { G.eqSlot = k; const w = wornIt(k); G.sel = w ? { uid: w.uid } : null; } return renderSheet(); }
     if (act === 'pin') { const it = selIt(); if (!it) return; p.quick = p.quick || []; const i = p.quick.indexOf(it.id); if (i >= 0) p.quick.splice(i, 1); else { if (p.quick.length >= QUICK_MAX) p.quick.shift(); p.quick.push(it.id); toast(ITEMS[it.id].name + ' — 빠른 칸에 넣었다 (화면 아래)'); } renderQuick(); return renderSheet(); }
+    if (act === 'takesel') { const u = G.sel && G.sel.uid; G.sel = null; if (u != null) sheetAction('takecont', u); return renderSheet(); }
     if (act.startsWith('sksel-')) { G.skSel = act.slice(6); return renderSheet(); }
     if (act.startsWith('note-')) return readNote(act.slice(5));
     if (act === 'wear' || act === 'unwear') {
       const it = selIt(); if (!it || busyUid(it.uid)) return;
       const d = ITEMS[it.id], on = act === 'wear';
       const dur = d.slot === 'back' ? .8 : d.slot === 'body' ? (d.w > 2 ? 3 : 1.8) : d.slot === 'feet' ? 1.6 : 1;
-      queueAction({ uid: it.uid, sfx: 'equip', label: d.name + (on ? ' 입는 중' : ' 벗는 중'), icon: d.icon, dur: on ? dur : dur * .6,
+      queueAction({ uid: it.uid, sfx: 'wear', label: d.name + (on ? ' 입는 중' : ' 벗는 중'), icon: d.icon, dur: on ? dur : dur * .6,
         valid: () => p.inv.includes(it),
         done: () => { p.wear = p.wear || {}; if (on) { p.wear[d.slot] = it.uid; G.eqSlot = d.slot; } else if (p.wear[d.slot] === it.uid) p.wear[d.slot] = null; refreshLook(); if (on) toast(d.name + (d.slot === 'back' ? ' 멨다' : ' 입었다')); if (invWeight() > capKg()) toast('가방이 작아서 무겁다 — 느려진다'); } });
       return;
@@ -3625,16 +3882,18 @@ ${nx ? `<div class="nx"><b>LV.${sk.lv + 1} 되면</b>${nx.map(([a, b]) => `${a} 
       const it = selIt(); if (!it || busyUid(it.uid)) return;
       const d = ITEMS[it.id], m = d.soft ? 'cloth' : 'tape';
       if (!countOf(m)) return toast(m === 'cloth' ? '천이 필요하다' : '덕트 테이프가 필요하다');
-      queueAction({ uid: it.uid, sfx: 'bandage', label: d.name + ' 수선 중', icon: d.icon, dur: 3,
+      queueAction({ uid: it.uid, sfx: 'craft_cloth', label: d.name + ' 수선 중', icon: d.icon, dur: 3,
         valid: () => p.inv.includes(it) && countOf(m) > 0,
         done: () => { consume(m, 1); const mx = it.max || d.dur; it.dur = Math.min(mx, it.dur + Math.round(mx * .4)); toast(d.name + ' 수선했다'); } });
       return;
     }
     if (act === 'setsub' || act === 'unsub') { const it = selIt(); if (!it) return; if (act === 'setsub') { p.equip2 = it.uid; toast(ITEMS[it.id].name + ' — 보조무기'); } else p.equip2 = null; return renderSheet(); }
+    if (act === 'reload') { startReload(); return renderSheet(); }
+    if (act === 'unload') { const it = selIt(); if (it && !busyUid(it.uid)) unloadGun(it); return renderSheet(); }
     if (act === 'swapw') {
       if (p.equip2 == null) return;
       queueAction({ sfx: 'equip', label: '무기 바꾸는 중', icon: 'swap', dur: .6,
-        done: () => { const a = p.equip; p.equip = p.equip2; p.equip2 = a; updateWeaponLook(); const w = curWeapon(); toast((w.item ? ITEMS[w.item.id].name : '맨손') + ' 장착'); } });
+        done: () => { cancelReload(); const a = p.equip; p.equip = p.equip2; p.equip2 = a; updateWeaponLook(); const w = curWeapon(); toast((w.item ? ITEMS[w.item.id].name : '맨손') + ' 장착'); } });
       return;
     }
     if (act === 'craft' || act === 'craftmax') { craft(uid, act === 'craft' ? 1 : 99); return renderSheet(); }
@@ -3656,9 +3915,11 @@ ${nx ? `<div class="nx"><b>LV.${sk.lv + 1} 되면</b>${nx.map(([a, b]) => `${a} 
     } else if (act === 'use') {
       const it = selIt(); if (!it || busyUid(it.uid)) return;
       const d = ITEMS[it.id];
+      if (d.splint && !(p.wounds || []).some(w => w.k === 'fracture' && !w.spl)) return toast('부목을 댈 부러진 곳이 없다');
+      if (d.disinfect && !(p.wounds || []).length) return toast('소독할 상처가 없다');
       const verb = d.type === 'food' ? '먹는 중' : d.type === 'drink' ? '마시는 중' : (d.stopBleed ? '붕대 감는 중' : '복용 중');
       const aid = d.type === 'med' ? skillLv('aid') : 0;
-      queueAction({ uid: it.uid, sfx: d.type === 'food' ? 'eat' : d.type === 'drink' ? 'drink' : (d.stopBleed ? 'bandage' : 'pills'), label: d.name + ' ' + verb, icon: d.icon, dur: (d.time || 2) * (1 - .08 * aid),
+      queueAction({ uid: it.uid, sfx: d.type === 'food' ? 'eat' : d.type === 'drink' ? 'drink' : it.id === 'disinfect' ? 'disinfect' : it.id === 'splint' ? 'craft_tape' : (d.stopBleed ? 'bandage' : 'pills'), label: d.name + ' ' + verb, icon: d.icon, dur: (d.time || 2) * (1 - .08 * aid),
         valid: () => p.inv.includes(it),
         done: () => {
           const fr = freshState(it), mul = (fr ? fr.mul : 1) * (it.q || 1);
@@ -3667,17 +3928,27 @@ ${nx ? `<div class="nx"><b>LV.${sk.lv + 1} 되면</b>${nx.map(([a, b]) => `${a} 
           if (d.hp) p.hp = Math.min(100, p.hp + d.hp + aid);
           if (d.cooked) toast('따뜻한 음식 — 기운이 난다');
           if (fr && fr.lv === 2) { if (rand() < .65) { p.sick = 360; toast('상한 음식을 먹었다… 속이 안 좋다', 2400); } else toast('상한 맛이 난다'); }
-          if (d.stopBleed) { if (p.bleed) toast('지혈했다'); p.bleed = false; gainXP('aid', 3); p.bandT = 720; }
+          if (d.stopBleed) { if (p.bleed) toast('지혈했다'); p.bleed = false; for (const w of p.wounds || []) w.band = true; gainXP('aid', 3); p.bandT = 720; }
+          if (d.sickP && rand() < d.sickP) { p.sick = Math.max(p.sick || 0, 240); toast('물이 더러웠다… 배가 아프다', 2400); }
+          if (d.splint) { const w = (p.wounds || []).find(w => w.k === 'fracture' && !w.spl); if (w) { w.spl = true; toast(PART_NAME[w.p] + '에 부목을 댔다'); gainXP('aid', 4); } }
+          if (d.disinfect) { for (const w of p.wounds || []) w.dis = true; toast('상처를 소독했다 — 빨리 낫는다'); gainXP('aid', 2); if (d.uses && --it.u > 0) return; }
           p.inv.splice(p.inv.indexOf(it), 1);
+          if (it.id === 'water' || it.id === 'dirtywater') stackAdd(mkItem('bottle'));
           if (G.sel && G.sel.uid === it.uid) G.sel = null;
         } });
       if (ci < 0) closeSheet(); // 가방에서 쓰면 창을 닫고 아래 진행바로 보여줌
+    } else if (act === 'readmap') {
+      const it = selIt(); if (!it) return;
+      if (G.lv) return toast('건물 밖에서 펼쳐 보자');
+      if (it.read) { closeSheet(); return openBigmap(mapFocus(it)); }
+      queueAction({ uid: it.uid, sfx: 'map', label: nameOf(it) + ' 펼쳐 보는 중', icon: 'map', dur: 2.5, valid: () => p.inv.includes(it) && !G.lv,
+        done: () => { const f = revealMap(it); it.read = 1; toast(nameOf(it) + '을(를) 읽었다 — 지도에 표시됐다', 2400); closeSheet(); openBigmap(f); } });
     } else if (act === 'read') {
       const it = selIt(); if (!it) return;
       readNote(it.nid);
     } else if (act === 'listen') {
       const R = (DT.STORY || {}).radio || [], day = Math.floor((G.time - 540) / 1440);
-      SFX.play('equip', { vol: .5 });
+      SFX.play('radio');
       showStory('휴대용 라디오', `${day + 1}일차 · ${String(Math.floor(G.time % 1440 / 60)).padStart(2, '0')}시\n\n` + (R[Math.min(R.length - 1, day)] || '(잡음뿐이다)'));
     } else if (act === 'equip') {
       const it = selIt(); if (!it || busyUid(it.uid)) return;
@@ -3801,7 +4072,7 @@ ${nx ? `<div class="nx"><b>LV.${sk.lv + 1} 되면</b>${nx.map(([a, b]) => `${a} 
     for (let k = 0; k < n; k++) {
       const hm = !!(r.tools && r.tools.includes('hammer'));
       const tm = r.time * (r.cook ? 1 - .05 * skillLv('cook') : hm ? 1 - .05 * skillLv('carp') : 1);
-      queueAction({ kind: 'craft', rid: r.id, sfx: r.cook ? 'sizzle' : 'craft', hammer: hm, label: ITEMS[r.out].name + (r.cook ? ' 요리 중' : ' 만드는 중'), icon: ITEMS[r.out].icon, dur: tm, noise: r.noise,
+      queueAction({ kind: 'craft', rid: r.id, sfx: r.id === 'boil' ? 'boil' : r.cook ? 'sizzle' : (CRAFT_SFX[r.id] || (hm ? 'craft_wood' : 'craft')), hammer: hm, label: ITEMS[r.out].name + (r.cook ? ' 요리 중' : ' 만드는 중'), icon: ITEMS[r.out].icon, dur: tm, noise: r.noise,
         valid: () => { const ok = recipeMax(r) > 0; if (!ok) { toast(ITEMS[r.out].name + ' — 재료가 모자라 중단'); setTimeout(() => { if (!$('sheet').classList.contains('hidden')) renderSheet(); }, 0); } return ok; },
         done: () => {
           for (const [id, need] of r.in) consume(id, need);
@@ -3819,7 +4090,7 @@ ${nx ? `<div class="nx"><b>LV.${sk.lv + 1} 되면</b>${nx.map(([a, b]) => `${a} 
     const kind = M.containers[ci].kind, D = DISMANTLE[kind];
     if (contItems(ci).length) return toast('먼저 안을 비워야 한다');
     if (!has(D.tool)) return toast(TOOL_NAME[D.tool] + '가 필요하다');
-    queueAction({ kind: 'dismantle', hammer: true, label: LOOT[kind].name + ' 분해 중', icon: 'screwdriver', dur: dismantleTime(D.time), noise: D.noise,
+    queueAction({ kind: 'dismantle', hammer: D.tool === 'hammer', sfx: D.tool === 'hammer' ? null : 'screw', label: LOOT[kind].name + ' 분해 중', icon: 'screwdriver', dur: dismantleTime(D.time), noise: D.noise,
       valid: () => G.openC === ci && has(D.tool) && !contItems(ci).length,
       done: () => {
         G.removed.add(ci); refreshContainer(ci);
@@ -3839,7 +4110,7 @@ ${nx ? `<div class="nx"><b>LV.${sk.lv + 1} 되면</b>${nx.map(([a, b]) => `${a} 
   function dismantleItem(it) {
     const D = ITEM_DISMANTLE[it.id];
     if (D.tool && !has(D.tool)) return toast(TOOL_NAME[D.tool] + '가 필요하다');
-    queueAction({ uid: it.uid, sfx: 'craft', hammer: D.tool === 'hammer', label: ITEMS[it.id].name + ' 분해 중', icon: 'screwdriver', dur: dismantleTime(D.time), noise: D.noise,
+    queueAction({ uid: it.uid, sfx: D.out.some(o => o[0] === 'cloth') ? 'craft_cloth' : D.tool === 'hammer' ? null : D.tool === 'screwdriver' ? 'screw' : 'craft_wood', hammer: D.tool === 'hammer', label: ITEMS[it.id].name + ' 분해 중', icon: 'screwdriver', dur: dismantleTime(D.time), noise: D.noise,
       valid: () => G.p.inv.includes(it) && (!D.tool || has(D.tool)),
       done: () => {
         G.p.inv.splice(G.p.inv.indexOf(it), 1);
@@ -3865,7 +4136,7 @@ ${nx ? `<div class="nx"><b>LV.${sk.lv + 1} 되면</b>${nx.map(([a, b]) => `${a} 
   }
   // 작업대 설치
   function placeBench(it) {
-    const p = G.p, isF = it.id === 'furn' || it.id === 'campkit';
+    const p = G.p, isF = it.id === 'furn' || it.id === 'campkit' || it.id === 'raincol';
     const spot = () => {
       const cands = [[Math.cos(p.face), Math.sin(p.face)], [1, 0], [-1, 0], [0, 1], [0, -1]];
       const px = Math.floor(p.x), py = Math.floor(p.y);
@@ -3890,7 +4161,8 @@ ${nx ? `<div class="nx"><b>LV.${sk.lv + 1} 되면</b>${nx.map(([a, b]) => `${a} 
         const [x, y] = spot();
         G.p.inv.splice(G.p.inv.indexOf(it), 1);
         if (G.sel && G.sel.uid === it.uid) G.sel = null;
-        if (it.id === 'campkit') { addPlaced({ x, y, type: 'campfire' }); SFX.play('fireup'); toast('모닥불을 피웠다 — 정전돼도 요리 가능'); }
+        if (it.id === 'raincol') { addPlaced({ x, y, type: 'raincol', w: 0 }); SFX.play('place'); toast('빗물 받이를 놓았다 — 밖에 두면 비가 올 때 찬다'); }
+        else if (it.id === 'campkit') { addPlaced({ x, y, type: 'campfire' }); SFX.play('fireup'); toast('모닥불을 피웠다 — 정전돼도 요리 가능'); }
         else if (isF) { addPlaced({ x, y, type: 'furn', kind: it.kind, items: it.items || [] }); SFX.play('place'); toast(nameOf(it) + '을(를) 놓았다'); }
         else { addPlaced({ x, y, type: 'bench' }); SFX.play('place'); toast('작업대를 설치했다'); }
       } });
@@ -3909,6 +4181,7 @@ ${nx ? `<div class="nx"><b>LV.${sk.lv + 1} 되면</b>${nx.map(([a, b]) => `${a} 
       b.glow = el('circle', { cx: b.x + .5, cy: b.y + .5, r: 3.6, fill: 'url(#lampGlow)', 'fill-opacity': L._fop || 0 }, L.fires);
       return;
     }
+    if (b.type === 'raincol') { el('circle', { cx: .5, cy: .5, r: .4, fill: '#2e3a44', stroke: '#0e1216', 'stroke-width': .07 }, b.g); b.wv = el('circle', { cx: .5, cy: .5, r: .05, fill: '#6aa8d8', opacity: .85 }, b.g); el('path', { d: 'M.14 .5H.86M.5 .14V.86', stroke: '#8a6a45', 'stroke-width': .05 }, b.g); drawRainCol(b); return; }
     if (b.type === 'furn') {
       if (FURN_CONT[b.kind]) drawFurniture(b.g, b.kind); else drawDecor(b.g, { kind: b.kind, x: 0, y: 0, w: 1, h: 1, wx: 0, wy: -1, c: b.id % 6 });
       return;
@@ -3917,6 +4190,7 @@ ${nx ? `<div class="nx"><b>LV.${sk.lv + 1} 되면</b>${nx.map(([a, b]) => `${a} 
     el('path', { d: 'M.1 .38H.9M.1 .62H.9', stroke: '#5a432d', 'stroke-width': .05 }, b.g);
     el('path', { d: 'M.62 .2L.82 .42M.3 .55l.18 .18', stroke: '#d9dde0', 'stroke-width': .07, 'stroke-linecap': 'round' }, b.g);
   }
+  function drawRainCol(b) { if (b.wv) b.wv.setAttribute('r', (.05 + .3 * Math.min(1, (b.w || 0) / 20)).toFixed(3)); }
   function removePlaced(b) {
     const i = G.placed.indexOf(b); if (i < 0) return;
     G.placed.splice(i, 1);
@@ -3957,7 +4231,7 @@ ${nx ? `<div class="nx"><b>LV.${sk.lv + 1} 되면</b>${nx.map(([a, b]) => `${a} 
     }
     for (const b of G.placed) {
       const d = Math.hypot(b.x + .5 - p.x, b.y + .5 - p.y);
-      if (d < fd) { fd = d; fb = { t: 'placed', b, kind: b.type === 'bench' ? 'bench' : b.type === 'campfire' ? 'campfire' : b.kind }; }
+      if (d < fd) { fd = d; fb = { t: 'placed', b, kind: b.type === 'bench' ? 'bench' : b.type === 'campfire' ? 'campfire' : b.type === 'raincol' ? 'raincol' : b.kind }; }
     }
     G.nearOp = best; G.nearLift = fb;
     // 벨 수 있는 나무 (바로 옆 칸)
@@ -3994,7 +4268,7 @@ ${nx ? `<div class="nx"><b>LV.${sk.lv + 1} 되면</b>${nx.map(([a, b]) => `${a} 
       if (v) { const k = hasKeyFor(v); out.push(['carIn', v.hp <= 0 ? '차에 타기 — 망가짐' : k ? `차에 타기 (연료 ${Math.round(v.fuel)}%)` : '차에 타기 — 열쇠 없음', 'car', !k || v.hp <= 0]); }
     }
     const hammer = has('hammer'), boards = countOf('barricade');
-    if (G.nearOp) {
+    if (G.nearOp && G.ds[G.nearOp.o.k]) {
       const o = G.nearOp.o, s = G.ds[o.k], nb = s.b.length;
       if (o.type === 'door') {
         if (!s.br && !nb) out.push(s.o ? ['doorClose', '문 닫기', 'close'] : ['doorOpen', '문 열기', 'hand']);
@@ -4006,20 +4280,31 @@ ${nx ? `<div class="nx"><b>LV.${sk.lv + 1} 되면</b>${nx.map(([a, b]) => `${a} 
           const side = o.horiz ? (p.y < o.y + .5 ? 1 : -1) : (p.x < o.x + .5 ? 1 : -1);
           const tx = o.horiz ? o.x : o.x + side, ty = o.horiz ? o.y + side : o.y, tk = ty * M.W + tx;
           const blocked = M.moveBlock[tk] || M.dynBlock[tk];
-          out.push(blocked ? ['climb', '창문 넘기 — 안쪽이 막힘', 'run', true, 'red'] : ['climb', '창문 넘기', 'run']);
+          if (G.lv && G.lv.z > 0 && M.t[tk] === DT.T.VOID) out.push(['jump', `창문으로 뛰어내리기 (${DT.floorName(G.lv.z)} — 다칠 수 있음)`, 'run', false, 'red']); // 위층: 밖으로 뛰어내림
+          else out.push(blocked ? ['climb', '창문 넘기 — 안쪽이 막힘', 'run', true, 'red'] : ['climb', '창문 넘기', 'run']);
         }
         if (nb < 4) out.push(['board', `판자로 막기 (${nb}/4)`, 'barricade', !(hammer && boards)]);
       }
       if (nb) out.push(['unboard', '판자 떼기', 'hammer', !hammer]);
     }
     if (G.nearTree >= 0) out.push(['chop', '나무 베기', 'axe', !has('axe')]);
+    const wt = nearWater();
+    if (wt && wt.kind === 'tap') {
+      if (G.waterOn) { out.push(['tapDrink', '수돗물 마시기', 'drop']); if (bottles()) out.push(['tapFill', `물병 채우기 (${bottles()}개)`, 'bottle']); }
+      else out.push(['tapDrink', '수도 — 단수로 물이 안 나온다', 'drop', true]);
+    } else if (wt && wt.kind === 'toilet') {
+      const used = (G.toiletUsed || []).includes(wt.k);
+      if (G.waterOn) out.push(['tapDrink', '수돗물 마시기', 'drop']);
+      else out.push(['toiletWater', used ? '변기 물통 — 비었다' : '변기 물통에서 물 뜨기 (물병 필요)', 'bottle', used || !bottles()]);
+    }
+    if (G.nearLift && G.nearLift.kind === 'raincol') { const b = G.nearLift.b, n = Math.floor(b.w || 0); out.push(['rainDrink', `빗물 마시기 (${n}병 분량)`, 'drop', n < 1]); if (bottles()) out.push(['rainFill', `빗물 뜨기 → 물병 (${Math.min(n, bottles())}개)`, 'bottle', n < 1]); }
     const si = stairInfo();
     if (si) {
       if (si.z < si.info.max) out.push(['up', `위층으로 (${DT.floorName(si.z + 1)})`, 'stairs']);
       if (si.z > si.info.min) out.push(['down', `아래층으로 (${DT.floorName(si.z - 1)})`, 'stairs']);
     }
     if (G.nearLift) {
-      const f = G.nearLift, nm = f.kind === 'bench' ? '작업대' : f.kind === 'campfire' ? '모닥불' : FURN[f.kind][0];
+      const f = G.nearLift, nm = f.kind === 'bench' ? '작업대' : f.kind === 'campfire' ? '모닥불' : f.kind === 'raincol' ? '빗물 받이' : FURN[f.kind][0];
       if (f.kind === 'campfire') out.push(['lift', '모닥불 끄기', 'fire']);
       else out.push(['lift', nm + ' 들기', 'bench']);
     }
@@ -4033,29 +4318,55 @@ ${nx ? `<div class="nx"><b>LV.${sk.lv + 1} 되면</b>${nx.map(([a, b]) => `${a} 
     if (act === 'carIn') {
       const v = nearVehicle(); if (!v || !hasKeyFor(v) || v.hp <= 0) return;
       return queueAction({ kind: 'car', label: '차에 타는 중', icon: 'car', dur: .7, valid: () => nearVehicle() === v,
-        done: () => { p.inCar = v.id; p.crouch = false; vehBlock(v, false); SFX.play('carDoor'); toast(`연료 ${Math.round(v.fuel)}% · 차 상태 ${Math.round(v.hp)}% — 빨간 버튼은 경적`, 2600); } });
+        done: () => { p.inCar = v.id; p.crouch = false; vehBlock(v, false); SFX.play('carDoor'); if (v.fuel > 0 && v.hp > 0) setTimeout(() => SFX.play('engine_start', { vol: .8 }), 350); toast(`연료 ${Math.round(v.fuel)}% · 차 상태 ${Math.round(v.hp)}% — 빨간 버튼은 경적`, 2600); } });
     }
     if (act === 'carOut') return exitCar();
+    if (act === 'jump') {
+      const o0 = G.nearOp && G.nearOp.o; if (!o0 || !G.lv || G.lv.z <= 0) return;
+      const side = o0.horiz ? (p.y < o0.y + .5 ? 1 : -1) : (p.x < o0.x + .5 ? 1 : -1), hi = G.lv.hi, z = G.lv.z, h = G.worldM.houses[hi];
+      const lx = o0.horiz ? o0.x : o0.x + side, ly = o0.horiz ? o0.y + side : o0.y;
+      return queueAction({ kind: 'jump', label: '창문으로 뛰어내리는 중', icon: 'run', dur: 1.4, noise: 2, valid: () => !!G.lv && G.lv.hi === hi,
+        done: () => {
+          const W0 = G.worldM; let tx = lx + h.x - 1, ty = ly + h.y - 1;
+          if (W0.moveBlock[ty * W0.W + tx] || W0.t[ty * W0.W + tx] === DT.T.FLOOR) { let best = null; for (let r = 1; r < 6 && !best; r++) for (let dy = -r; dy <= r && !best; dy++) for (let dx = -r; dx <= r; dx++) { const x = tx + dx, y = ty + dy; if (!W0.moveBlock[y * W0.W + x] && W0.t[y * W0.W + x] !== DT.T.FLOOR && W0.t[y * W0.W + x] !== DT.T.WALL) { best = [x, y]; break; } } if (best) [tx, ty] = best; }
+          changeLevel(hi, 0, false, [tx + .5, ty + .5]);
+          // 높이만큼 다침: 2층 가벼움 · 3층 위험 · 4층 이상 매우 위험
+          const P = G.p, frP = z === 1 ? .25 : z === 2 ? .6 : .9, dmg = z === 1 ? 8 : z === 2 ? 20 : 35 + 10 * (z - 3);
+          P.hp -= dmg; hurtFlash(); shake(.5); SFX.play('land'); SFX.play('hurt'); noise(P.x, P.y, 8, true);
+          const leg = rand() < .5 ? 'legl' : 'legr';
+          if (rand() < frP) { addWound('fracture', leg); toast(`${DT.floorName(z)}에서 뛰어내렸다 — ${PART_NAME[leg]} 골절!`, 3000); }
+          else { addWound('bruise', leg); toast(`${DT.floorName(z)}에서 뛰어내렸다 — ${PART_NAME[leg]} 타박상`, 2400); }
+          if (z >= 3) addWound('bruise', 'torso');
+          if (P.hp <= 0) die();
+        } });
+    }
+    if (act === 'tapDrink') { if (!G.waterOn) return toast('단수 — 물이 안 나온다'); return queueAction({ kind: 'drink', sfx: 'tap', label: '수돗물 마시는 중', icon: 'drop', dur: 2.5, valid: () => !!nearWater(), done: () => drinkRaw(30, 0, '시원하다') }); }
+    if (act === 'tapFill') { if (!G.waterOn) return; return queueAction({ kind: 'drink', sfx: 'tap', label: '물병 채우는 중', icon: 'bottle', dur: 1 + bottles() * .6, valid: () => !!nearWater() && G.waterOn, done: () => { const n = fillBottles(99, 'water'); toast(`물병 ${n}개를 채웠다`); } }); }
+    if (act === 'toiletWater') { const wt = nearWater(); if (!wt || !bottles()) return toast('빈 물병이 필요하다'); return queueAction({ kind: 'drink', sfx: 'tap', label: '변기 물통에서 물 뜨는 중', icon: 'bottle', dur: 3, valid: () => nearWater() && nearWater().k === wt.k,
+      done: () => { const n = fillBottles(2, 'dirtywater'); G.toiletUsed = G.toiletUsed || []; G.toiletUsed.push(wt.k); toast(`끓이지 않은 물 ${n}병 — 끓여 마시자`, 2400); } }); }
+    if (act === 'rainDrink' || act === 'rainFill') { const f = G.nearLift; if (!f || f.kind !== 'raincol') return; const b = f.b;
+      return queueAction({ kind: 'drink', sfx: act === 'rainDrink' ? 'drink' : 'tap', label: act === 'rainDrink' ? '빗물 마시는 중' : '빗물 뜨는 중', icon: 'drop', dur: act === 'rainDrink' ? 2.5 : 1 + bottles() * .6, valid: () => G.placed.includes(b) && b.w >= 1,
+        done: () => { if (act === 'rainDrink') { b.w -= 1; drinkRaw(30, .2, '빗물을 마셨다'); } else { const n = fillBottles(Math.floor(b.w), 'dirtywater'); b.w -= n; toast(`빗물 ${n}병 — 끓이면 안전하다`); } drawRainCol(b); } }); }
     const mech = skillLv('mech'), mt = 1 - .05 * mech;
     if (act === 'canPour') {
       const v = nearVehicle(); if (!v) return;
-      return queueAction({ kind: 'fuel', label: '기름 붓는 중', icon: 'fuel', dur: 3 * mt, valid: () => nearVehicle() === v,
+      return queueAction({ kind: 'fuel', sfx: 'fuel', label: '기름 붓는 중', icon: 'fuel', dur: 3 * mt, valid: () => nearVehicle() === v,
         done: () => { const got = canTake((100 - v.fuel) * TANK_L / 100); v.fuel = Math.min(100, v.fuel + got / TANK_L * 100); v._fw = 0; gainXP('mech', 1); toast(`기름 ${got.toFixed(1)}L 넣음 → 연료 ${Math.round(v.fuel)}%`); } });
     }
     if (act === 'siphon') {
       const v = nearVehicle(); if (!v) return;
-      return queueAction({ kind: 'fuel', label: '기름 빼는 중', icon: 'fuel', dur: 6 * mt, noise: 1, valid: () => nearVehicle() === v,
+      return queueAction({ kind: 'fuel', sfx: 'fuel', label: '기름 빼는 중', icon: 'fuel', dur: 6 * mt, noise: 1, valid: () => nearVehicle() === v,
         done: () => { const l = Math.min(canSpace(), v.fuel * TANK_L / 100); canAdd(l); v.fuel = Math.max(0, v.fuel - l / TANK_L * 100); gainXP('mech', 2); toast(`기름 ${l.toFixed(1)}L 뺐다 (차 ${Math.round(v.fuel)}%)`); } });
     }
     if (act === 'canFill') {
       if (!G.power) return toast('정전 — 주유기가 멈췄다. 세워진 차에서 기름을 빼자', 2600);
-      return queueAction({ kind: 'fuel', label: '기름통 채우는 중', icon: 'fuel', dur: 3, noise: 2, valid: () => nearPump(p) && G.power,
+      return queueAction({ kind: 'fuel', sfx: 'fuel', label: '기름통 채우는 중', icon: 'fuel', dur: 3, noise: 2, valid: () => nearPump(p) && G.power,
         done: () => { const l = canSpace(); canAdd(l); toast(`기름 ${l.toFixed(1)}L 채움`); } });
     }
     if (act === 'carFix') {
       const v = nearVehicle(); if (!v) return;
       if (!has('wrench') || !countOf('scrap')) return toast('렌치와 고철이 필요하다');
-      return queueAction({ kind: 'carfix', label: '차 고치는 중', icon: 'wrench', dur: 6 * mt, noise: 4, hammer: true, valid: () => nearVehicle() === v && countOf('scrap') > 0,
+      return queueAction({ kind: 'carfix', sfx: 'wrench', label: '차 고치는 중', icon: 'wrench', dur: 6 * mt, noise: 4, valid: () => nearVehicle() === v && countOf('scrap') > 0,
         done: () => { consume('scrap', 1); v.hp = Math.min(100, Math.round(v.hp + 8 + 2 * mech)); v._dead = 0; gainXP('mech', 5); toast(`차 상태 ${v.hp}%`); } });
     }
     if (act === 'refuel') {
@@ -4068,7 +4379,7 @@ ${nx ? `<div class="nx"><b>LV.${sk.lv + 1} 되면</b>${nx.map(([a, b]) => `${a} 
       const nz = si.z + (act === 'up' ? 1 : -1);
       return queueAction({ kind: 'stairs', label: act === 'up' ? '계단 오르는 중' : '계단 내려가는 중', icon: 'stairs', dur: .9, noise: 1,
         valid: () => !!stairInfo(),
-        done: () => { const nf = queueFollowers(si.hi, si.z, nz); changeLevel(si.hi, nz); SFX.play('step', { vol: .6 }); if (nf) setTimeout(() => toast(`좀비 ${nf}마리가 따라온다!`, 2000), 1900); toast((M.level ? (M.level.name ? M.level.name + ' ' : '') + M.level.floor : '1층') + (M.dark ? ' — 어둡다' : ''), 1800); } });
+        done: () => { const nf = queueFollowers(si.hi, si.z, nz); changeLevel(si.hi, nz); SFX.play('step', { stairs: 1, vol: .8 }); if (nf) setTimeout(() => toast(`좀비 ${nf}마리가 따라온다!`, 2000), 1900); toast((M.level ? M.level.floor : '1층') + (M.dark ? ' — 어둡다' : ''), 1800); } });
     }
     if (act === 'doorOpen' || act === 'doorClose') {
       const opening = act === 'doorOpen';
@@ -4089,7 +4400,7 @@ ${nx ? `<div class="nx"><b>LV.${sk.lv + 1} 되면</b>${nx.map(([a, b]) => `${a} 
     } else if (act === 'chop') {
       const k = G.nearTree; if (k < 0) return;
       if (!has('axe')) return toast('도끼가 필요하다 (철물점·옷장·차량에서 찾기)');
-      queueAction({ kind: 'chop', hammer: true, label: '나무 베는 중', icon: 'axe', dur: 7 * (1 - .05 * skillLv('carp')), noise: 7,
+      queueAction({ kind: 'chop', sfx: 'chop', label: '나무 베는 중', icon: 'axe', dur: 7 * (1 - .05 * skillLv('carp')), noise: 7,
         valid: () => M.t[k] === DT.T.TREE && G.nearTree === k,
         done: () => {
           M.t[k] = DT.T.GRASS; M.moveBlock[k] = 0; M.sightBlock[k] = 0; G.chopped.add(k); G.dsV++;
@@ -4106,14 +4417,14 @@ ${nx ? `<div class="nx"><b>LV.${sk.lv + 1} 되면</b>${nx.map(([a, b]) => `${a} 
       queueAction({ kind: 'smash', urgent: true, label: '창문 깨는 중', icon: 'fist', dur: .6,
         valid: () => !s.br && !s.b.length, done: () => { s.br = 1; updTile(o.k); SFX.play('glass'); noise(o.x + .5, o.y + .5, 13, true); shake(.25); } });
     } else if (act === 'climb') {
-      queueAction({ kind: 'climb', urgent: true, sfx: 'climb', label: '창문 넘는 중', icon: 'run', dur: 1.3,
+      queueAction({ kind: 'climb', urgent: true, label: '창문 넘는 중', icon: 'run', dur: 1.3,
         valid: () => s.br && !s.b.length && Math.hypot(o.x + .5 - p.x, o.y + .5 - p.y) < 1.6,
         done: () => {
           // 벽 반대편으로
           if (o.horiz) { p.x = o.x + .5; p.y = o.y + .5 + (p.y < o.y + .5 ? 1 : -1); }
           else { p.y = o.y + .5; p.x = o.x + .5 + (p.x < o.x + .5 ? 1 : -1); }
           resolve(p);
-          if (rand() < .12) { p.bleed = true; p.hp -= 3; hurtFlash(); toast('깨진 유리에 베였다 — 출혈'); }
+          if (rand() < .12) { const w = addWound('cut', rand() < .5 ? 'arml' : 'armr'); p.hp -= 3; hurtFlash(); toast('깨진 유리에 ' + PART_NAME[w.p] + ' 베였다 — 출혈'); }
         } });
     } else if (act === 'lift') {
       const f = G.nearLift; if (!f) return;
@@ -4122,6 +4433,7 @@ ${nx ? `<div class="nx"><b>LV.${sk.lv + 1} 되면</b>${nx.map(([a, b]) => `${a} 
       if (f.t === 'placed' && f.b.items && f.b.items.length) return toast('먼저 안을 비워야 한다');
       if (G.p.inv.some(i => i.id === 'furn')) return toast('가구는 한 번에 하나만 들 수 있다');
       if (kind === 'campfire') return queueAction({ kind: 'lift', label: '모닥불 끄는 중', icon: 'fire', dur: 1, valid: () => true, done: () => { removePlaced(f.b); toast('모닥불을 껐다'); } });
+      if (kind === 'raincol') return queueAction({ kind: 'lift', label: '빗물 받이 드는 중', icon: 'drop', dur: 1.2, valid: () => true, done: () => { removePlaced(f.b); stackAdd(mkItem('raincol')); toast('빗물 받이를 들었다 (물은 쏟아졌다)'); } });
       queueAction({ kind: 'lift', label: (kind === 'bench' ? '작업대' : FURN[kind][0]) + ' 드는 중', icon: 'bench', dur: 1.5, noise: 2,
         valid: () => true,
         done: () => {
@@ -4192,9 +4504,9 @@ ${nx ? `<div class="nx"><b>LV.${sk.lv + 1} 되면</b>${nx.map(([a, b]) => `${a} 
     return {
       v: 1, seed: G.seed, time: G.time, kills: G.kills, uid: G.uid, lastHour: G.lastHour,
       p: { x: p.x, y: p.y, face: p.face, hp: p.hp, full: p.full, hyd: p.hyd, energy: p.energy, endu: p.endu,
-        bleed: p.bleed, infected: p.infected, infT: p.infT, bt: p.bt != null ? +p.bt.toFixed(2) : 36.6, wet: +(p.wet || 0).toFixed(2), quick: p.quick || [], inv: p.inv, equip: p.equip, equip2: p.equip2 != null ? p.equip2 : null, wear: p.wear || {}, sick: p.sick || 0, inCar: p.inCar != null ? p.inCar : null },
-      rain: G.rain, rainTarget: G.rainTarget, weatherNext: G.weatherNext, sk: G.sk, power: G.power, powerOffAt: G.powerOffAt, sick: G.p.sick,
-      cont2: (() => { const o = {}; G.containers.forEach((l, i) => { o[i] = l; }); return o; })(), searched: [...G.searched], removed: [...G.removed], chopped: [...(G.chopped || [])], placed: G.placed.map(b => ({ x: b.x, y: b.y, type: b.type, kind: b.kind, items: b.items, id: b.id })), ds: dsSave(), rmDecor: [...(G.rmDecor || [])],
+        bleed: p.bleed, infected: p.infected, infT: p.infT, bt: p.bt != null ? +p.bt.toFixed(2) : 36.6, wounds: p.wounds || [], wet: +(p.wet || 0).toFixed(2), quick: p.quick || [], inv: p.inv, equip: p.equip, equip2: p.equip2 != null ? p.equip2 : null, wear: p.wear || {}, sick: p.sick || 0, inCar: p.inCar != null ? p.inCar : null },
+      rain: G.rain, rainTarget: G.rainTarget, weatherNext: G.weatherNext, sk: G.sk, power: G.power, powerOffAt: G.powerOffAt, waterOn: G.waterOn, waterOffAt: G.waterOffAt, snowCov: +(G.snowCov || 0).toFixed(3), marks: G.marks || [], toiletUsed: G.toiletUsed || [], sick: G.p.sick,
+      cont2: (() => { const o = {}; G.containers.forEach((l, i) => { o[i] = l; }); return o; })(), searched: [...G.searched], removed: [...G.removed], chopped: [...(G.chopped || [])], placed: G.placed.map(b => ({ x: b.x, y: b.y, type: b.type, kind: b.kind, items: b.items, id: b.id, w: b.w })), ds: dsSave(), rmDecor: [...(G.rmDecor || [])],
       z: G.zombies.filter(z => !z.dead).map(z => [+z.x.toFixed(2), +z.y.toFixed(2), +z.hp.toFixed(2), z.shirt, 0, 0, z.lk]).concat([].concat(...G.zdorm.values()).map(r => [r[0], r[1], r[2], r[3], 0, 0, r[4]])),
       c: G.corpses.map(c => [+c.x.toFixed(2), +c.y.toFixed(2), +c.a.toFixed(2), c.shirt, c.items, c.searched ? 1 : 0, c.id, c.lk]),
       look: G.look, journal: G.journal || [], followers: G.followers || [], vehicles: (G.vehicles || []).map(v => ({ id: v.id, x: +v.x.toFixed(2), y: +v.y.toFixed(2), a: +v.a.toFixed(3), fuel: +v.fuel.toFixed(1), hp: v.hp, color: v.color, key: v.key, keyC: v.keyC, trunk: v.trunk })), mapV: G.mapV || 1, exp: encExp(), heliAt: G.heliAt, heli: G.heli ? { ph: G.heli.ph, x: G.heli.x, y: G.heli.y, a: G.heli.a, t: G.heli.t } : null,
@@ -4277,6 +4589,22 @@ ${nx ? `<div class="nx"><b>LV.${sk.lv + 1} 되면</b>${nx.map(([a, b]) => `${a} 
     for (const v of G.vehicles) { const d = Math.hypot(v.x - G.p.x, v.y - G.p.y); if (d < bd) { bd = d; best = v; } }
     return best;
   }
+  /* ---------- 물: 수도(단수 전까지) · 변기 물통 · 빗물 받이 ---------- */
+  function waterIdx() { // 세면대·욕조·조리대(싱크대) = 수도, 변기 = 물통 (지도마다 한 번)
+    if (M._wAt) return M._wAt;
+    const w = new Map(), W = M.W;
+    (M.decor || []).forEach((d, i) => { const kind = d.kind === 'sink' || d.kind === 'bath' ? 'tap' : d.kind === 'toilet' ? 'toilet' : null; if (!kind) return; for (let y = d.y; y < d.y + (d.h || 1); y++) for (let x = d.x; x < d.x + (d.w || 1); x++) w.set(y * W + x, { kind, i }); });
+    M.containers.forEach((c, i) => { if ((c.kind === 'cabinet' || c.kind === 'kitchen') && !w.has(c.y * W + c.x)) w.set(c.y * W + c.x, { kind: 'tap', ci: i }); });
+    return (M._wAt = w);
+  }
+  function nearWater() {
+    const p = G.p, W = M.W, w = waterIdx(), px = Math.floor(p.x), py = Math.floor(p.y); let best = null, bd = 1.6;
+    for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) { const x = px + dx, y = py + dy, e = w.get(y * W + x); if (!e) continue; if (e.i != null && G.rmDecor && G.rmDecor.has(e.i)) continue; if (e.ci != null && G.removed.has(e.ci)) continue; const d = Math.hypot(x + .5 - p.x, y + .5 - p.y); if (d < bd) { bd = d; best = Object.assign({ k: (M.level ? 'L' + (G.lv ? G.lv.hi + ':' + G.lv.z : '') + ':' : '') + (y * W + x) }, e); } }
+    return best;
+  }
+  const bottles = () => G.p.inv.filter(i => i.id === 'bottle').length;
+  function fillBottles(n, id) { let k = 0; for (const b of G.p.inv.filter(i => i.id === 'bottle')) { if (k >= n) break; G.p.inv.splice(G.p.inv.indexOf(b), 1); stackAdd(mkItem(id)); k++; } return k; }
+  function drinkRaw(hyd, sickP, msg) { const p = G.p; p.hyd = clamp(p.hyd + hyd, 0, 100); if (sickP && rand() < sickP) { p.sick = Math.max(p.sick || 0, 240); toast('물이 더러웠다… 배가 아프다', 2400); } else if (msg) toast(msg); }
   // 기름통: 1통 10L · 차 연료통 40L (차 연료 %는 40L 기준)
   const CAN_MAX = 10, TANK_L = 40;
   function canW(it) { it.w = +(.8 + (it.fuel || 0) * .75).toFixed(2); }
@@ -4334,7 +4662,8 @@ ${nx ? `<div class="nx"><b>LV.${sk.lv + 1} 되면</b>${nx.map(([a, b]) => `${a} 
       const pts = [[.95, 0], [.85, .38], [.85, -.38], [-.95, 0], [-.85, .38], [-.85, -.38], [0, .42], [0, -.42]];
       if (pts.some(([f, s2]) => blocked(nx + ca * f - sa * s2, ny + sa * f + ca * s2))) {
         const sp = Math.abs(v.v);
-        if (sp > 3) { v.hp = Math.max(0, Math.round(v.hp - (sp - 2.5) * 3)); shake(.12 + sp * .03); SFX.play('hitBlunt', { vol: .9 }); noise(v.x, v.y, 12, false); if (v.hp <= 0) toast('쾅! 엔진이 망가졌다', 2600); }
+        if (sp > 5.5 && rand() < Math.min(.6, (sp - 5) / 6)) { const P = G.p, w = addWound(rand() < .4 ? 'fracture' : 'bruise', rand() < .5 ? (rand() < .5 ? 'legl' : 'legr') : 'torso'); P.hp -= (sp - 4) * 2; hurtFlash(); toast('충돌! ' + PART_NAME[w.p] + ' ' + WOUND[w.k][0], 2600); }
+        if (sp > 3) { v.hp = Math.max(0, Math.round(v.hp - (sp - 2.5) * 3)); shake(.12 + sp * .03); SFX.play(sp * KMH >= 40 ? 'crash' : 'crash_low', { vol: .9 }); noise(v.x, v.y, 12, false); if (v.hp <= 0) toast('쾅! 엔진이 망가졌다', 2600); }
         v.v *= -.2;
       } else { v.x = nx; v.y = ny; }
     }
@@ -4347,7 +4676,7 @@ ${nx ? `<div class="nx"><b>LV.${sk.lv + 1} 되면</b>${nx.map(([a, b]) => `${a} 
       if (Math.abs(f) > 1.25 || Math.abs(s2) > .78) continue;
       if (sp > 2.5 && f * Math.sign(v.v) > .2) {
         damageZombie(z, sp * .45, v.v < 0 ? v.a + Math.PI : v.a, 1.1, true);
-        v.hp = Math.max(0, Math.round((v.hp - .6 - sp * .12) * 10) / 10); v.v *= .82; shake(.1); SFX.at('hitBlunt', z.x, z.y, { range: 12 });
+        v.hp = Math.max(0, Math.round((v.hp - .6 - sp * .12) * 10) / 10); v.v *= .82; shake(.1); SFX.at('car_hit', z.x, z.y, { range: 12 });
       }
       if (!z.dead) { const side = s2 >= 0 ? 1 : -1, need = .8 - Math.abs(s2); z.x += -sa * side * need; z.y += ca * side * need; resolve(z); }
     }
@@ -4386,7 +4715,7 @@ ${nx ? `<div class="nx"><b>LV.${sk.lv + 1} 되면</b>${nx.map(([a, b]) => `${a} 
       cont2, searched: [...G.searched], removed: [...G.removed], rmDecor: [...(G.rmDecor || [])], ds: dsSave(),
       z: G.zombies.filter(z => !z.dead).map(z => [+z.x.toFixed(2), +z.y.toFixed(2), +z.hp.toFixed(2), z.shirt, 0, 0, z.lk]).concat([].concat(...G.zdorm.values()).map(r => [r[0], r[1], r[2], r[3], 0, 0, r[4]])),
       c: G.corpses.map(c => [+c.x.toFixed(2), +c.y.toFixed(2), +c.a.toFixed(2), c.shirt, c.items, c.searched ? 1 : 0, c.id, c.lk]),
-      placed: G.placed.map(b => ({ x: b.x, y: b.y, type: b.type, kind: b.kind, items: b.items, id: b.id })),
+      placed: G.placed.map(b => ({ x: b.x, y: b.y, type: b.type, kind: b.kind, items: b.items, id: b.id, w: b.w })),
       _exp: G.exp, _seen: G.seen, // 메모리에만 (저장할 땐 cleanCtx로 압축)
     };
   }
@@ -4411,7 +4740,7 @@ ${nx ? `<div class="nx"><b>LV.${sk.lv + 1} 되면</b>${nx.map(([a, b]) => `${a} 
     G.zombies = []; G.zdorm = new Map(); G.zdormN = 0; G.corpses = []; G.placed = [];
     for (const [x, y, hp, shirt, , , lk] of ((c && c.z) || [])) placeZombie(x, y, hp, shirt, lk);
     for (const [x, y, a, shirt, items, sr, id, lk] of ((c && c.c) || [])) addCorpse(x, y, a, shirt, (items || []).filter(known), sr, id, lk);
-    for (const b of ((c && c.placed) || [])) addPlaced({ x: b.x, y: b.y, type: b.type, kind: b.kind, items: (b.items || []).filter(known), id: b.id });
+    for (const b of ((c && c.placed) || [])) addPlaced({ x: b.x, y: b.y, type: b.type, kind: b.kind, items: (b.items || []).filter(known), id: b.id, w: b.w || 0 });
     if (fresh) spawnLevelZombies();
     G.dsV = (G.dsV || 0) + 1;
   }
@@ -4440,7 +4769,7 @@ ${nx ? `<div class="nx"><b>LV.${sk.lv + 1} 되면</b>${nx.map(([a, b]) => `${a} 
     return m;
   }
   // 계단으로 층 이동. z = 0이면 월드(1층)로 돌아감
-  function changeLevel(hi, z, noSnap) {
+  function changeLevel(hi, z, noSnap, pos) {
     const cur = lvKey(G.lv);
     if (!noSnap) { const snap = snapshotCtx(); if (cur === 'w') G.lvWorld = snap; else G.lvStore[cur] = snap; }
     const W0 = G.worldM, info = W0.levels[hi];
@@ -4451,12 +4780,14 @@ ${nx ? `<div class="nx"><b>LV.${sk.lv + 1} 되면</b>${nx.map(([a, b]) => `${a} 
     pathQueue = []; L.mini = L.big = null;
     buildScene(); tm.push(performance.now()); buildMaps(); tm.push(performance.now());
     const [wx, wy] = info.stair;
-    if (z === 0) { G.p.x = wx + .5; G.p.y = wy + .5; } else { G.p.x = M.spawn.x + .5; G.p.y = M.spawn.y + .5; }
+    if (pos) { G.p.x = pos[0]; G.p.y = pos[1]; } else if (z === 0) { G.p.x = wx + .5; G.p.y = wy + .5; } else { G.p.x = M.spawn.x + .5; G.p.y = M.spawn.y + .5; }
     G.p.vx = G.p.vy = 0;
     const snap = z === 0 ? G.lvWorld : G.lvStore[lvKey(target)];
     restoreCtx(snap, (!snap || snap.pendingFresh) && z !== 0); // 좀비는 위치 기준으로 가까운 것만 깨우므로 플레이어를 먼저 옮김
     tm.push(performance.now()); L._tm = tm.map((v, i) => i ? Math.round(v - tm[i - 1]) : 0).slice(1).join('/');
     L._cx = null; L._vkey = null; L._ckR = null; G.openC = -1; G.nearC = -1;
+    G.nearOp = null; G.nearLift = null; G.nearTree = -1; G.nearBench = -1; // 이전 층의 문·가구 기억 지우기 (진행바가 남던 문제)
+    renderAction();
     for (let i = 0; i < M.containers.length; i++) refreshContainer(i);
     updateFloorTag();
   }
@@ -4475,7 +4806,7 @@ ${nx ? `<div class="nx"><b>LV.${sk.lv + 1} 되면</b>${nx.map(([a, b]) => `${a} 
   function updateFloorTag() {
     const e = $('flTag'); if (!e) return;
     if (!G.lv) { e.classList.add('hidden'); return; }
-    e.textContent = (M.level.name ? M.level.name + ' · ' : '') + M.level.floor;
+    e.textContent = M.level.floor; // 건물 이름은 표시 안 함
     e.classList.remove('hidden');
   }
   // 지금 서 있는 건물의 층 정보 (계단 옆일 때)
@@ -4593,6 +4924,7 @@ ${nx ? `<div class="nx"><b>LV.${sk.lv + 1} 되면</b>${nx.map(([a, b]) => `${a} 
     const seed = (Math.random() * 1e9) | 0;
     G = baseState(seed);
     G.mapV = window.DT_MAPV || 5;
+    G.waterOffAt = G.powerOffAt + (1 + Math.floor(Math.random() * 3)) * 1440; // 정전 1~3일 뒤 단수
     G.look = loadLook();
     setupWorld(seed);
     initOpenings();
@@ -4600,7 +4932,7 @@ ${nx ? `<div class="nx"><b>LV.${sk.lv + 1} 되면</b>${nx.map(([a, b]) => `${a} 
     p.x = M.spawn.x + .5; p.y = M.spawn.y + .5;
     const lr = DT.rng(seed ^ 0x5bd1e995);
     G.containers = [];
-    if (M.spawnContainer >= 0) contItems(M.spawnContainer).push(mkItem('hammer'));
+    if (M.spawnContainer >= 0) contItems(M.spawnContainer).push(mkItem('hammer'), mkItem('pencil'));
     else p.inv.push(mkItem('hammer'));
     p.inv.push(mkItem('water'), mkItem('chips'), mkItem('bandage'));
     giveStarterGear(p);
@@ -4638,6 +4970,7 @@ ${nx ? `<div class="nx"><b>LV.${sk.lv + 1} 되면</b>${nx.map(([a, b]) => `${a} 
     if (s.rain != null) { G.rain = s.rain; G.rainTarget = s.rainTarget; G.weatherNext = s.weatherNext; }
     if (s.sk) for (const k in G.sk) if (s.sk[k]) G.sk[k] = s.sk[k];
     if (s.power != null) { G.power = s.power; G.powerOffAt = s.powerOffAt; }
+    G.waterOn = s.waterOn != null ? s.waterOn : 1; G.waterOffAt = s.waterOffAt || (G.powerOffAt + 2 * 1440); G.snowCov = s.snowCov || 0; G.marks = s.marks || []; G.toiletUsed = s.toiletUsed || [];
     G.heliAt = s.heliAt != null ? s.heliAt : G.time + (6 + rand() * 30) * 60;
     if (s.heli) G.heli = Object.assign({ nt: 0, rot: 0 }, s.heli); // 날던 헬기 이어서
     Object.assign(G.p, s.p);
@@ -4655,7 +4988,7 @@ ${nx ? `<div class="nx"><b>LV.${sk.lv + 1} 되면</b>${nx.map(([a, b]) => `${a} 
     else M.containers.forEach((c, i) => { if (i < sc.length) G.containers[i] = (sc[i] || []).filter(known); }); // 예전 저장 (없는 칸은 열 때 새로 채움)
     for (const [x, y, hp, shirt, skin, bw, lk] of s.z) placeZombie(x, y, hp, shirt, lk);
     for (const [x, y, a, shirt, items, sr, id, lk] of (s.c || [])) addCorpse(x, y, a, shirt, (items || []).filter(i => i && ITEMS[i.id]), sr, id, lk);
-    for (const b of (s.placed || [])) addPlaced({ x: b.x, y: b.y, type: b.type, kind: b.kind, items: (b.items || []).filter(known), id: b.id });
+    for (const b of (s.placed || [])) addPlaced({ x: b.x, y: b.y, type: b.type, kind: b.kind, items: (b.items || []).filter(known), id: b.id, w: b.w || 0 });
     for (let i = 0; i < M.containers.length; i++) refreshContainer(i);
     G.vehicles = (s.vehicles || []).map(v => Object.assign({ v: 0 }, v)); G.keyAt = {};
     for (const v of G.vehicles) if (v.keyC != null) G.keyAt[v.keyC] = v.id;
@@ -4726,6 +5059,7 @@ ${nx ? `<div class="nx"><b>LV.${sk.lv + 1} 되면</b>${nx.map(([a, b]) => `${a} 
     $('btnUse').addEventListener('click', () => { if (G.nearC >= 0) startSearch(G.nearC); else if (G.nearBench >= 0) { G.tab = 'craft'; openSheet(-1); } });
     $('btnBag').addEventListener('click', () => { G.tab = 'bag'; openSheet(-1); });
     $('btnSwap').addEventListener('click', () => { if (G && G.running && !G.dead) sheetAction('swapw'); });
+    $('btnReload').addEventListener('click', () => { if (!G || !G.running || G.dead) return; if (G.p.rl) return cancelReload('재장전을 멈췄다'); startReload(); });
     $('btnAlt').addEventListener('click', () => {
       const opts = altOptions(); if (!opts.length) return;
       if (opts.length === 1) { const o = opts[0]; if (o[3]) return toast(o[0] === 'climb' ? '창문 안쪽이 가구로 막혀 있다 — 다른 창문이나 문으로' : o[0] === 'chop' ? '도끼가 필요하다 (철물점·옷장·차량에서 찾기)' : o[0] === 'board' ? (has('hammer') ? '바리케이드 판자가 필요하다' : '망치가 필요하다') : '망치가 필요하다'); return doAlt(o[0]); }
@@ -4737,7 +5071,7 @@ ${nx ? `<div class="nx"><b>LV.${sk.lv + 1} 되면</b>${nx.map(([a, b]) => `${a} 
       doAlt(b.dataset.alt);
     });
     $('sheetClose').addEventListener('click', closeSheet);
-    document.addEventListener('pointerdown', e => { if (e.target.closest('.sheet-card button, .overlay button, .qb, #menuBtn, #minimap, #btnBag, #btnUse, #btnSwap')) SFX.play('ui'); }, true);
+    document.addEventListener('pointerdown', e => { const b = e.target.closest('.sheet-card button, .overlay button, .qb, #menuBtn, #minimap, #btnBag, #btnUse, #btnSwap'); if (b && !b.matches('#sheetClose, #btnBag')) SFX.play('ui_tap'); }, true); // 버튼·탭·칸 고르기 모두 같은 소리
     // 두 손가락: 조이스틱을 누른 채 다른 버튼을 탭하면 아이폰은 click을 만들지 않음 → 직접 만들어 줌 (중복 방지 포함)
     let synthAt = 0, synthEl = null;
     document.addEventListener('pointerup', e => {
@@ -4750,7 +5084,15 @@ ${nx ? `<div class="nx"><b>LV.${sk.lv + 1} 되면</b>${nx.map(([a, b]) => `${a} 
     document.addEventListener('click', e => { if (e.isTrusted && synthEl && performance.now() - synthAt < 350 && (e.target === synthEl || synthEl.contains(e.target) || e.target.contains(synthEl))) { e.stopImmediatePropagation(); e.preventDefault(); } }, true);
     $('act').addEventListener('click', e => { if (e.target.closest('[data-act=cancel]')) cancelActions('행동 취소'); });
     $('quick').addEventListener('click', e => { const b = e.target.closest('button[data-q]'); if (b) quickAct(b.dataset.q, +b.dataset.uid); });
+    // 보관함 물건: 짧게 누르면 가져오기, 길게 누르면 정보만 보기
+    { const sc = document.querySelector('.sheet-card'); let lpT = null, lp0 = null;
+      const clr = () => { clearTimeout(lpT); lpT = null; };
+      sc.addEventListener('pointerdown', e => { const c = e.target.closest('.card[data-src="cont"]'); if (!c) return; lp0 = [e.clientX, e.clientY]; clr(); lpT = setTimeout(() => { lpT = null; L.lpFired = true; G.sel = { uid: +c.dataset.uid, cont: true }; SFX.play('ui_tap'); renderSheet(); }, 420); });
+      sc.addEventListener('pointermove', e => { if (lpT && lp0 && Math.hypot(e.clientX - lp0[0], e.clientY - lp0[1]) > 10) clr(); });
+      for (const ev of ['pointerup', 'pointercancel', 'pointerleave']) sc.addEventListener(ev, () => { clr(); if (L.lpFired) setTimeout(() => { L.lpFired = false; }, 60); }); // 길게 누른 뒤 따라오는 탭 하나만 무시
+      sc.addEventListener('contextmenu', e => { if (e.target.closest('.card')) e.preventDefault(); }); }
     document.querySelector('.sheet-card').addEventListener('click', e => {
+      if (L.lpFired) { L.lpFired = false; return; }
       const c = e.target.closest('.card');
       if (c && c.classList.contains('busy')) { const u = +c.dataset.uid; G.actions = G.actions.filter(a => a.uid !== u); toast('취소했다'); renderAction(); return renderSheet(); }
       if (c && c.dataset.src === 'cont' && c.dataset.uids) { for (const u of c.dataset.uids.split(',')) sheetAction('takecont', +u); return; } // 묶음은 한 번에 다 챙김
@@ -4760,10 +5102,34 @@ ${nx ? `<div class="nx"><b>LV.${sk.lv + 1} 되면</b>${nx.map(([a, b]) => `${a} 
     });
     $('minimap').addEventListener('click', () => {
       if (!G || !G.running) return;
-      G.paused = true; if (G.expDirty) { G.expDirty = false; updateMapMask(); } fitBigmap();
-      $('bigmap').classList.remove('hidden');
+      openBigmap();
     });
     $('mapClose').addEventListener('click', () => { $('bigmap').classList.add('hidden'); resumeIfFree(); });
+    $('mkBar').addEventListener('click', e => {
+      const pb = e.target.closest('button[data-pen]'); if (pb) { L.pen = pb.dataset.pen; return renderMkBar(); }
+      const b = e.target.closest('button[data-mk]'); if (!b || b.disabled) return;
+      L.mkMode = L.mkMode === b.dataset.mk ? null : b.dataset.mk; renderMkBar(); if (L.mkMode === 'text') setTimeout(() => $('mkText').focus(), 30);
+    });
+    $('mapZoom').addEventListener('click', e => { const b = e.target.closest('button[data-z]'); if (!b || !L.bv) return; const z = b.dataset.z, v = L.bv;
+      if (z === 'me') setBigView(G.p.x, G.p.y, Math.min(v.size, 80)); else setBigView(v.cx, v.cy, v.size * (z === 'in' ? .6 : 1 / .6)); SFX.play('ui_tap'); });
+    { // 끌어서 이동 · 짧게 누르면 표시
+      const sv = $('bigmapSvg'); let d0 = null;
+      const toMap = (cx, cy) => { const pt = sv.createSVGPoint(); pt.x = cx; pt.y = cy; return pt.matrixTransform(sv.getScreenCTM().inverse()); };
+      sv.addEventListener('pointerdown', e => { if (!L.bv) return; d0 = { x: e.clientX, y: e.clientY, v: Object.assign({}, L.bv), moved: false, id: e.pointerId }; try { sv.setPointerCapture(e.pointerId); } catch (err) {} });
+      sv.addEventListener('pointermove', e => { if (!d0 || e.pointerId !== d0.id) return; const dx = e.clientX - d0.x, dy = e.clientY - d0.y; if (!d0.moved && Math.hypot(dx, dy) < 7) return; d0.moved = true; const k = d0.v.size / sv.getBoundingClientRect().width; setBigView(d0.v.cx - dx * k, d0.v.cy - dy * k, d0.v.size); });
+      sv.addEventListener('pointerup', e => {
+        if (!d0) return; const moved = d0.moved; d0 = null; if (moved || !L.mkMode || M.level) return;
+        const q = toMap(e.clientX, e.clientY); G.marks = G.marks || [];
+        const near = G.marks.reduce((b, k, i) => { const d = Math.hypot(k.x - q.x, k.y - q.y); return d < b[0] ? [d, i] : b; }, [(L._bigSize || 72) / 22, -1]);
+        if (L.mkMode === 'del') { if (near[1] < 0) return; const k = G.marks[near[1]]; if (k.pen && k.pen !== 'pencil') return toast('펜으로 적은 건 지울 수 없다'); G.marks.splice(near[1], 1); }
+        else { if (!L.pen) return toast('필기구가 없다');
+          const m = { t: L.mkMode, x: +q.x.toFixed(1), y: +q.y.toFixed(1), c: ITEMS[L.pen].pen, pen: L.pen };
+          if (L.mkMode === 'text') { const tx = $('mkText').value.trim(); if (!tx) return toast('적을 글자를 먼저 쓰세요'); m.txt = tx.slice(0, 14); }
+          G.marks.push(m); if (G.marks.length > 80) G.marks.shift(); }
+        SFX.play(L.mkMode === 'del' ? 'ui_tap' : 'pen'); drawMarks();
+      });
+      sv.addEventListener('wheel', e => { if (!L.bv) return; e.preventDefault(); const q = toMap(e.clientX, e.clientY), f = e.deltaY > 0 ? 1.15 : 1 / 1.15, v = L.bv; setBigView(q.x + (v.cx - q.x) * f, q.y + (v.cy - q.y) * f, v.size * f); }, { passive: false });
+    }
     $('bigmap').addEventListener('click', e => { if (e.target.id === 'bigmap') { $('bigmap').classList.add('hidden'); resumeIfFree(); } });
     $('wakeBtn').addEventListener('click', () => wake());
     $('menuBtn').addEventListener('click', () => {
@@ -4803,7 +5169,7 @@ ${nx ? `<div class="nx"><b>LV.${sk.lv + 1} 되면</b>${nx.map(([a, b]) => `${a} 
     addEventListener('touchmove', e => { if (pinch && e.touches.length === 2) { const [a, b] = e.touches; setZoom(pinch.z * Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY) / pinch.d); } }, { passive: true });
     addEventListener('touchend', e => { if (e.touches.length < 2) pinch = null; }, { passive: true });
     // 웅크리기
-    $('btnCrouch').addEventListener('click', () => { if (G && G.running) { G.p.crouch = !G.p.crouch; SFX.play('ui'); } });
+    $('btnCrouch').addEventListener('click', () => { if (G && G.running) { G.p.crouch = !G.p.crouch; SFX.play('ui_tap'); } });
     $('mNew').addEventListener('click', () => {
       const b = $('mNew');
       if (!b.classList.contains('confirm')) { b.classList.add('confirm'); b.textContent = '한 번 더 누르면 현재 기록이 삭제됩니다'; setTimeout(() => { b.classList.remove('confirm'); b.textContent = '새 게임'; }, 3000); return; }
@@ -4846,6 +5212,7 @@ ${nx ? `<div class="nx"><b>LV.${sk.lv + 1} 되면</b>${nx.map(([a, b]) => `${a} 
       if (G.paused) { updKeys(); return; }
       if (e.code === 'KeyE' && G.nearC >= 0 && G.openC < 0) startSearch(G.nearC);
       if (e.code === 'KeyC') G.p.crouch = !G.p.crouch;
+      if (e.code === 'KeyR') { if (G.p.rl) cancelReload('재장전을 멈췄다'); else startReload(); }
       if (e.code === 'Equal' || e.code === 'NumpadAdd') $('zIn').click();
       if (e.code === 'Minus' || e.code === 'NumpadSubtract') $('zOut').click();
       else if (e.code === 'KeyF') $('btnAlt').click();
@@ -4915,5 +5282,5 @@ ${nx ? `<div class="nx"><b>LV.${sk.lv + 1} 되면</b>${nx.map(([a, b]) => `${a} 
   if (loadSave()) $('tContinue').classList.remove('hidden');
   requestAnimationFrame(frame);
 
-  window.DT.debug = { mkItem: id => mkItem(id), stackAdd: it => stackAdd(it), contItems: i => contItems(i), zone: () => updateZombieZone(), clearZ: () => { G.zdorm.clear(); G.zdormN = 0; }, alt: a => { findInteract(); doAlt(a); }, findI: () => findInteract(), addZ: (x, y) => addZombie(x, y, 3, null, null, null, null), changeLv: (h, z) => changeLevel(h, z), lvCache: () => L.lvCache, tm: () => L._tm, cam: () => (L.lax || 0).toFixed(2) + "," + (L.lay || 0).toFixed(2), altOpts: () => altOptions(), benchChunks: (x, y) => { let n = 0; const cx0 = Math.floor(x / CK), cy0 = Math.floor(y / CK); for (let cy = cy0; cy < cy0 + 4; cy++) for (let cx = cx0; cx < cx0 + 4; cx++) { const ch = L.chunks.get(cy * M.CW + cx); if (ch) dropChunk(ch); buildChunk(cx, cy); n++; } return n; }, RECIPES, get G() { return G; }, get M() { return M; }, get AS() { return AS; }, newGame, save, loadSave, continueGame, playerAttack, noise, openSheet, art: { drawPlayerArt, weaponArt, makeZombieG, genLook, lookParts, LOOK, ITEMS, ZTRAIT } };
+  window.DT.debug = { addWound: (k, pt) => addWound(k, pt), woundMul: k => woundMul(k), nearWater: () => nearWater(), drawMarks: () => drawMarks(), L: () => L, mkItem: id => mkItem(id), stackAdd: it => stackAdd(it), contItems: i => contItems(i), zone: () => updateZombieZone(), clearZ: () => { G.zdorm.clear(); G.zdormN = 0; }, alt: a => { findInteract(); doAlt(a); }, findI: () => findInteract(), addZ: (x, y) => addZombie(x, y, 3, null, null, null, null), changeLv: (h, z) => changeLevel(h, z), lvCache: () => L.lvCache, tm: () => L._tm, cam: () => (L.lax || 0).toFixed(2) + "," + (L.lay || 0).toFixed(2), altOpts: () => altOptions(), benchChunks: (x, y) => { let n = 0; const cx0 = Math.floor(x / CK), cy0 = Math.floor(y / CK); for (let cy = cy0; cy < cy0 + 4; cy++) for (let cx = cx0; cx < cx0 + 4; cx++) { const ch = L.chunks.get(cy * M.CW + cx); if (ch) dropChunk(ch); buildChunk(cx, cy); n++; } return n; }, RECIPES, get G() { return G; }, get M() { return M; }, get AS() { return AS; }, newGame, save, loadSave, continueGame, playerAttack, noise, openSheet, art: { drawPlayerArt, weaponArt, makeZombieG, genLook, lookParts, LOOK, ITEMS, ZTRAIT } };
 })();
