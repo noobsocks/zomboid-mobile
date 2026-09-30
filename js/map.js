@@ -1,15 +1,15 @@
 // 마을 맵 생성: 3x3 블록, 블록당 집 최대 4채, 도로/인도/나무
 (function () {
-  const T = { GRASS: 0, ROAD: 1, FLOOR: 2, WALL: 3, DOOR: 4, WINDOW: 5, TREE: 6, WALK: 7, CAR: 8 };
-  const MOVE_BLOCK = [0, 0, 0, 1, 0, 0, 1, 0, 1];  // 벽·나무·폐차는 못 지나감 (문·창문은 상태에 따라 게임에서 따로 막음)
-  const SIGHT_BLOCK = [0, 0, 0, 1, 0, 0, 1, 0, 0]; // 벽·나무는 시야 차단 (창문·폐차 너머는 보임)
+  const T = { GRASS: 0, ROAD: 1, FLOOR: 2, WALL: 3, DOOR: 4, WINDOW: 5, TREE: 6, WALK: 7, CAR: 8, FENCE: 9, WATER: 10, DIRT: 11, VOID: 12, STAIRS: 13 };
+  const MOVE_BLOCK = [0, 0, 0, 1, 0, 0, 1, 0, 1, 1, 1, 0];  // 벽·나무·폐차·철책·물은 못 지나감 (문·창문은 상태에 따라 게임에서 따로 막음)
+  const SIGHT_BLOCK = [0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0]; // 벽·나무는 시야 차단 (창문·폐차·철책·물 너머는 보임)
 
   // opt.v: 1 = 예전 72x72 마을(기존 저장 호환), 2 = 160x160 큰 마을 (공원·숲·주차장 블록 섞임)
   function generateMap(seed, opt) {
-    const v2 = !!(opt && opt.v >= 2);
+    const v2 = !!(opt && opt.v >= 2), v3 = !!(opt && opt.v >= 3);
     const rng = DT.rng(seed);
     const ri = (a, b) => a + Math.floor(rng() * (b - a + 1));
-    const W = v2 ? 160 : 72, H = W;
+    const W = (opt && opt.size) || (v2 ? 160 : 72), H = W;
     const t = new Uint8Array(W * H);
     const idx = (x, y) => y * W + x;
     const roads = [];
@@ -39,8 +39,11 @@
     const mid = blocks[(blocks.length - 1) >> 1];
     // 블록 종류 (큰 마을만): 주택가 / 공원 / 숲 / 주차장
     const btr = DT.rng(seed ^ 0xb10c), btype = {}, forest = new Uint8Array(W * H), lots = [];
+    // 도시 모양: opt.mask(i, j)가 거짓인 블록은 비워 둠 (불규칙한 도시 윤곽)
+    if (opt && opt.mask) blocks.forEach((bx, i) => blocks.forEach((by, j) => { if (!opt.mask(i, j)) btype[bx + ',' + by] = 'void'; }));
     if (v2) for (const bx of blocks) for (const by of blocks) {
       if (bx === mid && by === mid) continue;
+      if (btype[bx + ',' + by]) continue;
       const k = btr();
       const ty = k < .12 ? 'park' : k < .2 ? 'forest' : k < .26 ? 'parking' : 'res';
       if (ty === 'res') continue;
@@ -50,6 +53,17 @@
         else { park[idx(x, y)] = 1; if (ty === 'forest') forest[idx(x, y)] = 1; }
       }
       if (ty === 'parking') lots.push([bx, by]);
+    }
+    // 특수 건물 블록 (마트·약국·경찰서·철물점·주유소)
+    const shopPlan = [];
+    if (v2) {
+      const free = [];
+      for (const bx of blocks) for (const by of blocks) if (!btype[bx + ',' + by] && !(bx === mid && by === mid) && Math.abs(bx - mid) + Math.abs(by - mid) > 22) free.push([bx, by]);
+      for (const kind of (opt && opt.shops) || ['market', 'market', 'pharmacy', 'pharmacy', 'police', 'hardware', 'hardware', 'gas', 'gas'].concat(v3 ? ['firestation', 'restaurant', 'restaurant', 'hunting', 'sports', 'bank'] : [])) {
+        if (!free.length) break;
+        const [bx, by] = free.splice(Math.floor(btr() * free.length), 1)[0];
+        btype[bx + ',' + by] = 'shop'; shopPlan.push({ kind, bx, by });
+      }
     }
 
     for (const bx of blocks) for (const by of blocks) for (let li = 0; li < 2; li++) for (let lj = 0; lj < 2; lj++) {
@@ -187,6 +201,108 @@
       }
     }
 
+    // ---- 특수 건물 짓기 ----
+    const shops = [];
+    const SHOPNAME = { market: '마트', pharmacy: '약국', police: '경찰서', hardware: '철물점', gas: '주유소', firestation: '소방서', restaurant: '식당', hunting: '사냥용품점', sports: '스포츠용품점', bank: '은행', army: '군부대', hospital: '카운티 병원', warehouse: '물류 창고', factory: '공장', terminal: '공항 터미널', prison: '감방동' };
+    const addC = (x, y, kind, block, house) => { house.containers.push(containers.length); containers.push({ x, y, kind }); reserved[idx(x, y)] = 1; if (block) deco[idx(x, y)] = 1; };
+    for (const sp of shopPlan) {
+      const { kind, bx, by } = sp;
+      for (let y = by; y < by + 17; y++) for (let x = bx; x < bx + 17; x++) reserved[idx(x, y)] = 1;
+      const gas = kind === 'gas';
+      const hx = bx + 1, hy = by + 1, hw = gas ? 9 : 15, hh = gas ? 7 : 12;
+      for (let y = hy; y < hy + hh; y++) for (let x = hx; x < hx + hw; x++) {
+        const edge = x === hx || y === hy || x === hx + hw - 1 || y === hy + hh - 1;
+        t[idx(x, y)] = edge ? T.WALL : T.FLOOR;
+      }
+      // 앞쪽(아래) 벽: 양문 + 큰 유리창
+      const dx0 = hx + (hw >> 1) - (gas ? 0 : 1), fy = hy + hh - 1;
+      for (let x = hx + 1; x < hx + hw - 1; x++) t[idx(x, fy)] = (x === dx0 || (!gas && x === dx0 + 1)) ? T.DOOR : (x % 2 ? T.WINDOW : T.WALL);
+      if (!gas) { t[idx(hx, hy + 3)] = T.WINDOW; t[idx(hx + hw - 1, hy + 3)] = T.WINDOW; t[idx(hx, hy + 7)] = T.WINDOW; t[idx(hx + hw - 1, hy + 7)] = T.WINDOW; }
+      // 뒷문 (막히지 않게 하나 더)
+      t[idx(hx + 2, hy)] = T.DOOR;
+      const house = { x: hx, y: hy, w: hw, h: hh, containers: [], shop: kind };
+      if (kind === 'police') {
+        // 가운데 벽으로 사무실 | 무기고
+        const wx = hx + 9;
+        for (let y = hy + 1; y < hy + hh - 1; y++) t[idx(wx, y)] = y === hy + 5 ? T.DOOR : T.WALL;
+        for (const [x, y] of [[hx + 2, hy + 2], [hx + 5, hy + 2], [hx + 2, hy + 5], [hx + 5, hy + 5]]) { deco[idx(x, y)] = 1; decor.push({ kind: 'desk', x, y, w: 1, h: 1, wx: 0, wy: -1, c: 0 }); }
+        for (let x = wx + 1; x < hx + hw - 1; x++) addC(x, hy + 1, 'locker', true, house);
+        addC(hx + hw - 2, hy + 4, 'gunlocker', true, house); addC(hx + hw - 2, hy + 6, 'gunlocker', true, house);
+        addC(hx + 3, hy + 9, 'counter', true, house); addC(hx + 4, hy + 9, 'counter', true, house);
+      } else if (kind === 'hospital') {
+        // 병실: 침대 줄 · 약 선반 · 사물함 · 접수대
+        for (let x = hx + 4; x <= hx + hw - 3; x += 2) { deco[idx(x, hy + 1)] = deco[idx(x, hy + 2)] = 1; decor.push({ kind: 'bed', x, y: hy + 1, w: 1, h: 2, wx: 0, wy: -1, c: 1 }); }
+        for (let x = hx + 3; x <= hx + 6; x++) addC(x, hy + 5, 'shelf_med', true, house);
+        for (let x = hx + 9; x <= hx + 12; x++) addC(x, hy + 5, 'shelf_med', true, house);
+        addC(hx + hw - 2, hy + 7, 'locker', true, house); addC(hx + hw - 2, hy + 8, 'locker', true, house);
+        addC(hx + 2, hy + 9, 'counter', true, house); addC(hx + 3, hy + 9, 'counter', true, house); addC(hx + 1, hy + 7, 'drawer', true, house);
+      } else if (kind === 'warehouse') {
+        // 나무 상자가 줄지어 쌓인 창고
+        [hy + 2, hy + 5, hy + 8].forEach(y => { for (let x = hx + 2; x <= hx + hw - 3; x++) if (x !== dx0 && x !== dx0 + 1 && x !== dx0 - 1) addC(x, y, 'crate', true, house); });
+      } else if (kind === 'factory') {
+        for (let x = hx + 4; x <= hx + 8; x++) addC(x, hy + 1, 'locker', true, house);
+        for (let x = hx + 2; x <= hx + hw - 3; x++) if (x !== dx0 && x !== dx0 + 1) addC(x, hy + 4, 'toolrack', true, house);
+        for (let x = hx + 2; x <= hx + hw - 3; x++) if (x !== dx0 && x !== dx0 + 1 && x % 2) addC(x, hy + 7, 'crate', true, house);
+        addC(hx + 2, hy + 9, 'counter', true, house);
+      } else if (kind === 'terminal') {
+        // 대합실: 버려진 여행 가방 · 탑승 수속대 · 매점
+        for (const y of [hy + 3, hy + 6]) for (let x = hx + 2; x <= hx + hw - 3; x += 2) if (x !== dx0 && x !== dx0 + 1) addC(x, y, 'luggage', true, house);
+        for (let x = hx + 3; x <= hx + hw - 4; x++) if (x < dx0 - 1 || x > dx0 + 2) addC(x, hy + 9, 'counter', true, house);
+        addC(hx + hw - 2, hy + 1, 'shelf_food', true, house); addC(hx + hw - 3, hy + 1, 'shelf_food', true, house);
+      } else if (kind === 'prison') {
+        // 위쪽: 감방 4칸(철문), 아래쪽: 교도관실
+        const wy = hy + 5;
+        for (let x = hx + 1; x < hx + hw - 1; x++) t[idx(x, wy)] = T.WALL;
+        for (let k = 0; k < 4; k++) {
+          const cx0 = hx + 1 + k * 3;
+          if (k > 0) for (let y = hy + 1; y < wy; y++) t[idx(cx0 - 1, y)] = T.WALL;
+          t[idx(cx0 + 1, wy)] = T.DOOR;
+          deco[idx(cx0, hy + 1)] = deco[idx(cx0, hy + 2)] = 1; decor.push({ kind: 'bed', x: cx0, y: hy + 1, w: 1, h: 2, wx: -1, wy: 0, c: 5 });
+          if (k === 2) addC(cx0 + 1, hy + 1, 'drawer', true, house);
+        }
+        t[idx(hx + 13, wy)] = T.DOOR;
+        addC(hx + hw - 2, hy + 7, 'gunlocker', true, house); addC(hx + hw - 2, hy + 8, 'locker', true, house); addC(hx + hw - 2, hy + 9, 'locker', true, house);
+        addC(hx + 3, hy + 9, 'counter', true, house); addC(hx + 2, hy + 7, 'shelf_food', true, house);
+      } else if (kind === 'army') {
+        // 군 막사: 사물함 줄 · 총기 보관함 · 보급 선반
+        for (let x = hx + 4; x <= hx + hw - 3; x++) addC(x, hy + 1, 'locker', true, house);
+        for (const y of [hy + 4, hy + 6, hy + 8]) addC(hx + hw - 2, y, 'gunlocker', true, house);
+        for (let x = hx + 3; x <= hx + 8; x++) if (x !== dx0 && x !== dx0 + 1) addC(x, hy + 5, 'shelf_food', true, house);
+        for (const [x, y] of [[hx + 2, hy + 8], [hx + 4, hy + 8]]) { deco[idx(x, y)] = 1; decor.push({ kind: 'bed', x, y, w: 1, h: 2, wx: -1, wy: 0, c: 2 }); }
+      } else if (kind === 'firestation') {
+        // 소방 장비함 줄 + 사무실 책상 + 뒤편 차고(빈 공간)
+        for (let x = hx + 4; x <= hx + hw - 3; x++) addC(x, hy + 1, 'firegear', true, house);
+        for (const [x, y] of [[hx + 2, hy + 4], [hx + 2, hy + 7]]) { deco[idx(x, y)] = 1; decor.push({ kind: 'desk', x, y, w: 1, h: 1, wx: 0, wy: -1, c: 0 }); }
+        addC(hx + hw - 2, hy + 5, 'firegear', true, house); addC(hx + hw - 2, hy + 7, 'drawer', true, house);
+        addC(hx + 3, hy + 9, 'counter', true, house);
+      } else if (kind === 'restaurant') {
+        // 뒤쪽 주방(냉장고·주방 선반) | 앞쪽 홀(식탁)
+        addC(hx + 4, hy + 1, 'fridge', true, house); addC(hx + 5, hy + 1, 'fridge', true, house);
+        for (let x = hx + 6; x <= hx + hw - 3; x++) addC(x, hy + 1, 'kitchen', true, house);
+        for (let x = hx + 3; x <= hx + hw - 4; x++) if (x !== dx0 && x !== dx0 + 1 && x !== dx0 - 1) addC(x, hy + 3, x % 3 ? 'kitchen' : 'cabinet', true, house);
+        for (const y of [hy + 6, hy + 8]) for (const x of [hx + 2, hx + 4, hx + hw - 5, hx + hw - 3]) { deco[idx(x, y)] = 1; decor.push({ kind: 'table', x, y, w: 1, h: 1, wx: 0, wy: -1, c: 0 }); }
+        addC(hx + hw - 2, hy + 10, 'counter', true, house);
+      } else if (kind === 'bank') {
+        // 창구(계산대 줄) 뒤로 금고·사물함
+        for (let x = hx + 1; x < hx + hw - 1; x++) if (x !== hx + 2 && x !== hx + hw - 3) addC(x, hy + 6, 'counter', true, house);
+        for (let x = hx + 4; x <= hx + 7; x++) addC(x, hy + 1, 'safe', true, house);
+        for (let x = hx + 9; x <= hx + hw - 3; x++) addC(x, hy + 1, 'locker', true, house);
+        for (const [x, y] of [[hx + 4, hy + 3], [hx + 8, hy + 3], [hx + 11, hy + 3]]) { deco[idx(x, y)] = 1; decor.push({ kind: 'desk', x, y, w: 1, h: 1, wx: 0, wy: -1, c: 0 }); }
+      } else if (gas) {
+        for (let x = hx + 2; x <= hx + 6; x++) if (x !== hx + 4) addC(x, hy + 2, 'shelf_food', true, house);
+        addC(hx + 6, hy + 4, 'counter', true, house);
+        // 주유기 + 앞마당 아스팔트
+        for (let y = by + 9; y < by + 17; y++) for (let x = bx; x < bx + 17; x++) t[idx(x, y)] = T.ROAD;
+        for (const x of [bx + 3, bx + 8, bx + 13]) { deco[idx(x, by + 12)] = 1; decor.push({ kind: 'pump', x, y: by + 12, w: 1, h: 1, wx: 0, wy: -1, c: 0 }); }
+      } else {
+        // 진열대 3줄 (가운데·양옆은 통로)
+        const sk = kind === 'market' ? ['shelf_food', 'shelf_food', 'shelf_food'] : kind === 'pharmacy' ? ['shelf_med', 'shelf_med', 'shelf_food'] : kind === 'hunting' ? ['huntrack', 'huntrack', 'sportrack'] : kind === 'sports' ? ['sportrack', 'sportrack', 'shelf_food'] : ['toolrack', 'toolrack', 'toolrack'];
+        [hy + 2, hy + 4, hy + 6].forEach((y, r) => { for (let x = hx + 2; x <= hx + hw - 3; x++) if (x !== dx0 && x !== dx0 + 1) addC(x, y, sk[r], true, house); });
+        addC(hx + 2, hy + 9, 'counter', true, house); addC(hx + 3, hy + 9, 'counter', true, house);
+      }
+      houses.push(house);
+      shops.push({ kind, name: SHOPNAME[kind], x: hx, y: hy, w: hw, h: hh, door: [dx0, fy] });
+    }
     decor.push(...extraDecor); // 저장된 가구 번호가 밀리지 않도록 맨 뒤에 붙임
     // 나무
     for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) {
@@ -222,9 +338,11 @@
       t[idx(x, y)] = T.CAR; t[idx(x, y + 1)] = T.CAR;
       cars.push({ x, y, vert: true, color: colors[Math.floor(cr() * colors.length)], flip: cr() < .5, burnt: cr() < .2 });
     }
+    // 폐차 트렁크 (수색 가능) — 기존 저장 번호가 밀리지 않게 수색 가구 목록 맨 뒤에 붙임
+    for (const c of cars) if (!c.burnt) containers.push({ x: c.x, y: c.y, kind: 'car', car: true, cw: c.vert ? 1 : 2, ch: c.vert ? 2 : 1 });
     const moveBlock = new Uint8Array(W * H), sightBlock = new Uint8Array(W * H);
     for (let i = 0; i < W * H; i++) { moveBlock[i] = MOVE_BLOCK[t[i]] || deco[i]; sightBlock[i] = SIGHT_BLOCK[t[i]]; }
-    return { W, H, t, moveBlock, sightBlock, containers, houses, spawn, spawnContainer, cars, decor, deco, T, roads, blocks, btype, v: v2 ? 2 : 1 };
+    return { W, H, t, moveBlock, sightBlock, containers, houses, spawn, spawnContainer, cars, decor, deco, T, roads, blocks, btype, shops, v: v3 ? 3 : v2 ? 2 : 1 };
   }
 
   DT.T = T;

@@ -36,7 +36,7 @@ svg{display:block}
 
 /* ===== HUD ===== */
 #hud{position:absolute;left:0;right:0;top:0;padding:calc(var(--st) + 2px) 12px 14px;pointer-events:none;
-  background:var(--grain),linear-gradient(rgba(6,6,5,.96),rgba(6,6,5,.78) 72%,rgba(6,6,5,0))}
+  background:linear-gradient(rgba(6,6,5,.96),rgba(6,6,5,.78) 72%,rgba(6,6,5,0))}
 .hud-grid{display:flex;gap:10px;align-items:stretch}
 .hud-left{flex:1;min-width:0;display:flex;flex-direction:column;gap:9px}
 #clock{display:flex;align-items:stretch;gap:8px}
@@ -137,7 +137,7 @@ svg{display:block}
 .wbar.over em{background:var(--blood)}
 .wbar .cap{position:absolute;right:0;top:-3px;bottom:-3px;width:2px;background:var(--blood)}
 #wtext{font-family:var(--fn);font-size:12px;min-width:74px;text-align:right}
-.scroll{overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;padding:2px 14px 12px}
+.scroll{overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-x pan-y;padding:2px 14px 12px}
 .sec-t{display:flex;align-items:center;justify-content:space-between;font-family:var(--fh);font-weight:400;font-size:13px;letter-spacing:.04em;margin:14px 0 8px;color:#ff4b55}
 .sec-t button{font-family:var(--fh);font-size:12px;padding:5px 10px;background:var(--bone);color:var(--ink);clip-path:var(--cut-s)}
 .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
@@ -245,7 +245,7 @@ svg{display:block}
   --sr:max(env(safe-area-inset-right),12px);
 }
 #hud{padding:calc(var(--st) + 6px) calc(var(--sr) + 2px) 16px calc(var(--sl) + 2px);
-  background:var(--grain),linear-gradient(rgba(6,6,5,.9),rgba(6,6,5,.55) 70%,rgba(6,6,5,0))}
+  background:linear-gradient(rgba(6,6,5,.9),rgba(6,6,5,.55) 40%,rgba(6,6,5,0) 75%)}
 .hud-left{flex-direction:row;align-items:flex-start;gap:18px}
 #stats{width:340px;margin-top:5px}
 #moodles{margin-top:6px;padding-left:0}
@@ -517,3 +517,269 @@ html.rot #bigmapSvg{height:calc(100vw - 64px)}
 #loading .ld-box{display:flex;align-items:center;gap:14px;font-family:var(--fh);font-size:20px;color:var(--bone)}
 #loading i{width:22px;height:22px;border:3px solid rgba(232,220,196,.25);border-top-color:var(--blood);border-radius:50%;animation:ldspin .8s linear infinite}
 @keyframes ldspin{to{transform:rotate(360deg)}}
+
+#sky{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+
+/* 폰 설정: 버튼 크기 · 왼손 조작 */
+:root{--bs:1}
+#btns{transform:scale(var(--bs));transform-origin:100% 100%}
+html.lefty #joyzone{left:auto;right:0}
+html.lefty #joy{left:auto;right:calc(var(--sr) + 20px)}
+html.lefty #btns{right:auto;left:calc(var(--sl) + 4px);transform-origin:0 100%}
+html.lefty #altMenu{right:auto;left:calc(var(--sl) + 180px)}
+#menu .mrow .obtn{font-size:13px;padding-left:4px;padding-right:4px}
+html.lefty .btn.big{right:auto;left:4px}
+html.lefty #btnUse{right:auto;left:118px}
+html.lefty #btnBag{right:auto;left:14px}
+html.lefty #btnAlt{right:auto;left:100px}
+
+/* 줌 버튼 · 웅크리기 */
+.rcol{display:flex;flex-direction:column;gap:6px}
+.icon-btn.zb{font-family:var(--fh);font-size:22px;line-height:1;color:var(--bone);height:30px}
+#btnCrouch{position:absolute;left:calc(var(--sl) + 158px);bottom:calc(var(--sb) + 18px);width:44px;height:44px;gap:0} /* 조이스틱 오른쪽, 밑면 맞춤 */
+#btnCrouch .ic{width:18px;height:18px}
+#btnCrouch small{font-size:8px;max-width:40px}
+#btnCrouch.on{background:var(--bone);color:var(--ink)}
+html.lefty #btnCrouch{left:auto;right:calc(var(--sr) + 158px)}
+#altMenu button.red{color:#ff6a70;border-color:var(--blood);background:rgba(90,8,12,.85)}
+#btnAlt.red{border-color:var(--blood);color:#ff6a70}
+
+/* 행동 진행바: 화면 가운데 아래 */
+#act{top:auto;bottom:calc(var(--sb) + 66px);width:300px;max-width:none;display:block;padding:7px 10px 8px;pointer-events:auto;z-index:6;
+  background:var(--grain),rgba(10,10,9,.92);border:2px solid var(--bone);box-shadow:0 6px 18px rgba(0,0,0,.6)}
+#act .ab-top{display:flex;align-items:center;gap:7px;font-size:14px}
+#act .ab-top svg{width:18px;height:18px;flex:none}
+#act .ab-top span{flex:1;overflow:hidden;text-overflow:ellipsis}
+#act .ab-top small{font-family:var(--fb, inherit);font-size:12px;opacity:.75}
+#act .ab-top button{width:24px;height:24px;border:1.5px solid rgba(233,227,210,.5);background:transparent;color:var(--bone);font-size:12px;line-height:1;padding:0}
+#act em{display:block;height:7px;margin-top:6px;background:#2c2c28;border:1px solid #000}
+#act em b{background:linear-gradient(90deg,#b8b09a,var(--bone))}
+
+/* 아이폰: 홈 표시줄 스와이프와 조이스틱이 겹치지 않게 · 작은 버튼 키우기(44 근처) */
+#joyzone{bottom:var(--sb)}
+#joy{bottom:18px!important}
+html:not(.lefty) #joy{left:calc(var(--sl) + 20px)}
+.icon-btn{width:42px;height:42px}
+.icon-btn.zb{height:38px;font-size:24px}
+.xbtn{width:42px!important;height:42px!important}
+#act .ab-top button{width:32px;height:32px;font-size:14px}
+.lk-row button{height:26px;min-width:32px}
+.lk-rand{height:26px}
+/* 추천 버튼: 웅크리기·버튼 사이에 3개가 들어가게 조금 촘촘히 */
+.qb{padding:8px 8px 8px 7px;font-size:12px;gap:4px}
+.qb svg{width:15px;height:15px}
+#quick{gap:5px}
+/* 타이틀 캐릭터 선택: 2열로 (5줄이면 화면 높이를 넘음) */
+.lk-rows{display:grid;grid-template-columns:1fr 1fr;gap:4px 6px}
+.lk-row span{font-size:11px;overflow:hidden;text-overflow:ellipsis}
+.lk-row button{min-width:28px;padding:0 4px}
+.lk-rand{margin-top:0}
+.lookpick{padding:6px}
+
+/* 이야기 창 (도입부 · 쪽지 · 라디오 · 기록) */
+.story-box{max-width:min(560px,92vw)}
+#storyX{white-space:pre-wrap;text-align:left;line-height:1.5;font-size:12.5px;max-height:calc(100vh - 150px);overflow:auto;margin:4px 0 8px;color:#e9e3d2}
+#storyX p{margin:0 0 6px}
+.story-box h2{font-size:20px;margin:4px 0 2px}
+.story-box .wbtn{padding-top:9px;padding-bottom:9px}
+#storyList{display:flex;flex-direction:column;gap:6px;max-height:52vh;overflow:auto;margin-bottom:10px}
+#storyList button{text-align:left;padding:9px 12px;background:#1d1d1a;border:1px solid #3a3a34;color:#e9e3d2;font:inherit;font-size:13px;border-radius:4px}
+#storyList button small{display:block;color:#9a9486;font-size:11px;margin-top:2px}
+#storyList:empty{display:none}
+
+#flTag{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:3px;background:#c8a020;color:#141414;font-size:11px;font-weight:800;vertical-align:middle}
+#flTag.hidden{display:none}
+#carTag{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:3px;background:#2a5a7a;color:#f2eee4;font-size:11px;font-weight:800;vertical-align:middle}
+#carTag.hidden{display:none}
+#carTag.low{background:#c8141f}
+
+/* 가방 정리: 필터 · 종류별 제목 · 칸 무게 · 보관 한도 */
+.filt{display:flex;gap:5px;margin:2px 0 8px;overflow-x:auto;scrollbar-width:none}
+.filt::-webkit-scrollbar{display:none}
+.filt button{flex:1 1 0;min-width:0;justify-content:center;white-space:nowrap;display:flex;align-items:center;gap:4px;padding:5px 9px 5px 7px;background:#1b1b18;border:1px solid #3a3a34;color:#c8c2b2;font:inherit;font-size:12px;border-radius:3px}
+.filt button svg{width:14px;height:14px}
+.filt button em{font-style:normal;font-size:10px;color:#8a8474;margin-left:1px}
+.filt button.on{background:#e9e3d2;color:#141414;border-color:#e9e3d2}
+.filt button.on em{color:#5a5448}
+.filt button.none{opacity:.4}
+.cat-t{grid-column:1/-1;display:flex;justify-content:space-between;align-items:baseline;margin:6px 0 -1px;padding-bottom:3px;border-bottom:1px solid #2e2e2a;font-size:12px;color:#e9e3d2;font-weight:700}
+.cat-t:first-child{margin-top:0}
+.cat-t em{font-style:normal;font-weight:400;font-size:10.5px;color:#8a8474}
+.card .wt{order:3;margin-top:-4px;font-family:var(--fn);font-size:9.5px;line-height:1;color:#8a8474}
+.card.eq .wt{color:#d8c8c0}
+.card.stale{box-shadow:inset 0 0 0 2px #c8801a}
+.ccap{display:flex;align-items:center;gap:8px;margin:0 0 6px;font-size:11.5px;color:#c8c2b2}
+.ccap span{white-space:nowrap}
+.ccap i{flex:1;height:5px;background:#34352f;position:relative;overflow:hidden}
+.ccap b{position:absolute;left:0;top:0;bottom:0;background:#9ab070}
+.ccap.over b{background:#c8141f}
+.dt small{white-space:normal!important;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.3}
+.card.loot .qty{right:auto;left:6px}
+
+/* =====================================================
+   전체 화면 메뉴 (가방 · 장비 · 제작 · 능력 · 수첩)
+   ===================================================== */
+#sheet{pointer-events:auto;background:#0b0b0a;align-items:stretch;justify-content:stretch;z-index:20}
+#sheet .sheet-card{width:100%;height:100%;max-height:none;padding:0;border:0;box-shadow:none;display:flex;flex-direction:column;background:var(--grain),#0d0e0b}
+#sheet .sheet-head{flex:none;display:flex;align-items:center;gap:10px;padding:calc(var(--st) - 2px) calc(var(--sr) + 4px) 6px calc(var(--sl) + 8px);border-bottom:1px solid #2a2b26;background:#131311}
+#sheet .sheet-head b{flex:none;font-size:20px}
+#sheet #sheetTabs{display:none}
+#sheet .sheet-head .wgauge{margin-left:auto;padding:0;border:0;width:230px;flex:none}
+#sheet .sheet-head .xbtn{margin-left:4px;width:34px;height:34px}
+#danger{display:flex;align-items:center;gap:5px;padding:4px 9px;font-family:var(--fh);font-size:13px;color:#ffb0b0;border:1.5px solid var(--blood);background:rgba(200,20,31,.15)}
+#danger svg{width:15px;height:15px;color:#ff5a63}
+#danger.hot{background:var(--blood);color:#fff;animation:dgb .6s steps(2) infinite}
+#danger.hot svg{color:#fff}
+@keyframes dgb{50%{background:#5a0a10}}
+.sheet-main{flex:1;min-height:0;display:grid;grid-template-columns:calc(var(--sl) + 74px) minmax(0,1fr) calc(var(--sr) + 206px)}
+.sheet-main.wide{grid-template-columns:calc(var(--sl) + 74px) minmax(0,1fr) 0}
+#sheetNav{background:#121210;border-right:1px solid #2a2b26;padding-left:var(--sl);display:flex;flex-direction:column;overflow-y:auto;scrollbar-width:none}
+#sheetNav button{flex:1;min-height:52px;max-height:70px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-family:var(--fh);font-size:13px;color:#8b867a;border-bottom:1px solid #1d1d1a;position:relative}
+#sheetNav button svg{width:19px;height:19px}
+#sheetNav button.on{background:var(--blood);color:#fff}
+#sheetNav button em{position:absolute;top:6px;right:6px;font-style:normal;font-family:var(--fn);font-size:8.5px;background:var(--blood);color:#fff;padding:1px 4px;border:1px solid #ff8a90}
+.sheet-mid{min-width:0;min-height:0;display:flex;flex-direction:column}
+#sheet #sheetAct{margin:8px 10px 0}
+#sheet #sheetBody{flex:1;min-height:0;padding:8px 12px 14px}
+#sheet #sheetBody.withdetail{padding-bottom:14px}
+#sheet #detail{position:static;box-shadow:none;border:0;border-left:1px solid #2a2b26;background:#141412;padding:12px calc(var(--sr) + 4px) 10px 12px;display:flex;flex-direction:column;min-height:0;min-width:0;overflow-y:auto}
+#sheet #detail.hidden{display:none!important}
+#sheet .grid{grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:6px}
+#sheet .sec-t{margin:4px 0 6px;color:var(--bone)}
+#sheet .sec-t em{font-style:normal;font-family:inherit;font-size:10.5px;color:#8a8474;letter-spacing:0}
+#sheet .hint{margin-top:8px;font-size:10.5px;color:#7a7568}
+.card .eqt.sub{background:#3a4a5a}
+/* 오른쪽 정보 */
+#detail .dt{display:flex;align-items:center;gap:10px;margin-bottom:8px;position:relative}
+#detail .dt .dic{width:42px;height:42px}
+#detail .dt .dic svg{width:28px;height:28px}
+#detail .dtx{min-width:0;flex:1}
+#detail .dt b{font-size:17px;line-height:1.15}
+#detail .dtag{display:inline-block;margin-top:4px;font-size:10.5px;padding:2px 6px;background:#2c3a4a;color:#bcd4ec}
+#detail .dtag.r{background:#4a1d1f;color:#f2b8b8}
+#detail .dx{position:absolute;right:-4px;top:-4px;width:26px;height:26px;display:flex;align-items:center;justify-content:center;opacity:.6}
+#detail .dx svg{width:13px;height:13px}
+#detail .dl{display:flex;flex-direction:column;gap:3px;margin-bottom:8px}
+#detail .dl div{font-size:12px;color:#c8c2b2;padding-left:8px;border-left:2px solid #34352f;line-height:1.3;display:flex;justify-content:space-between;gap:6px}
+#detail .dl b{color:var(--bone)}#detail .dl b.up{color:#9ac870}
+#detail .ds{font-size:11.5px;color:#9a9486;line-height:1.45}
+#detail .dacts{margin-top:auto;display:grid;grid-template-columns:1fr 1fr;gap:6px}
+#detail .dacts .abtn{padding:9px 4px;font-size:12.5px;min-width:0;white-space:nowrap}
+#detail .dacts .abtn:first-child{grid-column:1/-1;padding:11px 4px;font-size:14px}
+#detail .busytxt{grid-column:1/-1}
+#detail .dempty{margin:auto;text-align:center;color:#6e6a5c;font-size:12px;line-height:1.5;display:flex;flex-direction:column;align-items:center;gap:8px}
+#detail .dempty svg{width:34px;height:34px;opacity:.35}
+#detail .lvl{display:flex;gap:3px;margin:2px 0 10px}#detail .lvl span{flex:1;height:7px;background:#2c2c28}#detail .lvl span.on{background:#9ab070}
+#detail .nx{background:#1f1f1b;border-left:3px solid #9ab070;padding:6px 8px;font-size:11.5px;color:#c8c2b2;margin:0 0 8px;line-height:1.4}
+#detail .nx b{display:block;font-size:12px;color:var(--bone)}
+/* 수색: 보관함 | 내 가방 */
+#sheet #sheetBody.split{display:grid;grid-template-columns:1fr 1fr;gap:12px;overflow:hidden;padding-bottom:0}
+#sheet .split .lcol{overflow-y:auto;min-height:0;padding-bottom:14px;-webkit-overflow-scrolling:touch;touch-action:pan-y}
+#sheet .split .lcol+.lcol{border-left:1px dashed #2e2e2a;padding-left:12px}
+#sheet .split .filt{overflow-x:auto}
+#sheet .split .filt button{flex:0 0 auto;padding:5px 8px}
+/* 장비 */
+.eqwrap{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:start}
+.board{display:grid;grid-template-columns:60px 150px 60px;gap:7px;background:#151513;border:1px solid #2a2b26;padding:8px}
+.board .col{display:flex;flex-direction:column;gap:7px}
+.slot{position:relative;width:60px;height:60px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:#131311;border:1.5px dashed #45453e;clip-path:var(--cut-s)}
+.slot svg{width:24px;height:24px;opacity:.2}
+.slot.fill{border:1.5px solid #6e6a5c;background:#1e1e1a}
+.slot.fill svg{opacity:1}
+.slot.sel{border-color:var(--bone);box-shadow:inset 0 0 0 1.5px var(--bone)}
+.slot .lb{position:absolute;left:4px;top:2px;font-size:8.5px;color:#7a7568;font-family:var(--fh)}
+.slot .cn{font-family:var(--fh);font-size:9.5px;line-height:1.05;text-align:center;word-break:keep-all;padding:0 2px;max-height:2.1em;overflow:hidden}
+.slot .dur{position:absolute;left:6px;right:6px;bottom:3px;height:2.5px;background:#34352f}.slot .dur i{position:absolute;left:0;top:0;bottom:0;background:var(--bone)}.slot .dur.low i{background:var(--blood)}
+.fig{background:radial-gradient(circle at 50% 42%,#2b2a24,#141412 72%);border:1px solid #2a2b26;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:6px 5px 5px}
+.fig .nm{font-family:var(--fh);font-size:12px;display:flex;justify-content:space-between;width:100%}
+.fig .nm em{font-style:normal;color:#ff5a63}
+.fig svg#eqFig{width:92px;height:92px}
+.gst{display:grid;grid-template-columns:1fr 1fr;gap:3px;width:100%}
+.gst div.cold b{color:#8ac4ff}.gst div.hot b{color:#ff8a60}
+.gst div{display:flex;align-items:center;gap:3px;background:#1f1f1b;padding:3px 4px;font-size:9.5px;color:#c8c2b2;white-space:nowrap}
+.gst svg{width:11px;height:11px;flex:none}.gst b{margin-left:auto;color:var(--bone);font-size:10px}
+.eqlist{min-width:0}
+.eqlist .grid{grid-template-columns:repeat(auto-fill,minmax(62px,1fr))!important}
+.card .upb{position:absolute;left:4px;top:3px;font-family:var(--fn);font-size:9.5px;color:#9ac870}
+.card .upb.dn{color:#e86a6a}
+/* 능력 */
+.skg{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:7px;margin-bottom:10px}
+.skc{position:relative;text-align:left;background:#1a1a17;border:1.5px solid #34352f;clip-path:var(--cut-s);padding:8px 9px;display:grid;grid-template-columns:32px 1fr;gap:4px 9px;align-items:center}
+.skc svg{width:32px;height:32px;grid-row:1/3;padding:6px;background:#24241f}
+.skc b{font-family:var(--fh);font-weight:400;font-size:13px;display:flex;justify-content:space-between;gap:4px;white-space:nowrap}
+.skc b em{font-style:normal;font-family:var(--fn);font-size:12px}
+.skc i{display:block;height:5px;background:#2c2c28;position:relative}.skc i u{position:absolute;left:0;top:0;bottom:0;background:#9ab070}
+.skc small{font-size:10px;color:#7a7568}
+.skc.sel{border-color:var(--bone)}
+.skc.lock{opacity:.45}
+.skc .nw{position:absolute;right:4px;top:3px;font-family:var(--fn);font-size:8.5px;background:var(--blood);color:#fff;padding:0 3px}
+.stg{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.stg div{display:flex;align-items:center;gap:6px;background:#1a1a17;border:1px solid #2c2d27;padding:6px 8px;font-size:12px}
+.stg svg{width:15px;height:15px}.stg b{margin-left:auto;font-family:var(--fn);font-weight:400}
+/* 수첩 */
+.notes{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px}
+.notes button{display:grid;grid-template-columns:22px 1fr;gap:2px 8px;align-items:center;text-align:left;padding:8px 10px;background:#1a1a17;border:1px solid #2c2d27}
+.notes button svg{width:18px;height:18px;grid-row:1/3;opacity:.7}
+.notes button b{font-weight:600;font-size:13px}
+.notes button small{font-size:10.5px;color:#8a8474}
+/* 메뉴 위에도 보여야 하는 것 */
+#toast{z-index:30}
+#hurt{z-index:25}
+.overlay{z-index:40}
+body.menuOn #toast{top:auto!important;bottom:calc(var(--sb) + 10px);left:50%!important}
+#sheet .split .sec-t{flex-wrap:wrap;gap:5px}
+#sheet .split .sec-b{display:flex;gap:5px;flex-wrap:wrap}
+#sheet .split .sec-t button{padding:4px 8px;font-size:11.5px}
+
+/* 기온 (시계 옆 온도계) */
+#tempChip{display:inline-flex;align-items:center;gap:2px;margin-left:8px;font-family:var(--fn);font-size:12px;color:var(--bone)}
+#tempChip .thermo{width:9px;height:19px;overflow:visible}
+#tempChip .tb{fill:#1a1a18;stroke:currentColor;stroke-width:.9}
+#tempChip b{font-weight:400}
+#tempChip.in::after{content:'실내';font-family:var(--fh);font-size:9px;margin-left:3px;padding:0 3px;border:1px solid currentColor;opacity:.75}
+.trow{display:flex;align-items:center}
+/* 무기 바꾸기 (공격 버튼 왼쪽 위) */
+#btnSwap{right:70px;bottom:70px;width:38px;height:38px;z-index:2;background:#1b1c19;border:2px solid var(--bone)}
+#btnSwap .ic{width:18px;height:18px}
+#btnSwap i{position:absolute;right:-5px;top:-5px;width:17px;height:17px;border-radius:50%;background:var(--blood);display:flex;align-items:center;justify-content:center}
+#btnSwap i svg{width:10px;height:10px;color:#fff}
+html.lefty #btnSwap{right:auto;left:70px}
+/* 빠른 칸 (고정) */
+.qb.pin{border-color:#9ab070}
+.qb.pin em{font-style:normal;font-family:var(--fn);font-size:10px;margin-left:2px;opacity:.8}
+.qb.pin.none{opacity:.4}
+
+/* =====================================================
+   상태별 화면 효과 (가장자리 위주 · 가운데 시야는 가리지 않음)
+   ===================================================== */
+#cond{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+#cond .cl{position:absolute;inset:0;opacity:0;transition:opacity 1.2s}
+#cond .cl-bleed{background:radial-gradient(ellipse at center,transparent 52%,rgba(150,0,12,.35) 78%,rgba(120,0,10,.75) 100%)}
+#cond .cl-bleed.on{animation:hb var(--bd,1.1s) infinite}
+@keyframes hb{0%,100%{transform:scale(1.04)}12%{transform:scale(1)}24%{transform:scale(1.03)}36%{transform:scale(.99)}}
+#cond .cl-crit{background:#7a7a7a;mix-blend-mode:saturation}
+#cond .cl-critv{box-shadow:inset 0 0 160px 70px rgba(0,0,0,.85)}
+#cond .cl-frost{background-size:100% 100%;background-repeat:no-repeat}
+#cond .cl-frost::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 45%,rgba(170,210,255,.28) 80%,rgba(210,235,255,.55) 100%)}
+#cond .cl-heat{background:radial-gradient(ellipse at center,rgba(255,150,40,.06) 30%,rgba(255,110,20,.32) 85%,rgba(255,80,10,.5) 100%)}
+#cond .cl-heat.on{animation:shim 3.2s ease-in-out infinite}
+@keyframes shim{50%{transform:scale(1.05);filter:none}}
+#cond .cl-sick{background:radial-gradient(ellipse at center,rgba(110,160,40,.10) 30%,rgba(80,130,20,.38) 100%)}
+#cond .cl-sick.on{animation:sick 4.5s ease-in-out infinite}
+@keyframes sick{50%{transform:scale(1.07) rotate(1.5deg)}}
+#cond .cl-wet{background-size:100% 100%;background-repeat:no-repeat}
+#cond .cl-starve{box-shadow:inset 0 0 130px 40px rgba(40,34,28,.8);background:rgba(60,55,45,.12)}
+#cond .cl-winded{box-shadow:inset 0 0 150px 60px rgba(0,0,0,.75)}
+#cond .cl-winded.on{animation:pant 1.5s ease-in-out infinite}
+@keyframes pant{50%{box-shadow:inset 0 0 90px 20px rgba(0,0,0,.45)}}
+#cond .lid{position:absolute;left:-10%;right:-10%;height:58%;background:#050505;transform:translateY(-100%);transition:transform .18s ease-in}
+#cond .lid.b{bottom:0;transform:translateY(100%)}
+#cond .lid.t{top:0;border-radius:0 0 50% 50%/0 0 18% 18%}
+#cond .lid.b{border-radius:50% 50% 0 0/18% 18% 0 0}
+#cond.blink .lid{transform:translateY(0)}
+#cond.droop .lid.t{transform:translateY(-80%)}
+#cond.droop .lid.b{transform:translateY(80%)}
+#cond.half .lid.t{transform:translateY(-45%)}
+#cond.half .lid.b{transform:translateY(45%)}
+#cond.droop.blink .lid{transform:translateY(0)}
+#cond.calm .cl{animation:none!important}

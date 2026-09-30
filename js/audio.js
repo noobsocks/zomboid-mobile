@@ -19,7 +19,9 @@
     const AC = window.AudioContext || window.webkitAudioContext;
     if (!AC) return false;
     try {
+      try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) {} // 아이폰 무음 스위치여도 게임 소리 나게 (Safari 16.4+)
       const c = new AC();
+      c.onstatechange = () => { if (c.state === 'interrupted' && S.on && !document.hidden) c.resume().catch(() => {}); };
       S.ctx = c;
       S.master = c.createGain(); S.master.gain.value = S.on ? S.vol : 0; S.master.connect(c.destination);
       const comp = c.createDynamicsCompressor();
@@ -38,7 +40,7 @@
   }
   function unlock() {
     if (!init()) return;
-    if (S.ctx.state === 'suspended') S.ctx.resume().catch(() => {});
+    if (S.ctx.state !== 'running') S.ctx.resume().catch(() => {}); // 전화·알람 뒤 'interrupted' 상태도 복구
     if (!S.unlocked) {
       try { const b = S.ctx.createBuffer(1, 1, 22050), s = S.ctx.createBufferSource(); s.buffer = b; s.connect(S.ctx.destination); s.start(0); } catch (e) {}
       S.unlocked = true;
@@ -132,6 +134,8 @@
   /* ---------- 소리 목록 ---------- */
   const SND = {
     ui(d) { osc(d, { f: 1400, f2: 900, dur: .05, g: .08, type: 'triangle' }); },
+    horn(d) { osc(d, { f: 392, f2: 388, dur: .55, g: .22, type: 'square' }); osc(d, { f: 494, f2: 490, dur: .55, g: .16, type: 'square' }); }, // 경적
+    carDoor(d) { nz(d, { type: 'lowpass', f: 500, dur: .12, g: .35 }); osc(d, { f: 90, f2: 60, dur: .1, g: .25 }); },
     step(d, o) {
       const s = o.surface;
       if (s === 'grass') nz(d, { type: 'lowpass', f: 700, dur: .09, g: o.run ? .22 : .12, a: .01 });
@@ -230,6 +234,8 @@
     sizzle(d) { nz(d, { type: 'highpass', f: 3500, dur: 1.4, g: .14, a: .2 }); for (let i = 0; i < 8; i++) nz(d, { t: R(0, 1.2), type: 'bandpass', f: R(3000, 6000), q: 5, dur: .03, g: .1 }); },
     powerdown(d) { osc(d, { f: 120, f2: 30, dur: 1.6, g: .3, type: 'sawtooth', lp: 600 }); osc(d, { f: 60, f2: 20, dur: 1.8, g: .35, lp: 200 }); },
     fireup(d) { nz(d, { type: 'bandpass', f: 800, q: .6, dur: 1, g: .3, a: .3 }); for (let i = 0; i < 6; i++) nz(d, { t: R(.1, .9), type: 'bandpass', f: R(1500, 3500), q: 4, dur: .03, g: .15 }); },
+    stomach(d) { for (let i = 0; i < 3; i++) osc(d, { t: i * R(.18, .3), f: R(70, 95), f2: R(45, 60), dur: R(.25, .4), g: .22, type: 'sawtooth', lp: 180 }); nz(d, { t: .1, type: 'lowpass', f: 160, dur: .7, g: .18, a: .2 }); }, // 배고픈 배꼽시계
+    cough(d) { for (let i = 0; i < 2; i++) { nz(d, { t: i * .32, type: 'bandpass', f: R(700, 1000), q: 1.2, dur: .14, g: .32, a: .005 }); osc(d, { t: i * .32, f: 180, f2: 110, dur: .1, g: .12, lp: 600 }); } }, // 마른기침
     cricket(d) { const f = R(4200, 5200); for (let i = 0; i < 3; i++) osc(d, { t: i * .045, f, dur: .025, g: .035, type: 'square', lp: 7000 }); },
   };
 
@@ -303,6 +309,49 @@
     }
   }
 
+  // 헬기 회전날개 소리 (계속 도는 소리): vol 0~1, pan -1~1
+  function heli(vol, pan) {
+    if (!S.ready) return;
+    const c = S.ctx, now = c.currentTime;
+    if (!S.heli) {
+      if (vol <= 0) return;
+      const src = c.createBufferSource(); src.buffer = S.brown; src.loop = true;
+      const lp = c.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 320;
+      const chop = c.createGain(); chop.gain.value = .5;
+      const lfo = c.createOscillator(), lg = c.createGain(); lfo.type = 'square'; lfo.frequency.value = 11; lg.gain.value = .45;
+      lfo.connect(lg); lg.connect(chop.gain);
+      const hum = c.createOscillator(), hg = c.createGain(); hum.type = 'sawtooth'; hum.frequency.value = 64; hg.gain.value = .06;
+      const g = c.createGain(); g.gain.value = 0;
+      const pn = c.createStereoPanner ? c.createStereoPanner() : null;
+      src.connect(lp); lp.connect(chop); hum.connect(hg); hg.connect(chop); chop.connect(g);
+      if (pn) { g.connect(pn); pn.connect(S.amb); } else g.connect(S.amb);
+      src.start(); lfo.start(); hum.start();
+      S.heli = { g, pn };
+    }
+    S.heli.g.gain.setTargetAtTime(clamp(vol, 0, 1) * 1.4, now, .3);
+    if (S.heli.pn) S.heli.pn.pan.setTargetAtTime(clamp(pan, -1, 1), now, .2);
+  }
+  // 자동차 엔진 (계속 도는 소리): vol 0~1, rpm 0~1 (빠를수록 높은 소리)
+  function engine(vol, rpm) {
+    if (!S.ready) return;
+    const c = S.ctx, now = c.currentTime;
+    if (!S.eng) {
+      if (vol <= 0) return;
+      const o1 = c.createOscillator(), o2 = c.createOscillator(); o1.type = 'sawtooth'; o2.type = 'square';
+      const lp = c.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 420;
+      const src = c.createBufferSource(); src.buffer = S.brown; src.loop = true;
+      const ng = c.createGain(); ng.gain.value = .35;
+      const g2 = c.createGain(); g2.gain.value = .18;
+      const g = c.createGain(); g.gain.value = 0;
+      o1.connect(lp); o2.connect(g2); g2.connect(lp); src.connect(ng); ng.connect(lp); lp.connect(g); g.connect(S.amb);
+      o1.start(); o2.start(); src.start();
+      S.eng = { g, o1, o2, lp };
+    }
+    const r = clamp(rpm, 0, 1);
+    S.eng.o1.frequency.setTargetAtTime(38 + r * 70, now, .15); S.eng.o2.frequency.setTargetAtTime(19 + r * 35, now, .15);
+    S.eng.lp.frequency.setTargetAtTime(300 + r * 700, now, .2);
+    S.eng.g.gain.setTargetAtTime(clamp(vol, 0, 1) * .9, now, .15);
+  }
   function setOn(v) {
     S.on = !!v;
     try { localStorage.setItem(PREF_KEY, S.on ? '1' : '0'); } catch (e) {}
@@ -311,5 +360,5 @@
   }
 
   window.DT = window.DT || {};
-  DT.sfx = { play, at, update, setOn, isOn: () => S.on, unlock, _S: S };
+  DT.sfx = { play, at, update, heli, engine, setOn, isOn: () => S.on, unlock, _S: S };
 })();

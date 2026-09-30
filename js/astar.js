@@ -6,20 +6,24 @@
 
   function AStar(W, H, block) {
     this.W = W; this.H = H; this.block = block;
-    const N = W * H;
+    // 아주 큰 세계는 좀비 주변 256x256칸 창 안에서만 길을 찾음 (메모리 절약)
+    this.win = W * H > 1200000 ? 256 : 0;
+    const N = this.win ? this.win * this.win : W * H;
     this.g = new Float32Array(N);
     this.par = new Int32Array(N);
     this.open = new Uint32Array(N);
     this.closed = new Uint32Array(N);
     this.gen = 0;
-    this.hn = new Int32Array(N * 8);
-    this.hf = new Float32Array(N * 8);
+    this.cap = Math.min(N * 8, 1 << 17); // 큰 세계에서도 메모리를 적게 쓰도록 힙 크기 제한
+    this.hn = new Int32Array(this.cap);
+    this.hf = new Float32Array(this.cap);
     this.hs = 0;
     this.lastExpanded = 0;
     this.cost = null; // 칸별 추가 비용 (닫힌 문·창문 등: 부수고 지나가야 함)
   }
   AStar.prototype.push = function (n, f) {
     const hn = this.hn, hf = this.hf;
+    if (this.hs >= this.cap) return; // 가득 차면 버림 (탐색 한도 안에서는 거의 없음)
     let i = this.hs++;
     while (i > 0) {
       const p = (i - 1) >> 1;
@@ -68,7 +72,12 @@
     }
     const gen = ++this.gen;
     const g = this.g, par = this.par, open = this.open, closed = this.closed;
-    const s = sy * W + sx, goal = ty * W + tx;
+    // 창(window) 좌표: LW x LH 크기, (ox, oy)가 왼쪽 위
+    const LW = this.win || W, LH = this.win || H;
+    const ox = this.win ? Math.max(0, Math.min(W - LW, ((sx + tx) >> 1) - (LW >> 1))) : 0;
+    const oy = this.win ? Math.max(0, Math.min(H - LH, ((sy + ty) >> 1) - (LH >> 1))) : 0;
+    if (sx < ox || sy < oy || tx < ox || ty < oy || sx >= ox + LW || sy >= oy + LH || tx >= ox + LW || ty >= oy + LH) return null; // 너무 멀면 포기
+    const s = (sy - oy) * LW + (sx - ox), goal = (ty - oy) * LW + (tx - ox);
     if (s === goal) return [];
     this.hs = 0;
     g[s] = 0; par[s] = -1; open[s] = gen;
@@ -81,21 +90,21 @@
       if (n === goal) {
         const path = [];
         let c = n;
-        while (c !== s && c !== -1) { path.push([c % W, (c / W) | 0]); c = par[c]; }
+        while (c !== s && c !== -1) { path.push([c % LW + ox, ((c / LW) | 0) + oy]); c = par[c]; }
         path.reverse();
         this.lastExpanded = exp;
         return path;
       }
       if (++exp > maxExp) break;
-      const x = n % W, y = (n / W) | 0;
+      const lx = n % LW, ly = (n / LW) | 0, x = lx + ox, y = ly + oy;
       for (let k = 0; k < 8; k++) {
         const dx = DX[k], dy = DY[k];
         const nx = x + dx, ny = y + dy;
-        if (nx < 0 || ny < 0 || nx >= W || ny >= H) continue;
-        const m = ny * W + nx;
-        if (B[m] || closed[m] === gen) continue;
+        if (nx < ox || ny < oy || nx >= ox + LW || ny >= oy + LH || nx >= W || ny >= H) continue;
+        const gm = ny * W + nx, m = (ny - oy) * LW + (nx - ox);
+        if (B[gm] || closed[m] === gen) continue;
         if (dx && dy && (B[y * W + nx] || B[ny * W + x])) continue;
-        const ng = g[n] + (dx && dy ? SQ2 : 1) + (this.cost ? this.cost[m] : 0);
+        const ng = g[n] + (dx && dy ? SQ2 : 1) + (this.cost ? this.cost[gm] : 0);
         if (open[m] !== gen || ng < g[m]) {
           open[m] = gen; g[m] = ng; par[m] = n;
           this.push(m, ng + h(nx, ny, tx, ty));
