@@ -113,6 +113,10 @@
 <symbol id="i-shield" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2l8 3v6c0 5.5-3.5 9.5-8 11-4.5-1.5-8-5.5-8-11V5z"/></symbol>
 <symbol id="i-lock" viewBox="0 0 24 24"><path fill="currentColor" d="M6 10V7a6 6 0 0 1 12 0v3h1v12H5V10zm2.5 0h7V7a3.5 3.5 0 0 0-7 0z"/></symbol>
 <symbol id="i-reload" viewBox="0 0 24 24"><path d="M19 12a7 7 0 1 1-2.05-4.95" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path fill="currentColor" d="M20.5 3.5v6h-6z"/></symbol>
+<symbol id="i-mkhome" viewBox="0 0 24 24"><path fill="currentColor" d="M12 3l9 8h-3v9h-5v-6h-2v6H6v-9H3z"/></symbol>
+<symbol id="i-mkmed" viewBox="0 0 24 24"><path fill="currentColor" d="M9 3h6v6h6v6h-6v6H9v-6H3V9h6z"/></symbol>
+<symbol id="i-mktext" viewBox="0 0 24 24"><path fill="currentColor" d="M4 4h16v4h-2.5V6.5H13.5V19H16v2H8v-2h2.5V6.5H6.5V8H4z"/></symbol>
+<symbol id="i-mkerase" viewBox="0 0 24 24"><path fill="currentColor" d="M15.2 3.6l5.2 5.2c.8.8.8 2 0 2.8L12 20H7.5l-3.9-3.9c-.8-.8-.8-2 0-2.8zM9 12.4l-3.6 3.6 2.9 2.9h2.9l2.4-2.4z"/><path fill="currentColor" d="M13 20h8v1.6h-8z"/></symbol>
 <symbol id="i-swap" viewBox="0 0 24 24"><path fill="currentColor" d="M16 3l5 5-5 5v-3.5H4v-3h12zM8 11v3.5h12v3H8V21l-5-5z"/></symbol>
 <symbol id="i-warn" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2l11 19H1zm-1.3 7v6h2.6V9zm0 8v2.6h2.6V17z"/></symbol>
 <symbol id="i-temp" viewBox="0 0 24 24"><path fill="currentColor" d="M10 3a2 2 0 0 1 4 0v10.5a4.5 4.5 0 1 1-4 0z"/></symbol>
@@ -151,6 +155,7 @@
           <div class="stat" data-k="endu"><svg><use href="#i-bolt"/></svg><b>100</b><span><em></em></span></div>
         </div>
         <div id="moodles"></div>
+        <div id="mdInfo" class="hidden"></div>
       </div>
       <div class="hud-right">
         <button id="minimap" aria-label="지도"><svg id="mini" viewBox="0 0 28 28"></svg><i class="mm-tag"><svg><use href="#i-map"/></svg></i></button>
@@ -222,8 +227,11 @@
       <div class="map-head"><svg><use href="#i-map"/></svg><b>지도</b><button id="mapClose" class="xbtn" aria-label="닫기"><svg><use href="#i-close"/></svg></button></div>
       <div class="map-wrap"><svg id="bigmapSvg" viewBox="0 0 72 72" preserveAspectRatio="xMidYMid meet"></svg><div id="mapZoom" class="mz"><button data-z="in" aria-label="확대">+</button><button data-z="out" aria-label="축소">−</button><button data-z="me" aria-label="내 위치">◎</button></div></div>
       <div id="mkBar" class="mk-bar">
-        <div class="mk-sym"><button data-mk="base"><b>집</b>기지</button><button data-mk="car"><b>차</b>차</button><button data-mk="danger"><b>!</b>위험</button><button data-mk="zomb"><b>좀</b>좀비</button><button data-mk="loot"><b>★</b>물건</button><button data-mk="food"><b>식</b>음식</button><button data-mk="water"><b>물</b>물</button><button data-mk="med"><b>✚</b>약</button></div>
-        <div class="mk-row"><button data-mk="text">글자 쓰기</button><button data-mk="del">지우개</button></div>
+        <div id="mkNo" class="mk-no hidden"></div>
+        <div id="mkTools" class="mk-grid">
+          <button data-mk="base" aria-label="기지" title="기지"><svg><use href="#i-mkhome"/></svg></button><button data-mk="car" aria-label="차" title="차"><svg><use href="#i-car"/></svg></button><button data-mk="danger" aria-label="위험" title="위험"><svg><use href="#i-warn"/></svg></button><button data-mk="zomb" aria-label="좀비" title="좀비"><svg><use href="#i-skull"/></svg></button><button data-mk="loot" aria-label="물건" title="물건"><svg><use href="#i-star"/></svg></button>
+          <button data-mk="food" aria-label="음식" title="음식"><svg><use href="#i-food"/></svg></button><button data-mk="water" aria-label="물" title="물"><svg><use href="#i-drop"/></svg></button><button data-mk="med" aria-label="약" title="약"><svg><use href="#i-mkmed"/></svg></button><button data-mk="text" aria-label="글자 쓰기" title="글자 쓰기"><svg><use href="#i-mktext"/></svg></button><button data-mk="del" aria-label="지우개" title="지우개"><svg><use href="#i-mkerase"/></svg></button>
+        </div>
         <input id="mkText" class="hidden" maxlength="14" placeholder="적을 글자 (14자)" autocomplete="off">
         <div id="mkPens" class="mk-pens"></div>
         <em id="mkHint"></em>
@@ -232,6 +240,7 @@
     </div>
   </div>
 
+  <button id="restBar" class="hidden" type="button"><svg class="ic"><use href="#i-bench"/></svg>휴식 중 · 시간 ×3<small>누르거나 움직이면 멈춤</small></button>
   <div id="sleep" class="hidden">
     <svg class="sleep-ic"><use href="#i-moon"/></svg>
     <div class="zzz">Z z z</div>

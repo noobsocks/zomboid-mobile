@@ -848,3 +848,32 @@ html.lefty #btnSwap{right:auto;left:70px}
 @keyframes rlspin{to{transform:rotate(360deg)}}
 html.lefty #btnReload{right:auto;left:22px}
 .btn.big.rl .rfg{stroke:#ffcf5a}
+
+/* 상태 눌러서 설명 보기 */
+#moodles .md{pointer-events:auto;cursor:pointer}
+#mdInfo{pointer-events:auto;max-width:300px;margin-top:6px;padding:8px 10px;background:rgba(10,10,9,.92);border:1.5px solid var(--bone);clip-path:var(--cut-s);font-size:12px;line-height:1.45;color:var(--bone)}
+#mdInfo b{font-family:var(--fh);font-weight:400;font-size:13px;display:block;margin-bottom:3px}
+#mdInfo p{margin:0}
+#mdInfo .fix{margin-top:4px;display:flex;gap:5px;align-items:flex-start;color:#fff}
+#mdInfo .fix svg{width:13px;height:13px;flex:none;margin-top:2px}
+/* 휴식 중 표시 */
+#restBar{position:absolute;left:50%;top:calc(var(--st) + 8px);transform:translateX(-50%);z-index:6;display:flex;align-items:center;gap:6px;
+  padding:7px 12px;background:rgba(10,10,9,.9);border:1.5px solid var(--bone);color:var(--bone);font-family:var(--fh);font-size:13px;clip-path:var(--cut-s);pointer-events:auto}
+#restBar .ic{width:16px;height:16px}
+#restBar small{font-family:var(--fb, sans-serif);font-size:10.5px;opacity:.7;margin-left:4px}
+
+/* 오른쪽 버튼 배치 (공격 버튼 둘레에 같은 간격) — 가방은 공격 버튼 바로 위, 무기 바꾸기·재장전은 그 사이 작은 버튼 */
+#btnBag{right:14px!important;bottom:119px!important}
+#btnSwap{right:94px!important;bottom:56px!important}
+#btnReload{right:60px!important;bottom:90px!important}
+html.lefty #btnBag{right:auto!important;left:14px!important}
+html.lefty #btnSwap{right:auto!important;left:94px!important}
+html.lefty #btnReload{right:auto!important;left:60px!important}
+
+/* 지도 표시 도구: 아이콘만, 사각 격자 */
+.mk-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
+.mk-grid button{aspect-ratio:1;display:flex;align-items:center;justify-content:center;padding:0;border:1.5px solid #4a4b44;background:rgba(0,0,0,.25);color:var(--bone)}
+.mk-grid button svg{width:58%;height:58%}
+.mk-grid button.on{background:var(--bone);color:var(--ink);border-color:var(--bone)}
+.mk-grid button:disabled{opacity:.28}
+.mk-no{font-size:12px;line-height:1.45;padding:10px;border:1.5px dashed #4a4b44;color:var(--bone);opacity:.85}

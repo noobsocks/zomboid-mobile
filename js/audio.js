@@ -134,6 +134,26 @@
 
   /* ---------- 소리 목록 ---------- */
   const SND = {
+    toast_ok(d) { osc(d, { f: 880, dur: .08, g: .08, type: 'triangle' }); osc(d, { t: .08, f: 1320, dur: .12, g: .08, type: 'triangle' }); }, // 해냄
+    toast_warn(d) { osc(d, { f: 520, dur: .12, g: .12, type: 'square', lp: 1800 }); osc(d, { t: .16, f: 420, dur: .16, g: .12, type: 'square', lp: 1800 }); }, // 위험
+    toast_deny(d) { osc(d, { f: 180, f2: 150, dur: .14, g: .1, type: 'sawtooth', lp: 900 }); }, // 안 됨
+    zombie_step(d, o) { // 발을 질질 끄는 걸음
+      const r = o.rate || 1, wood = o.w === 'wood';
+      nz(d, { type: 'bandpass', f: (wood ? 700 : 1100) * r, f2: (wood ? 380 : 600) * r, q: .9, dur: .22 / r, g: .1, a: .04 });
+      nz(d, { t: .02, type: 'lowpass', f: 380 * r, dur: .08, g: .12 });
+      if (wood) osc(d, { t: .02, f: 120 * r, f2: 80, dur: .06, g: .05 });
+    },
+    zombie_run(d, o) { // 뛰어오는 발소리 (쿵쿵)
+      const r = o.rate || 1, wood = o.w === 'wood';
+      nz(d, { type: 'lowpass', f: (wood ? 520 : 800) * r, dur: .07, g: .22 });
+      osc(d, { f: (wood ? 110 : 90) * r, f2: 55, dur: .08, g: .16 });
+      nz(d, { t: .015, type: 'bandpass', f: 1500 * r, q: 1.2, dur: .05, g: .06 });
+    },
+    zombie_step_snow(d, o) { // 눈 밟는 소리
+      const r = o.rate || 1;
+      for (let i = 0; i < 3; i++) nz(d, { t: i * .025, type: 'bandpass', f: R(1800, 2600) * r, q: 2, dur: .05, g: .07 });
+      nz(d, { type: 'lowpass', f: 500, dur: .12, g: .08, a: .02 });
+    },
     ui_tap(d) { osc(d, { f: 1400, f2: 900, dur: .05, g: .08, type: 'triangle' }); }, // 버튼·탭·칸 고르기 공통
     bag_zip(d) { for (let i = 0; i < 9; i++) nz(d, { t: i * .026, type: 'bandpass', f: 2600 + i * 120, q: 4, dur: .02, g: .16 }); }, // 가방 열기 (지퍼 열기)
     ui_back(d) { for (let i = 0; i < 9; i++) nz(d, { t: i * .024, type: 'bandpass', f: 3600 - i * 120, q: 4, dur: .02, g: .14 }); }, // 창 닫기 (지퍼 닫기)
@@ -271,9 +291,9 @@
   // 파일이 아직 없을 때 대신 쓸 합성음
   const FALLBACK = { wear: 'equip', tap: 'drink', boil: 'sizzle', craft_cloth: 'craft', craft_tape: 'craft', craft_wood: 'craft', saw: 'craft', screw: 'craft', chop: 'hammer', wrench: 'hammer',
     fuel: 'drink', map: 'search', pen: 'ui_tap', radio: 'equip', land: 'thump', bone: 'hitBlunt', zombie_bite: 'bite', board_break: 'boardBreak', weapon_break: 'breakw', car_door: 'carDoor',
-    fire_up: 'fireup', engine_start: 'carDoor', crash: 'hitBlunt', crash_low: 'hitBlunt', car_hit: 'hitBlunt', gun_pistol: 'gun', gun_revolver: 'gun', gun_shotgun: 'gun', gun_rifle: 'gun' };
+    fire_up: 'fireup', engine_start: 'carDoor', close_fridge: 'door', close_drawer: 'door', close_wood: 'door', close_metal: 'door', close_safe: 'door', close_lid: 'door', close_trunk: 'carDoor', crash: 'hitBlunt', crash_low: 'hitBlunt', car_hit: 'hitBlunt', gun_pistol: 'gun', gun_revolver: 'gun', gun_shotgun: 'gun', gun_rifle: 'gun' };
   // 소리별 음량 맞춤 (파일끼리 크기 차이 보정)
-  const GAIN = { step_floor: .55, step_road: .55, step_grass: .6, step_snow: .6, step_stairs: .6, ui_tap: .45, bag_zip: .6, ui_back: .6, toast: .35, flesh: .55, groan: .55, growl: .7, zombie_hurt: .75,
+  const GAIN = { zombie_step: .6, zombie_run: .7, zombie_step_snow: .6, step_floor: .55, step_road: .55, step_grass: .6, step_snow: .6, step_stairs: .6, ui_tap: .45, bag_zip: .6, ui_back: .6, toast: .35, flesh: .55, groan: .55, growl: .7, zombie_hurt: .75,
     eat: .7, drink: .7, tap: .6, search: .7, loot: .7, heart: .8, breath_run: .55, birds: .3, crickets: .3, drip: .35, blizzard: .6, fire_loop: .55, engine: .5, heli: .9, nightfall: .6,
     swing: .7, swing_heavy: .8, kill: .9, levelup: .6, radio: .5, map: .7, pen: .6, equip: .8, wear: .8, hammer: .8, sizzle: .6, boil: .6 };
   const F = { list: null, buf: {}, loading: false, base: 'sfx/', lastIx: {} };
@@ -321,7 +341,7 @@
     if (name === 'gun') return 'gun_' + (o.kind || 'pistol');
     return ALIAS[name] || name;
   }
-  const JITTER = { step_floor: .06, step_road: .06, step_grass: .06, step_snow: .06, hit_blunt: .05, hit_metal: .05, hit_blade: .05, hit_stab: .05, hit_axe: .05, hit_heavy: .04, hit_fist: .05, flesh: .06, swing: .05, swing_heavy: .04, thump: .05, groan: .06, hammer: .05, shell_in: .03, ammo_out: .08 };
+  const JITTER = { zombie_step: .07, zombie_run: .06, zombie_step_snow: .07, step_floor: .06, step_road: .06, step_grass: .06, step_snow: .06, hit_blunt: .05, hit_metal: .05, hit_blade: .05, hit_stab: .05, hit_axe: .05, hit_heavy: .04, hit_fist: .05, flesh: .06, swing: .05, swing_heavy: .04, thump: .05, groan: .06, hammer: .05, shell_in: .03, ammo_out: .08 };
   function playFile(k, o) {
     const j = JITTER[k] || 0, rate = (o.rate || 1) * (1 + (Math.random() * 2 - 1) * j);
     return bufOut(pickBuf(k, o), (o.vol == null ? 1 : o.vol) * (GAIN[k] || 1), o.pan || 0, o.rev || 0, rate, false);
@@ -349,7 +369,7 @@
   }
 
   // 같은 소리가 한꺼번에 몰리지 않게 (좀비 떼 신음 등) — 최소 간격(초)
-  const GAP = { toast: 1.2, step: .12, flesh: .05, hit: .05, thump: .08, groan: .45, scream: .25, growl: .15, kill: .06, hitBlunt: .05, hitBlade: .05, hammer: .1, ui_tap: .03, zombie_hurt: .12 };
+  const GAP = { toast: 1.2, toast_ok: 1.2, toast_warn: 1.2, toast_deny: .6, step: .12, flesh: .05, hit: .05, thump: .08, groan: .45, scream: .25, growl: .15, kill: .06, hitBlunt: .05, hitBlade: .05, hammer: .1, ui_tap: .03, zombie_hurt: .12 };
   const last = {};
   function play(name, o) {
     if (!S.ready || !S.on) return;

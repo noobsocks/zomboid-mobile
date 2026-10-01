@@ -279,9 +279,12 @@
     }
     return l;
   }
+  const LOOT_RATE = .7, Z_RATE = .7; // 물건·좀비 양 (1 = 예전)
   function rollLoot(kind, r) {
     const tb = LOOT[kind];
-    const n = tb.min + Math.floor(r() * (tb.max - tb.min + 1));
+    const n0 = tb.min + Math.floor(r() * (tb.max - tb.min + 1));
+    let n = 0; for (let i = 0; i < n0; i++) if (r() < LOOT_RATE) n++; // 물건 양 70%
+    if (tb.min > 0) n = Math.max(1, n); // 늘 뭔가 있는 곳(총기 보관함 등)은 최소 1개
     const total = tb.pool.reduce((s, p) => s + p[1], 0);
     const out = [];
     for (let i = 0; i < n; i++) {
@@ -1084,21 +1087,26 @@
   function renderMkBar() {
     const have = pensHave(); if (!have.includes(L.pen)) L.pen = have[0] || null;
     $('mkPens').innerHTML = have.map(id => `<button data-pen="${id}" class="${L.pen === id ? 'on' : ''}"><i style="background:${ITEMS[id].pen}"></i>${ITEMS[id].name}</button>`).join('') || '<span class="nopen">필기구가 없다 — 연필·펜을 찾아보자</span>';
-    const er = has('eraser');
-    for (const b of $('mkBar').querySelectorAll('button[data-mk]')) { const k = b.dataset.mk; b.disabled = k === 'del' ? !er : !L.pen; b.classList.toggle('on', k === L.mkMode); }
+    const er = has('eraser'), inLv = !!M.level;
+    // 필기구가 없거나 건물 안이면 표시 도구 자체를 막음
+    const lock = !L.pen ? '필기구(연필·펜)가 있어야 지도에 표시할 수 있다.' : inLv ? '건물 안에서는 표시할 수 없다 — 밖에서 지도를 펼치자.' : '';
+    $('mkNo').textContent = lock; $('mkNo').classList.toggle('hidden', !lock); $('mkTools').classList.toggle('hidden', !!lock); $('mkPens').classList.toggle('hidden', !L.pen);
+    if (lock) L.mkMode = null;
+    for (const b of $('mkBar').querySelectorAll('button[data-mk]')) { const k = b.dataset.mk; b.disabled = !!lock || (k === 'del' && !er); b.classList.toggle('on', k === L.mkMode); }
     if ((L.mkMode === 'del' && !er) || (L.mkMode && L.mkMode !== 'del' && !L.pen)) L.mkMode = null;
     $('mkText').classList.toggle('hidden', L.mkMode !== 'text');
     $('mkHint').textContent = !L.mkMode ? (L.pen ? '기호를 고르고 지도를 누르세요 · 끌어서 이동' : '끌어서 이동 · +/− 확대') : L.mkMode === 'del' ? '지울 표시를 누르세요 (연필로 쓴 것만)' : L.mkMode === 'text' ? '글자를 적고 지도를 누르세요' : '표시할 곳을 누르세요';
   }
   // 지도 표시 (기지·차·위험·물건) — 바깥 지도에만
+  const MARK_ICO = { base: 'mkhome', car: 'car', danger: 'warn', zomb: 'skull', loot: 'star', food: 'food', water: 'drop', med: 'mkmed' };
   const MARK = { base: ['기지', '#6ab04c', '집'], car: ['차', '#3a86c8', '차'], danger: ['위험', '#c8141f', '!'], loot: ['물건', '#d8a020', '★'], food: ['음식', '#d8a020', '식'], water: ['물', '#3a86c8', '물'], med: ['약', '#6ab04c', '✚'], zomb: ['좀비 떼', '#c8141f', '좀'], text: ['글자', '#1c1c1c', ''] };
   function drawMarks() {
     for (const m of [L.mini, L.big]) { if (!m || !m.mk) continue; m.mk.innerHTML = ''; if (M.level) continue;
       const r = m.big ? Math.max(1.4, (L._bigSize || 72) / 55) : 1.1;
       for (const k of G.marks || []) { const t = MARK[k.t]; if (!t) continue; const g = el('g', { transform: `translate(${k.x.toFixed(1)} ${k.y.toFixed(1)})` }, m.mk), c = k.c || t[1];
         if (k.t === 'text') { if (!m.big) { el('circle', { r: r * .35, fill: c }, g); continue; } const tx = el('text', { y: r * .4, 'text-anchor': 'middle', 'font-size': r * 1.25, 'font-weight': 800, fill: c, stroke: '#e8dfc6', 'stroke-width': r * .25, 'paint-order': 'stroke', 'font-family': 'sans-serif' }, g); tx.textContent = k.txt || ''; continue; }
-        el('circle', { r, fill: 'none', stroke: c, 'stroke-width': r * .22 }, g);
-        const tx = el('text', { y: r * .4, 'text-anchor': 'middle', 'font-size': r * (t[2].length > 1 ? .85 : 1.2), 'font-weight': 900, fill: c, stroke: m.big ? '#e8dfc6' : '#000', 'stroke-width': r * .12, 'paint-order': 'stroke', 'font-family': 'sans-serif' }, g); tx.textContent = t[2]; } }
+        el('circle', { r, fill: '#efe6cc', stroke: c, 'stroke-width': r * .2 }, g); // 종이색 바탕 + 필기구 색 테두리
+        const u = el('use', { href: '#i-' + (MARK_ICO[k.t] || 'star'), x: -r * .62, y: -r * .62, width: r * 1.24, height: r * 1.24 }, g); u.style.color = c; } }
   }
   function updateMaps() {
     const p = G.p;
@@ -1722,6 +1730,7 @@
   const ZTRAIT = { jogger: { spd: 1.6, hp: .75 }, fat: { spd: .68, hp: 2.6, knock: .7 }, soldier: { hp: 1.8, knock: .3 }, police: { hp: 1.3, knock: .15 }, fire: { hp: 1.7, knock: .25 }, hazmat: { hp: 1.35, knock: .2 }, prisoner: { spd: 1.12, hp: 1.1 }, guard: { hp: 1.2, knock: .15 }, hunter: { hp: 1.1 }, screamer: { hp: .9, scream: 1 }, elder: { spd: .85, hp: .85 } };
   const trait = z => (z.lk && ZTRAIT[z.lk.ty]) || {};
   function newZombie(x, y, ty, pr) {
+    if (rand() >= Z_RATE) return null; // 좀비 양 70% (물건 양과 같이 줄임)
     const lk = genLook(); if (ty && rand() < pr) lk.ty = ty;
     const tr = ZTRAIT[lk.ty] || {};
     return placeZombie(x, y, (2.6 + rand() * .8) * (tr.hp || 1), null, lk);
@@ -1757,12 +1766,30 @@
   function updateTownNow() {
     if (!M.towns) return;
     const p = G.p, t = M.towns.find(t => p.x >= t.x && p.x < t.x + t.w && p.y >= t.y && p.y < t.y + t.h) || null;
+    // 마지막으로 알린 도시에서 충분히(15칸) 벗어나야 다시 알림 → 도시 경계를 오가도 반복해서 안 뜸
+    const A = G._annT; if (A && !t) { const ox = Math.max(A.x - p.x, 0, p.x - (A.x + A.w)), oy = Math.max(A.y - p.y, 0, p.y - (A.y + A.h)); if (Math.hypot(ox, oy) > 15) G._annT = null; }
     if (t === G._town) return;
     const prev = G._town; G._town = t;
-    if (t && t.name && prev !== undefined) toast(`${t.name} · ${t.label}${t.tag ? ' — ' + t.tag : ''}`, 3000);
-    else if (t && t.kind === 'hamlet' && prev !== undefined) toast('작은 마을이 보인다', 1800);
+    if (!t || t === G._annT) return;
+    G._annT = t;
+    if (t.name && prev !== undefined) toast(`${t.name} · ${t.label}${t.tag ? ' — ' + t.tag : ''}`, 3000);
+    else if (t.kind === 'hamlet' && prev !== undefined) toast('작은 마을이 보인다', 1800);
   }
   // 먼 곳의 좀비 무리가 조금씩 플레이어 쪽으로 흘러옴 (큰 세계)
+  // 멀리(화면 밖) 잠든 좀비도 헬기 쪽으로 끌려감: 헬기 주변 칸의 좀비를 헬기 방향으로 조금씩 옮김
+  function pullDormant(x, y, R, step) {
+    if (!G.zdorm.size) return;
+    const c0x = Math.max(0, Math.floor((x - R) / CK)), c1x = Math.min(M.CW - 1, Math.floor((x + R) / CK));
+    const c0y = Math.max(0, Math.floor((y - R) / CK)), c1y = Math.min(M.CH - 1, Math.floor((y + R) / CK));
+    const moved = [];
+    for (let cy = c0y; cy <= c1y; cy++) for (let cx = c0x; cx <= c1x; cx++) {
+      const k = cy * M.CW + cx, a = G.zdorm.get(k); if (!a) continue;
+      G.zdorm.delete(k); G.zdormN -= a.length; moved.push(...a);
+    }
+    for (const r of moved) { const dx = x - r[0], dy = y - r[1], d = Math.hypot(dx, dy);
+      if (d > 2 && d < R) { const q = freeNear(clamp(r[0] + dx / d * step, 2, M.W - 3), clamp(r[1] + dy / d * step, 2, M.H - 3)); if (q) { r[0] = q[0]; r[1] = q[1]; } }
+      zStoreAdd(r); }
+  }
   function driftDormant() {
     if (!G.zdorm.size) return;
     const p = G.p, keys = [...G.zdorm.keys()];
@@ -2001,26 +2028,36 @@
     const p = G.p;
     if (!G.heli) {
       if (G.heliAt != null && G.time >= G.heliAt) {
-        const a = rand() * TAU;
-        G.heli = { ph: 'in', x: p.x + Math.cos(a) * 75, y: p.y + Math.sin(a) * 75, a: a + Math.PI, t: 0, nt: 0, rot: 0 };
+        // 헬기: 플레이어를 쫓지 않고 여러 곳(도시 위주)을 들렀다 떠남 → 지나가는 곳마다 좀비를 몰고 다님
+        const W0 = M.W, H0 = M.H, tw = (M.towns || []).filter(t => t.w * t.h > 30), wp = [];
+        const n = 3 + ((rand() * 3) | 0);
+        for (let i = 0; i < n; i++) {
+          if (tw.length && rand() < .75) { const t = tw[(rand() * tw.length) | 0]; wp.push([t.x + t.w * (.2 + rand() * .6), t.y + t.h * (.2 + rand() * .6)]); }
+          else wp.push([p.x + (rand() - .5) * 140, p.y + (rand() - .5) * 140]);
+        }
+        for (const q of wp) { q[0] = clamp(q[0], 4, W0 - 5); q[1] = clamp(q[1], 4, H0 - 5); }
+        const a = rand() * TAU, sx = clamp(wp[0][0] + Math.cos(a) * 90, 2, W0 - 3), sy = clamp(wp[0][1] + Math.sin(a) * 90, 2, H0 - 3);
+        G.heli = { ph: 'fly', x: sx, y: sy, a: Math.atan2(wp[0][1] - sy, wp[0][0] - sx), t: 0, nt: 0, rot: 0, wp, wi: 0 };
         G.heliAt = G.time + (2 + rand() * 2) * 24 * 60; // 다음은 2~4일 뒤
-        toast('멀리서 헬기 소리가 들린다…', 2800);
       } else { if (L.heliG) { L.heliG.remove(); L.heliG = null; } if (SFX.heli) SFX.heli(0, 0); return; }
     }
     const h = G.heli;
     h.t += dt; h.rot += dt * 40;
     let tx, ty, spd;
-    if (h.ph === 'in') { tx = p.x; ty = p.y; spd = 6; }
-    else if (h.ph === 'hover') { tx = p.x + Math.cos(h.t * .45) * 3.5; ty = p.y + Math.sin(h.t * .45) * 3.5; spd = 3; }
-    else { tx = h.x + Math.cos(h.a) * 10; ty = h.y + Math.sin(h.a) * 10; spd = 7; }
+    const cur = h.wp && h.wp[h.wi];
+    if (h.ph === 'fly' && cur) { tx = cur[0]; ty = cur[1]; spd = 6; }
+    else if (h.ph === 'hover' && cur) { tx = cur[0] + Math.cos(h.t * .45) * 3.5; ty = cur[1] + Math.sin(h.t * .45) * 3.5; spd = 3; }
+    else { h.ph = 'out'; tx = h.x + Math.cos(h.a) * 10; ty = h.y + Math.sin(h.a) * 10; spd = 7; }
     const dx = tx - h.x, dy = ty - h.y, d = Math.hypot(dx, dy);
     if (d > .05) { const m = Math.min(d, spd * dt); h.x += dx / d * m; h.y += dy / d * m; if (h.ph !== 'hover' || d > .5) h.a += angDiff(Math.atan2(dy, dx), h.a) * Math.min(1, dt * 2.5); }
-    if (h.ph === 'in' && d < 3) { h.ph = 'hover'; h.t = 0; toast('헬기가 머리 위를 맴돈다 — 좀비가 몰려온다!', 3000); shake(.3); if (G.sleeping) wake('헬기 소리에 잠이 깼다!'); }
-    else if (h.ph === 'hover' && h.t > 38) { h.ph = 'out'; h.a = rand() * TAU; toast('헬기 소리가 멀어진다', 2200); }
-    else if (h.ph === 'out' && Math.hypot(h.x - p.x, h.y - p.y) > 80) { G.heli = null; return; }
+    const pd = Math.hypot(h.x - p.x, h.y - p.y);
+    if (!h.heard && pd < 70) { h.heard = 1; toast('멀리서 헬기 소리가 들린다…', 2800); }
+    if (h.ph === 'fly' && d < 3) { h.ph = 'hover'; h.t = 0; h.hv = 14 + rand() * 16; if (pd < 25) { toast('헬기가 근처를 맴돈다 — 좀비가 몰려온다!', 3000); shake(.3); if (G.sleeping) wake('헬기 소리에 잠이 깼다!'); } }
+    else if (h.ph === 'hover' && h.t > h.hv) { h.wi++; h.t = 0; if (h.wi >= h.wp.length) { h.ph = 'out'; h.a = rand() * TAU; if (pd < 60) toast('헬기 소리가 멀어진다', 2200); } else h.ph = 'fly'; }
+    else if (h.ph === 'out' && (h.x < 1 || h.y < 1 || h.x > M.W - 2 || h.y > M.H - 2 || h.t > 40)) { G.heli = null; return; }
     // 소음: 맴도는 동안은 크게, 오고 갈 때는 조금
     h.nt -= dt;
-    if (h.nt <= 0) { h.nt = 1.6; if (h.ph === 'hover') noise(h.x, h.y, 22, false); else if (Math.hypot(h.x - p.x, h.y - p.y) < 30) noise(h.x, h.y, 10, false); }
+    if (h.nt <= 0) { h.nt = 1.6; if (h.ph === 'hover') { noise(h.x, h.y, 22, false); pullDormant(h.x, h.y, 22, 2.2); } else { noise(h.x, h.y, 12, false); pullDormant(h.x, h.y, 12, 1.4); } } // 날아가는 길에도 좀비가 따라감
     const dist = Math.hypot(h.x - p.x, h.y - p.y);
     if (SFX.heli) SFX.heli(clamp(1 - dist / 70, 0, 1), clamp((h.x - p.x) / 18, -.9, .9));
     drawHeli(h);
@@ -2059,7 +2096,7 @@
   const isPlacedC = ci => ci >= PLACED && ci < VEH;
   const placedOf = ci => G.placed.find(b => b.id === ci - PLACED);
   const cItems = ci => isVeh(ci) ? vehTrunk(vehOf(ci)) : isPlacedC(ci) ? ((placedOf(ci) || {}).items || []) : isCorpse(ci) ? ((corpseOf(ci) || {}).items || []) : contItems(ci);
-  const cName = ci => isVeh(ci) ? '자동차 트렁크' : isPlacedC(ci) ? (FURN[(placedOf(ci) || {}).kind] || ['가구'])[0] : isCorpse(ci) ? '시체' : LOOT[M.containers[ci].kind].name;
+  const cName = ci => isVeh(ci) ? '자동차 트렁크' : isPlacedC(ci) ? ((placedOf(ci) || {}).type === 'pile' ? '바닥에 둔 물건' : (FURN[(placedOf(ci) || {}).kind] || ['가구'])[0]) : isCorpse(ci) ? '시체' : LOOT[M.containers[ci].kind].name;
   const cPos = ci => { if (isVeh(ci)) { const v = vehOf(ci); return v ? [v.x, v.y] : [-99, -99]; } if (isPlacedC(ci)) { const b = placedOf(ci); return b ? [b.x + .5, b.y + .5] : [-99, -99]; } if (isCorpse(ci)) { const c = corpseOf(ci); return c ? [c.x, c.y] : [-99, -99]; } const c = M.containers[ci]; return c.car ? [c.x + c.cw / 2, c.y + c.ch / 2] : [c.x + .5, c.y + .5]; };
   const cSearched = ci => isPlacedC(ci) ? true : isCorpse(ci) ? !!(corpseOf(ci) || {}).searched : G.searched.has(ci);
   // 좀비 소지품: 입던 옷 + 가끔 생존 물품
@@ -2069,7 +2106,7 @@
     if (rand() < .55) out.push(mkItem('shirt'));
     const n = rand() < .35 ? 0 : rand() < .75 ? 1 : 2;
     const tot = CORPSE_POOL.reduce((s, q) => s + q[1], 0);
-    for (let i = 0; i < n; i++) { let x = rand() * tot; for (const [id, w] of CORPSE_POOL) { x -= w; if (x <= 0) { out.push(mkItem(id)); break; } } }
+    for (let i = 0; i < n; i++) { if (rand() >= LOOT_RATE) continue; let x = rand() * tot; for (const [id, w] of CORPSE_POOL) { x -= w; if (x <= 0) { out.push(mkItem(id)); break; } } }
     return out;
   }
   const JOB_LOOT = { hoodie: [['hoodie', .25]],  police: [['vest', .04], ['cap', .1], ['ammo', .5], ['pistol', .12], ['baton', .35]], medic: [['bandage', .7], ['pills', .6]], worker: [['gloves', .2], ['boots', .1], ['workpants', .1], ['hammer', .3], ['nails', .6], ['screwdriver', .3], ['wrench', .25], ['crowbar', .12]], soldier: [['milhelm', .15], ['milbag', .05], ['milboots', .1], ['ammo', .7], ['bandage', .4], ['can', .4], ['rammo', .35], ['machete', .12], ['rifle', .04]], office: [['soda', .3], ['chips', .3]], fire: [['firehelm', .12], ['firecoat', .06], ['fireaxe', .18], ['bandage', .5], ['cloth', .4], ['water', .4], ['crowbar', .08]], chef: [['hknife', .35], ['knife', .25], ['pan', .3], ['bread', .5], ['can', .4]], hunter: [['hikebag', .06], ['fieldjkt', .08], ['bolt', .5], ['rammo', .3], ['hknife', .3], ['machete', .08], ['crossbow', .08], ['rifle', .03]], golfer: [['golf', .45], ['water', .5], ['soda', .3]], guard: [['baton', .45], ['ammo', .35], ['bandage', .3], ['revolver', .06]], hazmat: [['bandage', .6], ['pills', .6], ['note', .35]], prisoner: [['knife', .12], ['chips', .3], ['note', .15]], soldier2: [], elder: [['pills', .5]], jogger: [['sneakers', .3], ['water', .6]] };
@@ -2361,6 +2398,7 @@
     const p = G.p;
     if (p.inCar != null) return honk();
     if (p.cd > 0 || G.sleeping || G.dead) return;
+    stopRest();
     const w = curWeapon(), def = w.def;
     if (p.rl) { // 재장전 중: 한 발씩 넣는 총은 넣은 만큼 바로 쏠 수 있다
       if (p.rl.R.kind === 'each' && w.item && w.item.mag > 0 && p.rl.loaded > 0) cancelReload(); else return;
@@ -2462,11 +2500,11 @@
     }
   }
   function damageZombie(z, dmg, a, knock, knockDown) {
-    z.hp -= dmg; z.flash = .12; z.stun = .45;
+    z.hp -= dmg; z.flash = .12; z.stun = .45; z.wind = 0; z.lunge = 0;
     z.state = 'chase'; z.lostT = 0; z.tx = G.p.x; z.ty = G.p.y; z.herd = false;
     const tr = trait(z);
     knock *= 1 - (tr.knock || 0);
-    z.x += Math.cos(a) * knock; z.y += Math.sin(a) * knock; resolve(z);
+    z.kbx = Math.cos(a) * knock / .14; z.kby = Math.sin(a) * knock / .14; z.kbt = .14; // 밀려나기: 순간이동 대신 0.14초 동안 미끄러지듯
     if (knockDown && rand() >= (tr.knock || 0)) z.down = 1.4;
     addFx('blood', { x: z.x, y: z.y, a });
     if (z.hv == null) z.hv = (rand() * 3) | 0; // 좀비마다 맞는 목소리 1개 고정 (3종 중)
@@ -2481,6 +2519,21 @@
   }
 
   /* ================= 좀비 AI ================= */
+  // 좀비 발소리: 8칸 안의 좀비만, 멀수록 작게 · 좌우 방향 구분 · 한꺼번에 몇 마리분만
+  function zombieStep(z, dist, p) {
+    if (!dist || G.sleeping) return;
+    const run = z.state === 'chase', tr = trait(z);
+    z.stepAcc = (z.stepAcc || 0) + dist;
+    const stride = (run ? .62 : .46) * (tr.hp > 2 ? 1.15 : 1);
+    if (z.stepAcc < stride) return;
+    z.stepAcc = 0;
+    const d = Math.hypot(z.x - p.x, z.y - p.y); if (d > 8) return;
+    const now = performance.now(); if (!L.zsT || now - L.zsT > 250) { L.zsT = now; L.zsN = 0; }
+    if (L.zsN >= 3) return; L.zsN++;
+    const tt = M.t[Math.floor(z.y) * M.W + Math.floor(z.x)], snow = !G.lv && (G.snowCov || 0) > .3 && tt !== DT.T.FLOOR && tt !== DT.T.DOOR;
+    const heavy = tr.hp > 2 ? 1.25 : 1, fast = tr.spd > 1 ? 1.12 : 1;
+    SFX.at(snow ? 'zombie_step_snow' : run ? 'zombie_run' : 'zombie_step', z.x, z.y, { range: 8, vol: (run ? .9 : .6) * heavy * (tt === DT.T.GRASS ? .8 : 1), rate: fast / (heavy > 1 ? 1.12 : 1), w: tt === DT.T.FLOOR ? 'wood' : 'hard' });
+  }
   function updateZombies(dt) {
     const p = G.p, night = G.night;
     const sightR = lerp(8.5, 6, night);
@@ -2495,11 +2548,18 @@
         if ((G.fc + zi) % every) continue;
         dtz = dt * every;
       }
+      const zx0 = z.x, zy0 = z.y;
       stepZombie(z, dtz, p, night, sightR);
+      if (md < 12) zombieStep(z, Math.hypot(z.x - zx0, z.y - zy0), p);
     }
     function stepZombie(z, dt, p, night, sightR) {
       z.cd -= dt; z.think -= dt; z.repath -= dt;
       if (z.flash > 0) z.flash -= dt;
+      if (z.kbt > 0) { const t = Math.min(dt, z.kbt); z.kbt -= t; z.x += z.kbx * t; z.y += z.kby * t; resolve(z); }
+      if (z.wind > 0) { // 공격 준비 동작 (좀비마다 속도 다름) → 끝나면 아직 가까우면 공격
+        z.wind -= dt; z.lunge = 1 - Math.max(0, z.wind) / (z.windT || .3);
+        if (z.wind <= 0) { z.lunge = 0; const dd = Math.hypot(p.x - z.x, p.y - z.y); if (dd < (p.inCar != null ? 1.5 : .95) && !(z.down > 0) && !(z.stun > 0)) zombieAttack(z); }
+      }
       if (z.down > 0) { z.down -= dt; return; }
       if (z.stun > 0) { z.stun -= dt; return; }
       const dx = p.x - z.x, dy = p.y - z.y, d = Math.hypot(dx, dy);
@@ -2545,7 +2605,9 @@
             followPath(z, spd, dt);
           }
         }
-        if (d < (p.inCar != null ? 1.35 : .75) && z.cd <= 0 && z.lostT === 0) { z.cd = 1.3 + rand() * .3; zombieAttack(z); }
+        if (d < (p.inCar != null ? 1.35 : .75) && z.cd <= 0 && z.lostT === 0 && !(z.wind > 0)) { // 좀비마다 공격 간격·준비 시간이 다름
+          if (z.acd == null) { const tr0 = trait(z); z.acd = (1 + rand() * .7) * (tr0.spd > 1 ? .8 : tr0.hp > 2 ? 1.3 : 1); z.windT = .16 + rand() * .22; }
+          z.cd = z.acd; z.wind = z.windT; }
       } else if (z.state === 'investigate') {
         spd = (z.search ? .95 : .8) * z.spdMul * slow;
         if (!z.path && !z.queued) requestPath(z);
@@ -2594,6 +2656,7 @@
       return;
     }
     if (G.sleeping) wake('좀비에게 습격당했다!');
+    stopRest('좀비에게 습격당했다!');
     const a = Math.atan2(z.y - p.y, z.x - p.x);
     if (Math.hypot(input.jx + input.kx, input.jy + input.ky) < .12) p.face = a;
     const hit = rand() <= (G.night > .5 ? .6 : .5);
@@ -2711,8 +2774,12 @@
     if (navigator.vibrate) try { navigator.vibrate(60); } catch (e) {}
   }
   let toastTO = 0;
+  // 알림 소리 구분: 위험 / 안 됨 / 해냄 / 그 밖의 알림
+  const TOAST_WARN = /좀비|물렸|습격|골절|피를|출혈|위험|비명|헬기|밤이 온다|망가|부서|쓰러|감염|다쳤|충돌|쾅|단수|전기가 끊|몰려/;
+  const TOAST_DENY = /없다|필요하다|수 없|부족|못 |못한|안 된|막혀|잠겨|가득|졸리지|먼저/;
+  const TOAST_OK = /했다|완료|만들었|장착|챙겼|올랐|레벨|채웠|놓았|피웠|고쳤|설치|찾았|열렸|뺐다/;
   function toast(msg, ms) {
-    if (msg) SFX.play('toast');
+    if (msg) SFX.play(TOAST_WARN.test(msg) ? 'toast_warn' : TOAST_DENY.test(msg) ? 'toast_deny' : TOAST_OK.test(msg) ? 'toast_ok' : 'toast');
     const t = $('toast'); t.textContent = msg; t.classList.add('on');
     clearTimeout(toastTO); toastTO = setTimeout(() => t.classList.remove('on'), ms || 1800);
   }
@@ -2954,7 +3021,7 @@
   }
   function update(dt) {
     const p = G.p;
-    const scale = G.sleeping ? 30 : 1;
+    const scale = G.sleeping ? 30 : G.resting ? 3 : 1;
     const dm = dt * scale;
     G.time += dm;
     G.night = nightLevel(G.time);
@@ -2964,6 +3031,7 @@
     let mag = Math.hypot(mx, my);
     if (mag > 1) { mx /= mag; my /= mag; mag = 1; }
     if (G.sleeping) { mx = my = 0; mag = 0; }
+    if (G.resting && (mag > .12 || p.inCar != null)) stopRest(); // 움직이면 휴식 끝
     const car = p.inCar != null && G.vehicles && !G.lv ? G.vehicles[p.inCar] : null;
     if (car) { driveUpdate(car, dt, mx, my, mag); mx = my = 0; mag = 0; } // 운전 중: 걷기 대신 차를 움직임
     else if (G._engOn !== false && SFX.engine) { SFX.engine(0, 0); G._engOn = false; }
@@ -2976,19 +3044,18 @@
       if (input.kx || input.ky) gait = keys.shift ? 'sprint' : keys.ctrl ? 'walk' : 'jog';
       else gait = mag > .88 ? 'sprint' : mag > .5 ? 'jog' : 'walk';
       if (gait === 'sprint' && p.endu <= 3) gait = 'jog';
-      if (p.crouch) gait = 'walk'; // 웅크리면 살금살금만
     }
     G.gait = moving ? gait : 'idle';
     const running = gait === 'sprint';
     const wt = invWeight();
-    const spd = ({ walk: 1.35, jog: 2.35, sprint: 3.5 })[gait] * (p.energy < 20 ? .8 : 1) * (p.hp < 25 ? .85 : 1) * (wt > capKg() ? .7 : 1) * (p.crouch ? .62 : 1) * gearStats().spd * woundMul('leg');
+    const spd = ({ walk: 1.35, jog: 2.35, sprint: 3.5 })[gait] * (p.energy < 20 ? .8 : 1) * (p.hp < 25 ? .85 : 1) * (wt > capKg() ? .7 : 1) * (p.crouch ? .5 : 1) * gearStats().spd * woundMul('leg');
     if (moving) {
       mx /= (mag || 1); my /= (mag || 1); // 속도는 걸음 단계로만 정함
       p.stepT = (p.stepT || 0) - spd * dt;
       if (p.stepT <= 0) {
         p.stepT = running ? .78 : gait === 'jog' ? .7 : .6;
         const tt = M.t[Math.floor(p.y) * M.W + Math.floor(p.x)];
-        SFX.play('step', { surface: tt === DT.T.FLOOR || tt === DT.T.DOOR ? 'wood' : (!G.lv && (G.snowCov || 0) > .3) ? 'snow' : tt === DT.T.GRASS ? 'grass' : 'hard', run: gait !== 'walk', vol: gait === 'walk' ? .45 : .8 });
+        SFX.play('step', { surface: tt === DT.T.FLOOR || tt === DT.T.DOOR ? 'wood' : (!G.lv && (G.snowCov || 0) > .3) ? 'snow' : tt === DT.T.GRASS ? 'grass' : 'hard', run: gait !== 'walk', vol: (gait === 'walk' ? .45 : .8) * (p.crouch ? .5 : 1) });
       }
       const ak = Math.floor(p.y + my * .6) * M.W + Math.floor(p.x + mx * .6), ao = M.opAt[ak];
       if (ao && ao.type === 'door') { const sd = G.ds[ak]; if (!sd.o && !sd.br && !sd.b.length && !G.actions.some(a => a.kind === 'door')) { G.nearOp = { t: 'op', o: ao }; doAlt('doorOpen'); } }
@@ -3012,13 +3079,13 @@
     p.atkT -= dt; p.cd -= dt;
     tickReload(dt);
     p.noiseT -= dt;
-    const nr = moving ? ({ walk: 1, jog: 3, sprint: 6.5 })[gait] * (p.crouch ? .3 : 1) : 0;
+    const nr = moving ? ({ walk: 1, jog: 3, sprint: 6.5 })[gait] * (p.crouch ? .5 : 1) : 0; // 웅크리면 소리 절반
     p.noiseR = Math.max(nr, p.noiseR - dt * 6);
     if (moving && p.noiseT <= 0) { p.noiseT = running ? .4 : .6; noise(p.x, p.y, nr, false); }
-    if (running) p.endu -= 6 * dt; else p.endu += (gait === 'jog' ? 4 : moving ? 8 : 12) * dt * ((p.wounds || []).some(w => w.p === 'torso') ? .75 : 1); // 질주 약 17초 · 서 있으면 약 8초에 회복
+    if (running) p.endu -= 6 * dt * (p.crouch ? 1.4 : 1); else p.endu += (gait === 'jog' ? 4 : moving ? 8 : 12) * dt * (G.resting ? 3 : 1) * ((p.wounds || []).some(w => w.p === 'torso') ? .75 : 1); // 질주 약 17초 · 서 있으면 약 8초에 회복
     p.endu = clamp(p.endu, 0, 100);
     G.isRunning = running;
-    if (mag > .3 && G.actions.length && !(G.actions.length === 1 && G.actions[0].kind === 'door')) cancelActions('이동해서 행동을 멈췄다');
+    if (mag > .3 && G.actions.length && !G.actions.every(a => a.kind === 'door' || a.move)) cancelActions('이동해서 행동을 멈췄다'); // 무기 바꾸기·들기는 걸으면서도 됨
     if (!G.sleeping) updateActions(dt);
     if (input.attackHeld || keys.space) playerAttack();
 
@@ -3040,7 +3107,7 @@
     p.hp = Math.min(100, p.hp);
     if (p.hp <= 0) return die();
 
-    G.zoneT -= dt; if (G.zoneT <= 0) { G.zoneT = .5; if (!G.lv) { updateZombieZone(); updateTownNow(); } }
+    G.zoneT -= dt; if (G.zoneT <= 0) { G.zoneT = .5; if (G.resting && G.zombies.some(z => !z.dead && z.state === 'chase' && Math.hypot(z.x - p.x, z.y - p.y) < 12)) stopRest('좀비가 다가온다!'); if (!G.lv) { updateZombieZone(); updateTownNow(); } }
     updateFollowers(dt);
     G.fdA = (G.fdA || 0) + dt; if (G.fdA >= 1) { G.fdA = 0; driftFloors(); }
     updateZombies(dt);
@@ -3084,10 +3151,10 @@
     G.rain += clamp(G.rainTarget - G.rain, -1, 1) * Math.min(1, dm * .02);
     if (G.rain > .65 && !G.sleeping) { G.thunderT -= dt; if (G.thunderT <= 0) { G.thunderT = 25 + rand() * 60; G.flashT = .45; const dl = .6 + rand() * 2.2; setTimeout(() => { SFX.play('thunder', { vol: 1 - dl / 4 }); shake(.35 * (1 - dl / 4)); }, dl * 1000); } }
     { let fd = 99; if (!G.lv) for (const b of G.placed) if (b.type === 'campfire') fd = Math.min(fd, Math.hypot(b.x + .5 - p.x, b.y + .5 - p.y));
-      const run = G.gait === 'sprint' || (G.gait === 'jog' && p.endu < 30);
-      L.breath = clamp((L.breath || 0) + (run ? dt * .5 : -dt * .25), 0, 1) * (p.inCar != null ? 0 : 1);
+      const tb = p.inCar == null && p.endu < 20 ? clamp(1.15 - p.endu / 20, .3, 1) : 0; // 지구력을 다 썼을 때만 헐떡임
+      L.breath = (L.breath || 0) + (tb - (L.breath || 0)) * Math.min(1, dt * (tb > (L.breath || 0) ? 1.5 : .6));
       SFX.update(dt, { rain: G.rain, x: p.x, y: p.y, night: G.night, hp: p.hp, dead: G.dead, sleeping: G.sleeping, indoor: ptile === DT.T.FLOOR,
-        snowing: !!L.snowing, fire: clamp(1 - fd / 7, 0, 1), breath: L.breath * clamp(1.2 - p.endu / 100, .3, 1) }); }
+        snowing: !!L.snowing, fire: clamp(1 - fd / 7, 0, 1), breath: L.breath }); }
     G.saveT += dt;
     if (G.saveT > 30) { G.saveT = 0; save(false); }
   }
@@ -3099,7 +3166,7 @@
     if (!G.paused) updateFx(dt);
     updateCond(dt);
     { const tz = (p.inCar != null && !G.lv) ? .72 : 1; L.dz = (L.dz || 1) + (tz - (L.dz || 1)) * Math.min(1, dt * 2.5); if (Math.abs(L.dz - tz) < .004) L.dz = tz; }
-    { const tc = p.crouch && p.inCar == null ? 1.25 : 1; L.cz = (L.cz || 1) + (tc - (L.cz || 1)) * Math.min(1, dt * 4); if (Math.abs(L.cz - tc) < .003) L.cz = tc; } // 웅크리면 카메라만 25% 확대 (캐릭터 크기는 그대로) // 운전하면 멀리 보이게 (목표에 닿으면 멈춤 → 다시 그리지 않음)
+    { const tc = 1.25 * (p.crouch && p.inCar == null ? 1.25 : 1); L.cz = (L.cz || 1) + (tc - (L.cz || 1)) * Math.min(1, dt * 4); if (Math.abs(L.cz - tc) < .003) L.cz = tc; } // 기본 카메라 = 예전 웅크린 거리, 웅크리면 25% 더 확대 (캐릭터 크기는 그대로) // 운전하면 멀리 보이게 (목표에 닿으면 멈춤 → 다시 그리지 않음)
     ZOOM = (VW > VH ? VH / 9 : Math.min(VW, VH) / 12.5) * (OPTS.zoom || 1) * L.dz * (L.cz || 1);
     const tr = G.trauma || 0, s2 = tr * tr * 16;
     const ox = (s2 ? s2 * (Math.sin(clockT * 47) * .6 + Math.sin(clockT * 83 + 1.3) * .4) : 0) + (G.kx || 0);
@@ -3181,7 +3248,9 @@
       const vis = Math.abs(z.x - p.x) < VW / 2 / ZOOM + 2 && Math.abs(z.y - p.y) < VH / 2 / ZOOM + 3 && inVision(z.x, z.y);
       if (vis !== z.vis) { z.vis = vis; if (vis) L.zombies.appendChild(z.g); else z.g.remove(); }
       if (vis) {
-        z.g.setAttribute('transform', `translate(${z.x.toFixed(3)} ${z.y.toFixed(3)}) rotate(${(z.face * 180 / Math.PI + (z.down > 0 ? 75 : 0)).toFixed(1)})`);
+        { const td = z.down > 0 ? 75 : 0; z.dr = (z.dr || 0) + (td - (z.dr || 0)) * Math.min(1, dt * (td ? 9 : 5)); if (Math.abs(z.dr - td) < .5) z.dr = td; } // 쓰러질 때 부드럽게 기울기
+        const lg = z.lunge > 0 ? Math.sin(z.lunge * Math.PI) * .22 : 0, lx = z.x + Math.cos(z.face) * lg, ly = z.y + Math.sin(z.face) * lg; // 공격할 때 앞으로 달려듦
+        z.g.setAttribute('transform', `translate(${lx.toFixed(3)} ${ly.toFixed(3)}) rotate(${(z.face * 180 / Math.PI + z.dr).toFixed(1)})`);
         if ((z.down > 0) !== !!z._dn) { z._dn = z.down > 0; if (!z.kd) z.kd = el('circle', { r: .44, fill: 'none', stroke: '#e9e3d2', 'stroke-width': .04, 'stroke-dasharray': '.12 .1', opacity: .55 }, z.g); z.kd.style.display = z._dn ? '' : 'none'; } // 쓰러짐 표시 (크기는 그대로)
         // 비틀거리며 걷기 (2프레임에 한 번 갱신 — 성능)
         const mv = (z.state === 'chase' ? 1.6 : (z.path ? 1 : .35)) * (trait(z).spd || 1); // 러너는 다리도 빨리 움직임
@@ -3247,8 +3316,8 @@
       if (d < Math.min(nd, 1.3) && losClear(p.x, p.y, c.x, c.y)) { nd = d; near = CORPSE + c.id; }
     }
     for (const b of G.placed) {
-      if (b.type !== 'furn' || !FURN_CONT[b.kind]) continue;
-      const d = Math.hypot(b.x + .5 - p.x, b.y + .5 - p.y);
+      if (!((b.type === 'furn' && FURN_CONT[b.kind]) || (b.type === 'pile' && b.items && b.items.length))) continue;
+      const d = Math.hypot(b.x + .5 - p.x, b.y + .5 - p.y) + (b.type === 'pile' ? .15 : 0);
       if (d < nd) { nd = d; near = PLACED + b.id; }
     }
     if (G.vehicles && !G.lv && G.p.inCar == null) for (const v of G.vehicles) { // 자동차 트렁크 (뒤쪽)
@@ -3281,7 +3350,7 @@
     $('joyRing').style.strokeDashoffset = (RING_C * (1 - p.endu / 100)).toFixed(1);
     const gk = G.gait || 'idle';
     const gk2 = gk + (p.crouch ? 'c' : '');
-    if (L._gk !== gk2) { L._gk = gk2; const jw = $('joy'); jw.dataset.g = gk; $('gaitLbl').textContent = p.crouch ? (gk === 'idle' ? '웅크림' : '살금살금') : ({ idle: '', walk: '걷기', jog: '달리기', sprint: '질주' })[gk]; $('btnCrouch').classList.toggle('on', !!p.crouch); }
+    if (L._gk !== gk2) { L._gk = gk2; const jw = $('joy'); jw.dataset.g = gk; $('gaitLbl').textContent = p.crouch ? ({ idle: '웅크림', walk: '살금살금', jog: '웅크려 뛰기', sprint: '웅크려 질주' })[gk] : ({ idle: '', walk: '걷기', jog: '달리기', sprint: '질주' })[gk]; $('btnCrouch').classList.toggle('on', !!p.crouch); }
     $('joy').classList.toggle('tired', p.endu < 20);
 
     G.hudT -= dt;
@@ -3412,7 +3481,7 @@
     if (p.energy < 25) md.push(['moon', '피곤', p.energy < 8]);
     if (p.endu < 20) md.push(['bolt', '지침', 0]);
     if (invWeight() > capKg()) md.push(['weight', '과적', 0]);
-    const html = md.map(([ic, t, bad]) => `<b class="md${bad ? ' bad' : ''}">${ico(ic)}${t}</b>`).join('');
+    const html = md.map(([ic, t, bad]) => `<b class="md${bad ? ' bad' : ''}" data-md="${t}">${ico(ic)}${t}</b>`).join('');
     const mo = $('moodles'); if (mo._h !== html) { mo._h = html; mo.innerHTML = html; }
     const w = curWeapon();
     let wn = w.def.name;
@@ -3439,9 +3508,13 @@
     $('sheet').classList.remove('hidden'); document.body.classList.add('menuOn');
     renderSheet();
   }
+  // 가구·차 닫는 소리 (선반·시체처럼 문이 없는 건 소리 없음)
+  const CLOSE_SND = { fridge: 'close_fridge', drawer: 'close_drawer', counter: 'close_drawer', cabinet: 'close_wood', closet: 'close_wood', kitchen: 'close_wood',
+    locker: 'close_metal', gunlocker: 'close_metal', firegear: 'close_metal', safe: 'close_safe', crate: 'close_lid', supply: 'close_lid', luggage: 'ui_back', car: 'close_trunk', miltruck: 'close_trunk' };
+  const cKind = ci => isVeh(ci) ? 'car' : isPlacedC(ci) ? (placedOf(ci) || {}).kind : isCorpse(ci) ? 'corpse' : (M.containers[ci] || {}).kind;
   function closeSheet() {
     G.eqSlot = null;
-    if (!$('sheet').classList.contains('hidden')) SFX.play('ui_back'); // 창 닫기 = 지퍼 닫는 소리
+    if (!$('sheet').classList.contains('hidden')) { if (G.openC < 0) SFX.play('ui_back'); else { const k = CLOSE_SND[cKind(G.openC)]; if (k) SFX.play(k, { close: 1 }); } } // 가방·장비 = 지퍼 / 가구 = 가구 닫는 소리
     if (G.openC >= 0) refreshContainer(G.openC);
     G.openC = -1; G.sel = null;
     $('sheet').classList.add('hidden'); document.body.classList.remove('menuOn'); $('danger').classList.add('hidden');
@@ -3508,7 +3581,7 @@
   function contCap(ci) {
     if (isVeh(ci)) return 35;
     if (isCorpse(ci)) return 10;
-    if (isPlacedC(ci)) { const b = placedOf(ci); return (b && CONT_CAP[b.kind]) || 10; }
+    if (isPlacedC(ci)) { const b = placedOf(ci); return b && b.type === 'pile' ? 999 : (b && CONT_CAP[b.kind]) || 10; }
     const c = M.containers[ci]; return (c && CONT_CAP[c.kind]) || 10;
   }
   const contWeight = ci => cItems(ci).reduce((s, it) => s + itemW(it), 0);
@@ -3638,7 +3711,7 @@
     }
     if (filt !== 'all' && !byCat[filt] && inv.length) h += `<div class="empty">이 종류는 없다</div>`;
     h += `</div>`;
-    if (!loot) h += `<div class="acts"><button class="abtn w" data-act="sleep">${ico('moon')}잠자기</button><button class="abtn" data-act="save">${ico('save')}저장</button></div>`;
+    if (!loot) h += `<div class="acts"><button class="abtn w" data-act="sleep">${G.p.energy >= 80 ? ico('bench') + '휴식' : ico('moon') + '잠자기'}</button><button class="abtn" data-act="save">${ico('save')}저장</button></div>`;
     return loot ? `<div class="lcol">${h}</div><div class="lcol">${hc}</div>` : h; // 왼쪽: 내 가방 · 오른쪽: 보관함
   }
   // 장비: 캐릭터 양옆에 8칸 + 합계 + 입을 수 있는 것
@@ -3859,7 +3932,9 @@ ${nx ? `<div class="nx"><b>LV.${sk.lv + 1} 되면</b>${nx.map(([a, b]) => `${a} 
     const takeOne = (it, c) => queueAction({ uid: it.uid, sfx: 'loot', label: ITEMS[it.id].name + ' 챙기는 중', icon: ITEMS[it.id].icon,
       dur: .35 + ITEMS[it.id].w * (it.n || 1) * .4,
       valid: () => G.openC === c && cItems(c).some(x => x.uid === it.uid),
-      done: () => { const arr = cItems(c), i = arr.findIndex(x => x.uid === it.uid); if (i >= 0) { stackAdd(arr.splice(i, 1)[0]); wtWarn(); } } });
+      done: () => { const arr = cItems(c), i = arr.findIndex(x => x.uid === it.uid); if (i >= 0) { stackAdd(arr.splice(i, 1)[0]); wtWarn(); }
+        const pb = isPlacedC(c) && placedOf(c); if (pb && pb.type === 'pile') { if (!arr.length) setTimeout(() => removePlaced(pb), 300); else drawPile(pb); }
+        if (!arr.length) setTimeout(() => { if (G.openC === c && !cItems(c).length && !G.actions.length) closeSheet(); }, 280); } }); // 다 챙기면 자동으로 닫힘
     if (act === 'cancel') return cancelActions('행동 취소');
     if (act === 'desel') { G.sel = null; return renderSheet(); }
     if (act.startsWith('filt-')) { G.filt = act.slice(5); try { localStorage.setItem('deadtown_filt', G.filt); } catch (e) {} return renderSheet(); }
@@ -3892,7 +3967,7 @@ ${nx ? `<div class="nx"><b>LV.${sk.lv + 1} 되면</b>${nx.map(([a, b]) => `${a} 
     if (act === 'unload') { const it = selIt(); if (it && !busyUid(it.uid)) unloadGun(it); return renderSheet(); }
     if (act === 'swapw') {
       if (p.equip2 == null) return;
-      queueAction({ sfx: 'equip', label: '무기 바꾸는 중', icon: 'swap', dur: .6,
+      queueAction({ move: true, sfx: 'equip', label: '무기 바꾸는 중', icon: 'swap', dur: .6,
         done: () => { cancelReload(); const a = p.equip; p.equip = p.equip2; p.equip2 = a; updateWeaponLook(); const w = curWeapon(); toast((w.item ? ITEMS[w.item.id].name : '맨손') + ' 장착'); } });
       return;
     }
@@ -3953,7 +4028,7 @@ ${nx ? `<div class="nx"><b>LV.${sk.lv + 1} 되면</b>${nx.map(([a, b]) => `${a} 
     } else if (act === 'equip') {
       const it = selIt(); if (!it || busyUid(it.uid)) return;
       const on = p.equip !== it.uid, d = ITEMS[it.id];
-      queueAction({ uid: it.uid, sfx: 'equip', label: d.name + (on ? ' 드는 중' : ' 내려놓는 중'), icon: d.icon, dur: on ? (d.type === 'gun' ? 1 : .6) : .3,
+      queueAction({ uid: it.uid, move: true, sfx: 'equip', label: d.name + (on ? ' 드는 중' : ' 내려놓는 중'), icon: d.icon, dur: on ? (d.type === 'gun' ? 1 : .6) : .3,
         valid: () => p.inv.includes(it),
         done: () => { if (on && p.equip2 === it.uid) p.equip2 = p.equip; p.equip = on ? it.uid : null; updateWeaponLook(); if (on) toast(d.name + ' 장착'); } });
     } else if (act === 'drop') {
@@ -3972,12 +4047,17 @@ ${nx ? `<div class="nx"><b>LV.${sk.lv + 1} 되면</b>${nx.map(([a, b]) => `${a} 
         done: () => {
           if (qty && qty < it.n) {
             it.n -= qty;
-            if (c >= 0) { const part = { uid: G.uid++, id: it.id, n: qty }; const same = cItems(c).find(x => x.id === it.id); if (same) same.n += qty; else cItems(c).push(part); }
+            const part = { uid: G.uid++, id: it.id, n: qty };
+            if (c >= 0) { const same = cItems(c).find(x => x.id === it.id); if (same) same.n += qty; else cItems(c).push(part); }
+            else dropToGround(part);
             return;
           }
           p.inv.splice(p.inv.indexOf(it), 1);
           if (p.equip === it.uid) { p.equip = null; updateWeaponLook(); }
+          if (p.equip2 === it.uid) p.equip2 = null;
           if (c >= 0) { const same = d.stack && cItems(c).find(x => x.id === it.id); if (same) same.n += it.n; else cItems(c).push(it); }
+          else dropToGround(it); // 버린 물건은 발밑에 남음 (다시 주울 수 있음)
+          { const pb = c >= 0 && isPlacedC(c) && placedOf(c); if (pb && pb.type === 'pile') drawPile(pb); }
           if (G.sel && G.sel.uid === it.uid) G.sel = null;
         } });
     } else if (act === 'sleep') {
@@ -4171,8 +4251,9 @@ ${nx ? `<div class="nx"><b>LV.${sk.lv + 1} 되면</b>${nx.map(([a, b]) => `${a} 
     G.pid = Math.max(G.pid || 0, (b.id || 0) + 1);
     if (b.id == null) b.id = G.pid++;
     G.placed.push(b);
-    M.moveBlock[b.y * M.W + b.x] = 1;
+    if (b.type !== 'pile') M.moveBlock[b.y * M.W + b.x] = 1; // 바닥에 둔 물건 더미는 지나갈 수 있음
     b.g = el('g', { transform: `translate(${b.x} ${b.y})` }, L.placed);
+    if (b.type === 'pile') { drawPile(b); return; }
     if (b.type === 'campfire') {
       el('circle', { cx: .5, cy: .5, r: .38, fill: '#2a2622', stroke: '#6b6660', 'stroke-width': .1, 'stroke-dasharray': '.12 .06' }, b.g);
       el('path', { d: 'M.2 .35L.8 .65M.2 .65L.8 .35', stroke: '#4a3624', 'stroke-width': .1, 'stroke-linecap': 'round' }, b.g);
@@ -4191,10 +4272,28 @@ ${nx ? `<div class="nx"><b>LV.${sk.lv + 1} 되면</b>${nx.map(([a, b]) => `${a} 
     el('path', { d: 'M.62 .2L.82 .42M.3 .55l.18 .18', stroke: '#d9dde0', 'stroke-width': .07, 'stroke-linecap': 'round' }, b.g);
   }
   function drawRainCol(b) { if (b.wv) b.wv.setAttribute('r', (.05 + .3 * Math.min(1, (b.w || 0) / 20)).toFixed(3)); }
+  // 바닥에 버린 물건 더미: 자루 + 맨 위 물건 아이콘
+  function drawPile(b) {
+    b.g.innerHTML = '';
+    const top = (b.items || [])[0], ic = top && ITEMS[top.id] ? ITEMS[top.id].icon : 'bag';
+    el('ellipse', { cx: .5, cy: .66, rx: .34, ry: .12, fill: '#000', opacity: .35 }, b.g);
+    el('path', { d: 'M.2 .66Q.16 .34 .36 .3L.64 .3Q.84 .34 .8 .66Q.5 .76 .2 .66Z', fill: '#6b5a3e', stroke: '#1a140c', 'stroke-width': .04 }, b.g);
+    el('path', { d: 'M.4 .3L.46 .22H.54L.6 .3', fill: 'none', stroke: '#1a140c', 'stroke-width': .04 }, b.g);
+    const u = el('use', { href: '#i-' + ic, x: .33, y: .36, width: .34, height: .26 }, b.g); u.style.color = '#e9e3d2';
+    if ((b.items || []).length > 1) { el('circle', { cx: .78, cy: .28, r: .12, fill: '#c8141f', stroke: '#000', 'stroke-width': .02 }, b.g); const t = el('text', { x: .78, y: .32, 'text-anchor': 'middle', 'font-size': .14, 'font-weight': 800, fill: '#fff', 'font-family': 'sans-serif' }, b.g); t.textContent = Math.min(99, b.items.length); }
+  }
+  function dropToGround(it) {
+    const p = G.p, x = clamp(Math.floor(p.x), 1, M.W - 2), y = clamp(Math.floor(p.y), 1, M.H - 2);
+    let b = G.placed.find(q => q.type === 'pile' && Math.abs(q.x - x) + Math.abs(q.y - y) <= 1);
+    if (!b) { b = { x, y, type: 'pile', kind: 'pile', items: [] }; addPlaced(b); }
+    const same = ITEMS[it.id].stack && b.items.find(q => q.id === it.id);
+    if (same) same.n += it.n || 1; else b.items.unshift(it);
+    drawPile(b);
+  }
   function removePlaced(b) {
     const i = G.placed.indexOf(b); if (i < 0) return;
     G.placed.splice(i, 1);
-    M.moveBlock[b.y * M.W + b.x] = 0;
+    if (b.type !== 'pile') M.moveBlock[b.y * M.W + b.x] = 0;
     if (G.nearC === PLACED + b.id) G.nearC = -1;
     if (G.openC === PLACED + b.id) closeSheet();
     b.g.remove(); if (b.glow) b.glow.remove();
@@ -4230,6 +4329,7 @@ ${nx ? `<div class="nx"><b>LV.${sk.lv + 1} 되면</b>${nx.map(([a, b]) => `${a} 
       if (d < fd) { fd = d; fb = { t: 'decor', i, kind: q.kind }; }
     }
     for (const b of G.placed) {
+      if (b.type === 'pile') continue;
       const d = Math.hypot(b.x + .5 - p.x, b.y + .5 - p.y);
       if (d < fd) { fd = d; fb = { t: 'placed', b, kind: b.type === 'bench' ? 'bench' : b.type === 'campfire' ? 'campfire' : b.type === 'raincol' ? 'raincol' : b.kind }; }
     }
@@ -4466,9 +4566,54 @@ ${nx ? `<div class="nx"><b>LV.${sk.lv + 1} 되면</b>${nx.map(([a, b]) => `${a} 
     $('altMenu').innerHTML = opts.map(o => `<button data-alt="${o[0]}"${o[3] ? ` class="off${o[4] ? ' ' + o[4] : ''}"` : ''}>${ico(o[2])}${o[1]}</button>`).join('');
     b.classList.toggle('red', opts.length === 1 && opts[0][4] === 'red');
   }
+  // 상태 설명: [무슨 일이 생기나, 어떻게 풀리나]
+  const MD_INFO = {
+    '출혈': ['체력이 빠르게 줄어든다. 피를 흘리는 동안은 잘 수 없다.', '붕대(또는 천)를 감아 지혈한다.'],
+    '추움': ['체온이 떨어지는 중. 기력(피로)이 더 빨리 줄고 체력이 회복되지 않는다.', '옷을 더 입거나, 실내·모닥불 옆으로 간다. 젖었으면 먼저 말린다.'],
+    '저체온': ['체온이 위험하게 낮다. 체력이 계속 줄어든다.', '바로 실내·모닥불로 가서 몸을 데우고, 따뜻한 옷을 입는다.'],
+    '더움': ['몸이 뜨겁다. 목이 더 빨리 마르고 체력이 회복되지 않는다.', '옷을 벗거나 가볍게 입고, 달리기를 줄이고 물을 마신다.'],
+    '열사병': ['체온이 위험하게 높다. 체력이 계속 줄어든다.', '옷을 벗고 쉬면서 물을 마신다.'],
+    '젖음': ['옷이 젖어 보온이 떨어지고 몸이 빨리 식는다.', '실내에 있으면 천천히, 모닥불 옆이면 빨리 마른다.'],
+    '골절': ['뼈가 부러졌다. 다친 곳에 따라 걷기나 공격이 크게 약해지고, 아주 느리게 낫는다.', '부목을 대면 훨씬 빨리 낫는다 (제작: 판자 + 천).'],
+    '골절 · 부목': ['부목으로 고정한 상태. 아직 약하지만 낫는 중이다.', '시간이 지나면 낫는다. 잠을 자면 더 빨리 낫는다.'],
+    '다리 부상': ['다리를 다쳐 이동이 느려진다.', '붕대를 감고 시간이 지나면 낫는다.'],
+    '팔 부상': ['팔을 다쳐 공격이 약해진다.', '붕대를 감고 시간이 지나면 낫는다.'],
+    '메스꺼움': ['좀비에게 물려 감염됐다. 시간이 지나면 체력이 계속 줄어든다.', '치료 방법은 없다. 체력을 높게 유지해 버틴다.'],
+    '식중독': ['상한 음식이나 더러운 물 때문에 체력과 수분이 조금씩 준다.', '시간이 지나면 낫는다. 물을 충분히 마신다.'],
+    '정전': ['전기가 끊겼다. 냉장고가 멈춰 음식이 빨리 상하고, 조리대·가로등을 쓸 수 없다.', '요리는 모닥불로 한다.'],
+    '중상': ['체력이 낮다. 이동이 느려진다.', '출혈을 멈추고, 배·물을 40 넘게 채운 뒤 쉬거나 자면 회복된다.'],
+    '배고픔': ['배가 고프다. 포만이 40 아래면 체력이 회복되지 않는다.', '음식을 먹는다.'],
+    '굶주림': ['굶고 있다. 0이 되면 체력이 줄어든다.', '바로 음식을 먹는다.'],
+    '갈증': ['목이 마르다. 수분이 40 아래면 체력이 회복되지 않는다.', '물이나 음료를 마신다.'],
+    '탈수': ['탈수 상태. 0이 되면 체력이 빠르게 줄어든다.', '바로 물을 마신다.'],
+    '피곤': ['기력이 낮다. 20 아래면 이동이 느려진다.', '잠을 잔다 (침대에서 자면 더 빨리 회복).'],
+    '지침': ['지구력을 다 썼다. 질주할 수 없고, 거의 바닥이면 공격도 느려진다.', '멈춰 서서 숨을 고르거나 휴식한다.'],
+    '과적': ['들 수 있는 무게를 넘었다. 이동이 30% 느려진다.', '짐을 버리거나 큰 가방을 멘다.'],
+  };
+  function showMdInfo(t, el0) {
+    const box = $('mdInfo'), i = MD_INFO[t]; if (!i) return;
+    if (!box.classList.contains('hidden') && box._t === t) { box.classList.add('hidden'); return; }
+    box._t = t; box.innerHTML = `<b>${t}</b><p>${i[0]}</p><p class="fix">${ico('hand')}${i[1]}</p>`;
+    box.classList.remove('hidden'); SFX.play('ui_tap');
+    clearTimeout(L._mdTO); L._mdTO = setTimeout(() => box.classList.add('hidden'), 6000);
+  }
+  // 휴식: 기력이 80 이상이면 잠 대신 휴식 (시간이 3배 빨리 흐름 — 배고픔·목마름도 3배)
+  function startRest() {
+    const p = G.p;
+    if (G.zombies.some(z => !z.dead && z.state === 'chase' && Math.hypot(z.x - p.x, z.y - p.y) < 16)) return toast('좀비가 쫓아와서 쉴 수 없다');
+    cancelActions(); closeSheet();
+    G.resting = true; input.jx = input.jy = 0;
+    $('restBar').classList.remove('hidden');
+    toast('잠깐 쉰다 — 시간이 3배 빨리 흐른다', 2000);
+  }
+  function stopRest(msg) {
+    if (!G.resting) return;
+    G.resting = false; $('restBar').classList.add('hidden');
+    if (msg) toast(msg, 2000);
+  }
   function trySleep() {
     const p = G.p;
-    if (p.energy > 85) return toast('졸리지 않다');
+    if (p.energy >= 80) return startRest(); // 기력이 충분하면 잠 대신 휴식
     if (p.bleed) return toast('피를 흘리는 중에는 잘 수 없다');
     if (G.zombies.some(z => !z.dead && Math.hypot(z.x - p.x, z.y - p.y) < (z.state === 'chase' ? 16 : 7))) return toast('근처에 좀비가 있어 잘 수 없다');
     cancelActions();
@@ -5029,8 +5174,10 @@ ${nx ? `<div class="nx"><b>LV.${sk.lv + 1} 되면</b>${nx.map(([a, b]) => `${a} 
       if (jid !== null) return;
       jid = e.pointerId; [ox, oy] = local(e);
       joy.classList.add('free', 'active');
-      joy.style.left = (ox - zone.offsetLeft) + 'px';
-      joy.style.bottom = (zone.offsetTop + zone.offsetHeight - oy) + 'px';
+      // 손가락 닿은 곳 = 조이스틱 중심 (#app 기준 좌표로 계산)
+      let zx = 0, zy = 0; for (let el = zone; el && el.id !== 'app'; el = el.offsetParent) { zx += el.offsetLeft; zy += el.offsetTop; }
+      joy.style.left = (ox - zx) + 'px';
+      joy.style.setProperty('bottom', (zy + zone.offsetHeight - oy) + 'px', 'important'); // CSS의 bottom !important보다 우선
       try { zone.setPointerCapture(jid); } catch (err) {}
       e.preventDefault();
     });
@@ -5047,7 +5194,7 @@ ${nx ? `<div class="nx"><b>LV.${sk.lv + 1} 되면</b>${nx.map(([a, b]) => `${a} 
       if (e.pointerId !== jid) return;
       jid = null; input.jx = input.jy = 0;
       knob.style.transform = '';
-      joy.classList.remove('free', 'active'); joy.style.left = ''; joy.style.bottom = '';
+      joy.classList.remove('free', 'active'); joy.style.left = ''; joy.style.removeProperty('bottom');
     };
     zone.addEventListener('pointerup', end);
     zone.addEventListener('pointercancel', end);
@@ -5116,7 +5263,7 @@ ${nx ? `<div class="nx"><b>LV.${sk.lv + 1} 되면</b>${nx.map(([a, b]) => `${a} 
       const sv = $('bigmapSvg'); let d0 = null;
       const toMap = (cx, cy) => { const pt = sv.createSVGPoint(); pt.x = cx; pt.y = cy; return pt.matrixTransform(sv.getScreenCTM().inverse()); };
       sv.addEventListener('pointerdown', e => { if (!L.bv) return; d0 = { x: e.clientX, y: e.clientY, v: Object.assign({}, L.bv), moved: false, id: e.pointerId }; try { sv.setPointerCapture(e.pointerId); } catch (err) {} });
-      sv.addEventListener('pointermove', e => { if (!d0 || e.pointerId !== d0.id) return; const dx = e.clientX - d0.x, dy = e.clientY - d0.y; if (!d0.moved && Math.hypot(dx, dy) < 7) return; d0.moved = true; const k = d0.v.size / sv.getBoundingClientRect().width; setBigView(d0.v.cx - dx * k, d0.v.cy - dy * k, d0.v.size); });
+      sv.addEventListener('pointermove', e => { if (!d0 || e.pointerId !== d0.id) return; const rot = document.documentElement.classList.contains('rot'), cdx = e.clientX - d0.x, cdy = e.clientY - d0.y, dx = rot ? cdy : cdx, dy = rot ? -cdx : cdy; if (!d0.moved && Math.hypot(dx, dy) < 12) return; d0.moved = true; const rc = sv.getBoundingClientRect(), k = d0.v.size / (rot ? rc.height : rc.width); setBigView(d0.v.cx - dx * k, d0.v.cy - dy * k, d0.v.size); }); // 화면을 돌려 쓰는 경우에도 끄는 방향 그대로 이동
       sv.addEventListener('pointerup', e => {
         if (!d0) return; const moved = d0.moved; d0 = null; if (moved || !L.mkMode || M.level) return;
         const q = toMap(e.clientX, e.clientY); G.marks = G.marks || [];
@@ -5132,6 +5279,9 @@ ${nx ? `<div class="nx"><b>LV.${sk.lv + 1} 되면</b>${nx.map(([a, b]) => `${a} 
     }
     $('bigmap').addEventListener('click', e => { if (e.target.id === 'bigmap') { $('bigmap').classList.add('hidden'); resumeIfFree(); } });
     $('wakeBtn').addEventListener('click', () => wake());
+    $('restBar').addEventListener('click', () => stopRest('휴식을 멈췄다'));
+    $('moodles').addEventListener('click', e => { const m = e.target.closest('.md'); if (m) showMdInfo(m.dataset.md, m); });
+    $('mdInfo').addEventListener('click', () => $('mdInfo').classList.add('hidden'));
     $('menuBtn').addEventListener('click', () => {
       if (!G || !G.running) return;
       G.paused = true;
@@ -5221,7 +5371,7 @@ ${nx ? `<div class="nx"><b>LV.${sk.lv + 1} 되면</b>${nx.map(([a, b]) => `${a} 
       updKeys();
     });
     addEventListener('keyup', e => { if (kmap[e.code]) keys[kmap[e.code]] = false; updKeys(); });
-    const releaseAll = () => { for (const k in keys) keys[k] = false; updKeys(); input.attackHeld = false; input.jx = input.jy = 0; jid = null; knob.style.transform = ''; joy.classList.remove('free', 'active'); joy.style.left = ''; joy.style.bottom = ''; };
+    const releaseAll = () => { for (const k in keys) keys[k] = false; updKeys(); input.attackHeld = false; input.jx = input.jy = 0; jid = null; knob.style.transform = ''; joy.classList.remove('free', 'active'); joy.style.left = ''; joy.style.removeProperty('bottom'); };
     L.releaseAll = releaseAll;
     addEventListener('blur', releaseAll);
     document.addEventListener('visibilitychange', () => { if (document.hidden) releaseAll(); });
