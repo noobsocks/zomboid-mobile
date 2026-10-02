@@ -2774,12 +2774,14 @@
     if (navigator.vibrate) try { navigator.vibrate(60); } catch (e) {}
   }
   let toastTO = 0;
-  // 알림 소리 구분: 위험 / 안 됨 / 해냄 / 그 밖의 알림
+  // 알림 소리 구분: 위험(소리 없음) / 레벨업(소리 없음 — levelup 따로 재생) / 장착(equip) / 안 됨 / 해냄 / 그 밖의 알림
+  const TOAST_LV = /^▲ .+ Lv\d+/;
   const TOAST_WARN = /좀비|물렸|습격|골절|피를|출혈|위험|비명|헬기|밤이 온다|망가|부서|쓰러|감염|다쳤|충돌|쾅|단수|전기가 끊|몰려/;
   const TOAST_DENY = /없다|필요하다|수 없|부족|못 |못한|안 된|막혀|잠겨|가득|졸리지|먼저/;
   const TOAST_OK = /했다|완료|만들었|장착|챙겼|올랐|레벨|채웠|놓았|피웠|고쳤|설치|찾았|열렸|뺐다/;
   function toast(msg, ms) {
-    if (msg) SFX.play(TOAST_WARN.test(msg) ? 'toast_warn' : TOAST_DENY.test(msg) ? 'toast_deny' : TOAST_OK.test(msg) ? 'toast_ok' : 'toast');
+    const snd = !msg || TOAST_LV.test(msg) || TOAST_WARN.test(msg) ? null : /장착/.test(msg) ? 'equip' : TOAST_DENY.test(msg) ? 'toast_deny' : TOAST_OK.test(msg) ? 'toast_ok' : 'toast';
+    if (snd) SFX.play(snd);
     const t = $('toast'); t.textContent = msg; t.classList.add('on');
     clearTimeout(toastTO); toastTO = setTimeout(() => t.classList.remove('on'), ms || 1800);
   }

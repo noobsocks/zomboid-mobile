@@ -135,7 +135,6 @@
   /* ---------- 소리 목록 ---------- */
   const SND = {
     toast_ok(d) { osc(d, { f: 880, dur: .08, g: .08, type: 'triangle' }); osc(d, { t: .08, f: 1320, dur: .12, g: .08, type: 'triangle' }); }, // 해냄
-    toast_warn(d) { osc(d, { f: 520, dur: .12, g: .12, type: 'square', lp: 1800 }); osc(d, { t: .16, f: 420, dur: .16, g: .12, type: 'square', lp: 1800 }); }, // 위험
     toast_deny(d) { osc(d, { f: 180, f2: 150, dur: .14, g: .1, type: 'sawtooth', lp: 900 }); }, // 안 됨
     zombie_step(d, o) { // 발을 질질 끄는 걸음
       const r = o.rate || 1, wood = o.w === 'wood';
@@ -293,7 +292,7 @@
     fuel: 'drink', map: 'search', pen: 'ui_tap', radio: 'equip', land: 'thump', bone: 'hitBlunt', zombie_bite: 'bite', board_break: 'boardBreak', weapon_break: 'breakw', car_door: 'carDoor',
     fire_up: 'fireup', engine_start: 'carDoor', close_fridge: 'door', close_drawer: 'door', close_wood: 'door', close_metal: 'door', close_safe: 'door', close_lid: 'door', close_trunk: 'carDoor', crash: 'hitBlunt', crash_low: 'hitBlunt', car_hit: 'hitBlunt', gun_pistol: 'gun', gun_revolver: 'gun', gun_shotgun: 'gun', gun_rifle: 'gun' };
   // 소리별 음량 맞춤 (파일끼리 크기 차이 보정)
-  const GAIN = { zombie_step: .6, zombie_run: .7, zombie_step_snow: .6, step_floor: .55, step_road: .55, step_grass: .6, step_snow: .6, step_stairs: .6, ui_tap: .45, bag_zip: .6, ui_back: .6, toast: .35, flesh: .55, groan: .55, growl: .7, zombie_hurt: .75,
+  const GAIN = { close_metal: .6, close_fridge: .8, close_trunk: .8, zombie_step: .6, zombie_run: .7, zombie_step_snow: .6, step_floor: .55, step_road: .55, step_grass: .6, step_snow: .6, step_stairs: .6, ui_tap: .45, bag_zip: .6, ui_back: .6, toast: .35, flesh: .55, groan: .55, growl: .7, zombie_hurt: .75,
     eat: .7, drink: .7, tap: .6, search: .7, loot: .7, heart: .8, breath_run: .55, birds: .3, crickets: .3, drip: .35, blizzard: .6, fire_loop: .55, engine: .5, heli: .9, nightfall: .6,
     swing: .7, swing_heavy: .8, kill: .9, levelup: .6, radio: .5, map: .7, pen: .6, equip: .8, wear: .8, hammer: .8, sizzle: .6, boil: .6 };
   const F = { list: null, buf: {}, loading: false, base: 'sfx/', lastIx: {} };
@@ -369,7 +368,7 @@
   }
 
   // 같은 소리가 한꺼번에 몰리지 않게 (좀비 떼 신음 등) — 최소 간격(초)
-  const GAP = { toast: 1.2, toast_ok: 1.2, toast_warn: 1.2, toast_deny: .6, step: .12, flesh: .05, hit: .05, thump: .08, groan: .45, scream: .25, growl: .15, kill: .06, hitBlunt: .05, hitBlade: .05, hammer: .1, ui_tap: .03, zombie_hurt: .12 };
+  const GAP = { toast: 1.2, toast_ok: 1.2, toast_deny: .6, step: .12, flesh: .05, hit: .05, thump: .08, groan: .45, scream: .25, growl: .15, kill: .06, hitBlunt: .05, hitBlade: .05, hammer: .1, ui_tap: .03, zombie_hurt: .12 };
   const last = {};
   function play(name, o) {
     if (!S.ready || !S.on) return;
